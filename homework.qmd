@@ -11,18 +11,21 @@ The syllabus states it plainly: **no individual or group assignments are require
 
 Each set goes live after the lecture it belongs to. A set is small on purpose — 30 to 45 minutes, one dataset, a handful of questions. Solutions are posted one week later.
 
-Work in R unless a set says otherwise. Bring what breaks to [office hours](office-hours.qmd) — a broken script is a better question than a vague one.
+Work in R unless a set says otherwise — see [Setup](setup.qmd) if your machine is not ready. Bring what breaks to [office hours](office-hours.qmd) — a broken script is a better question than a vague one.
 
 ## Module 1 · Prof. Arbia
 
 | Set | After lecture | Topic | Exercises | Solutions |
 |---|---|---|---|---|
-| 1 | 2 Nov | Hypothesis testing, CIs, OLS refresher | — | — |
-| 2 | 3 Nov | Bias–variance, cross-validation | — | — |
-| 3 | 9 Nov | Multiple and nonlinear regression | — | — |
-| 4 | 13 Nov | GLMs: logit, Poisson, survival | — | — |
-| 5 | 16 Nov | Ridge, LASSO, Elastic Net | — | — |
-| 6 | 17 Nov | ARIMA and forecasting | — | — |
+| 1 | 14 Sep | Hypothesis testing and confidence intervals | — | — |
+| 2 | 18 Sep | OLS, prediction, bias–variance, cross-validation | — | — |
+| 3 | 25 Sep | Multiple regression | — | — |
+| 4 | 29 Sep | Nonlinear regression | — | — |
+| 5 | 2 Oct | GLMs: logit and Poisson | — | — |
+| 6 | 5 Oct | Survival models | — | — |
+| 7 | 9 Oct | Ridge, LASSO, Elastic Net | — | — |
+| 8 | 16 Oct | Time series components and smoothing | — | — |
+| 9 | 23 Oct | AR and ARIMA | — | — |
 
 : {tbl-colwidths="[6,14,44,18,18]"}
 
@@ -30,12 +33,15 @@ Work in R unless a set says otherwise. Bring what breaks to [office hours](offic
 
 | Set | After lecture | Topic | Exercises | Solutions |
 |---|---|---|---|---|
-| 7 | 23 Nov | Clustering and segmentation | — | — |
-| 8 | 27 Nov | PCA and correspondence analysis | — | — |
-| 9 | 30 Nov | Trees, random forests, boosting | — | — |
-| 10 | 4 Dec | Neural networks | — | — |
-| 11 | 9 Dec | Interpretability | — | — |
-| 12 | 11 Dec | Dashboards and communication | — | — |
+| 10 | 3 Nov | k-means and customer segmentation | — | — |
+| 11 | 9 Nov | Hierarchical clustering | — | — |
+| 12 | 16 Nov | Principal components | — | — |
+| 13 | 17 Nov | Correspondence analysis | — | — |
+| 14 | 23 Nov | Decision trees | — | — |
+| 15 | 27 Nov | Random forests and gradient boosting | — | — |
+| 16 | 30 Nov | Neural networks | — | — |
+| 17 | 9 Dec | Interpretability | — | — |
+| 18 | 11 Dec | Dashboards and communication | — | — |
 
 : {tbl-colwidths="[6,14,44,18,18]"}
 

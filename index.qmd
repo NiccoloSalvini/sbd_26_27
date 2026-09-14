@@ -10,24 +10,27 @@ Prof. **Giuseppe Arbia** · Prof. **Niccolò Salvini**
 :::
 
 ::: {.facts}
-<div><span class="k">Lectures</span><span class="v">Mon 17:00–19:00 · room 202</span></div>
-<div><span class="k">Lab / long session</span><span class="v">Tue–Fri mornings · room 204</span></div>
+<div><span class="k">Module 1 · Arbia</span><span class="v">14 Sep – 23 Oct · room 204</span></div>
+<div><span class="k">Module 2 · Salvini</span><span class="v">2 Nov – 11 Dec · rooms 202 / 204</span></div>
 <div><span class="k">Office hours</span><span class="v">[Book a slot](office-hours.qmd)</span></div>
-<div><span class="k">Slides & readings</span><span class="v">[Blackboard]({{< var blackboard-url >}})</span></div>
+<div><span class="k">Software</span><span class="v">[Setup guide](setup.qmd)</span></div>
 :::
 
 Everything you need for this course is on this page. Each lecture gets a row: slides, code and readings appear there as we go.
 
-<h2 class="module">Statistical foundations, advanced regression, forecasting <small>Prof. Giuseppe Arbia · weeks 1–6</small></h2>
+<h2 class="module">Module 1 — Statistical foundations, advanced regression, forecasting <small>Prof. Giuseppe Arbia · 14 September – 23 October · room 204</small></h2>
 
 | # | Date | Time · Room | Topic | Materials |
 |---|------|-------------|-------|-----------|
-| 1 | Mon 2 Nov | 17:00–19:00 · 202 | Statistical and AI foundations: hypothesis testing, confidence intervals, OLS, notions of prediction | — |
-| 2 | Tue 3 Nov | 09:00–12:00 · 204 | Machine learning principles: bias–variance tradeoff, cross-validation | — |
-| 3 | Mon 9 Nov | 17:00–19:00 · 202 | Advanced regression modelling: multiple and nonlinear regression | — |
-| 4 | Fri 13 Nov | 09:00–12:00 · 204 | GLM extensions: logit, Poisson, survival models | — |
-| 5 | Mon 16 Nov | 17:00–19:00 · 202 | Regularisation and high-dimensional methods: Ridge, LASSO, Elastic Net | — |
-| 6 | Tue 17 Nov | 10:00–13:00 · 204 | Time series and forecasting: components, smoothing, trend and seasonality, AR and ARIMA, space–time models | — |
+| 1 | Mon 14 Sep | 17:00–19:00 · 204 | Course introduction · statistical foundations: hypothesis testing, confidence intervals | — |
+| 2 | Fri 18 Sep | 09:00–13:00 · 204 | OLS and notions of prediction · machine learning principles: bias–variance tradeoff, cross-validation | — |
+| 3 | Fri 25 Sep | 09:00–13:00 · 204 | Multiple regression | — |
+| 4 | Tue 29 Sep | 10:00–12:00 · 204 | Nonlinear regression | — |
+| 5 | Fri 2 Oct | 09:00–13:00 · 204 | GLM extensions: logit and Poisson models | — |
+| 6 | Mon 5 Oct | 17:00–19:00 · 204 | Survival models | — |
+| 7 | Fri 9 Oct | 09:00–13:00 · 204 | Regularisation and high-dimensional methods: Ridge, LASSO, Elastic Net | — |
+| 8 | Fri 16 Oct | 09:00–13:00 · 204 | Time series: components, visualization, smoothing, trend and seasonality | — |
+| 9 | Fri 23 Oct | 09:00–13:00 · 204 | AR and ARIMA models · space–time modelling · business applications | — |
 
 : {tbl-colwidths="[4,12,16,48,20]"}
 
@@ -35,16 +38,22 @@ Everything you need for this course is on this page. Each lecture gets a row: sl
 **First intermediate exam** — typically November, on Module 1 content. Date published on [Blackboard]({{< var blackboard-url >}}).
 :::
 
-<h2 class="module">Unsupervised learning, machine learning, communication <small>Prof. Niccolò Salvini · weeks 7–12</small></h2>
+<h2 class="module">Module 2 — Unsupervised learning, machine learning, communication <small>Prof. Niccolò Salvini · 2 November – 11 December · rooms 202 / 204</small></h2>
 
 | # | Date | Time · Room | Topic | Materials |
 |---|------|-------------|-------|-----------|
-| 7 | Mon 23 Nov | 17:00–19:00 · 202 | Unsupervised learning I — clustering and customer segmentation, patient grouping in healthcare | — |
-| 8 | Fri 27 Nov | 10:00–13:00 · 204 | Unsupervised learning II — principal components, latent drivers of customer behaviour and brand perception | — |
-| 9 | Mon 30 Nov | 17:00–19:00 · 202 | ML for business analytics I — decision trees, random forests, gradient boosting | — |
-| 10 | Fri 4 Dec | 10:00–13:00 · 204 | ML for business analytics II — neural networks | — |
-| 11 | Wed 9 Dec | 17:00–19:00 · 202 | Model interpretability — predictive accuracy vs interpretability in managerial decision-making | — |
-| 12 | Fri 11 Dec | 10:00–13:00 · **108** | Data visualization and communication — executive dashboards, uncertainty, storytelling with data, human–AI collaboration | — |
+| 10 | Mon 2 Nov | 17:00–19:00 · 202 | Module 2 opening · software setup check · the unsupervised learning problem | [setup](setup.qmd) |
+| 11 | Tue 3 Nov | 09:00–12:00 · 204 | k-means clustering · customer segmentation | — |
+| 12 | Mon 9 Nov | 17:00–19:00 · 202 | Hierarchical clustering · hospital and patient grouping | — |
+| 13 | Fri 13 Nov | 09:00–12:00 · 204 | Lab — clustering end to end in R | — |
+| 14 | Mon 16 Nov | 17:00–19:00 · 202 | Principal components · latent drivers of customer behaviour | — |
+| 15 | Tue 17 Nov | 10:00–13:00 · 204 | Correspondence analysis · dimensions of brand perception · lab | — |
+| 16 | Mon 23 Nov | 17:00–19:00 · 202 | Decision trees | — |
+| 17 | Fri 27 Nov | 10:00–13:00 · 204 | Random forests and gradient boosting · lab | — |
+| 18 | Mon 30 Nov | 17:00–19:00 · 202 | Neural networks | — |
+| 19 | Fri 4 Dec | 10:00–13:00 · 204 | Lab — neural networks, and when not to reach for them | — |
+| 20 | Wed 9 Dec | 17:00–19:00 · 202 | Model interpretability · predictive accuracy vs interpretability in managerial decision-making | — |
+| 21 | Fri 11 Dec | 10:00–13:00 · **108** | Executive dashboards · communicating uncertainty · storytelling with data · human–AI collaboration | — |
 
 : {tbl-colwidths="[4,12,16,48,20]"}
 

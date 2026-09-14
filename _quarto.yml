@@ -25,6 +25,8 @@ website:
         text: Schedule
       - href: syllabus.qmd
         text: Syllabus
+      - href: setup.qmd
+        text: Setup
       - href: homework.qmd
         text: Practice
       - href: resources.qmd
@@ -38,6 +40,11 @@ website:
 format:
   html:
     theme: [cosmo, styles.scss]
+    include-in-header:
+      - text: |
+          <link rel="preconnect" href="https://fonts.googleapis.com">
+          <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+          <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
     toc: true
     toc-depth: 2
     anchor-sections: true

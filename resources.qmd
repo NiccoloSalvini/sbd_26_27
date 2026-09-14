@@ -18,36 +18,8 @@ Additional readings and support material: [Blackboard]({{< var blackboard-url >}
 
 ## Software
 
-You need R and RStudio. Python is used in a few labs; Excel appears in the advanced-analytics examples.
-
-::: {.panel-tabset}
-
-### R
-
-```r
-install.packages(c(
-  "tidyverse",   # data manipulation and ggplot2
-  "glmnet",      # Ridge, LASSO, Elastic Net
-  "fable",       # tidy forecasting
-  "forecast",    # ARIMA and friends
-  "factoextra",  # PCA and clustering visualisation
-  "ranger",      # random forests
-  "xgboost",     # gradient boosting
-  "ISLR2"        # datasets from the textbook
-))
-```
-
-Install [R](https://cran.r-project.org/) first, then [RStudio Desktop](https://posit.co/download/rstudio-desktop/).
-
-### Python
-
-```bash
-pip install pandas scikit-learn statsmodels pymc matplotlib seaborn
-```
-
-Any recent Python 3 works. If you have never installed Python, use [uv](https://docs.astral.sh/uv/) or the Anaconda distribution.
-
-:::
+Installing R, RStudio and Python, the RStudio settings that save you a semester of
+grief, and the full list of course packages: **[Setup](setup.qmd)**.
 
 ## Going deeper
 
