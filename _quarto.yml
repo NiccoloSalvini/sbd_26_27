@@ -1,0 +1,46 @@
+project:
+  type: website
+  output-dir: _site
+  render:
+    - "*.qmd"
+  resources:
+    - slides/
+    - materials/
+    - homework/
+
+website:
+  title: "Statistics & Big Data"
+  description: "Business Statistics and Artificial Intelligence — HEMA, Università Cattolica del Sacro Cuore, Rome. A.Y. 2026–2027."
+  favicon: images/cattolica-logo-favicon.png
+  search:
+    location: navbar
+    type: overlay
+  navbar:
+    logo: images/cattolica-logo.png
+    logo-alt: "Università Cattolica del Sacro Cuore"
+    title: "Statistics & Big Data <span class='nav-year'>26/27</span>"
+    background: primary
+    left:
+      - href: index.qmd
+        text: Schedule
+      - href: syllabus.qmd
+        text: Syllabus
+      - href: homework.qmd
+        text: Practice
+      - href: resources.qmd
+        text: Resources
+      - href: office-hours.qmd
+        text: Office hours
+  page-footer:
+    left: "HEMA · Università Cattolica del Sacro Cuore, Rome · A.Y. 2026–2027"
+    right: "Prof. Giuseppe Arbia · Prof. Niccolò Salvini"
+
+format:
+  html:
+    theme: [cosmo, styles.scss]
+    toc: true
+    toc-depth: 2
+    anchor-sections: true
+    link-external-newwindow: true
+    grid:
+      body-width: 1000px

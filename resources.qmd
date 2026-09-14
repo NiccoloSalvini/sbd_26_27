@@ -1,0 +1,74 @@
+---
+title: "Resources"
+---
+
+## Textbooks
+
+**An Introduction to Statistical Learning** — James, Witten, Hastie, Tibshirani (2021, Springer).
+The spine of the course. Chapters 3, 4, 6, 8, 10 and 12 map almost one-to-one onto our lectures.
+[Free PDF + labs →](https://www.statlearning.com/)
+
+**Data Science for Business** — Provost & Fawcett (2013, O'Reilly).
+Read this one for *why*, not for *how*. Best source on framing a business problem as a data problem, and on what a model is actually worth to a firm.
+
+**Practical Time Series Forecasting with R** — Shmueli & Polak (2024, Axelrod Schnall).
+Companion for the Module 1 forecasting block.
+
+Additional readings and support material: [Blackboard]({{< var blackboard-url >}}).
+
+## Software
+
+You need R and RStudio. Python is used in a few labs; Excel appears in the advanced-analytics examples.
+
+::: {.panel-tabset}
+
+### R
+
+```r
+install.packages(c(
+  "tidyverse",   # data manipulation and ggplot2
+  "glmnet",      # Ridge, LASSO, Elastic Net
+  "fable",       # tidy forecasting
+  "forecast",    # ARIMA and friends
+  "factoextra",  # PCA and clustering visualisation
+  "ranger",      # random forests
+  "xgboost",     # gradient boosting
+  "ISLR2"        # datasets from the textbook
+))
+```
+
+Install [R](https://cran.r-project.org/) first, then [RStudio Desktop](https://posit.co/download/rstudio-desktop/).
+
+### Python
+
+```bash
+pip install pandas scikit-learn statsmodels pymc matplotlib seaborn
+```
+
+Any recent Python 3 works. If you have never installed Python, use [uv](https://docs.astral.sh/uv/) or the Anaconda distribution.
+
+:::
+
+## Going deeper
+
+Optional. None of this is examinable — it is here for when a topic catches you.
+
+**Regularisation and high-dimensional data**
+: *Statistical Learning with Sparsity* — Hastie, Tibshirani, Wainwright. [Free PDF](https://hastie.su.domains/StatLearnSparsity/)
+
+**Forecasting**
+: *Forecasting: Principles and Practice* (3rd ed.) — Hyndman & Athanasopoulos. [Free online](https://otexts.com/fpp3/) — the reference for `fable`.
+
+**Model interpretability**
+: *Interpretable Machine Learning* — Christoph Molnar. [Free online](https://christophm.github.io/interpretable-ml-book/) — SHAP, LIME, partial dependence, done properly.
+
+**Data visualization**
+: *Fundamentals of Data Visualization* — Claus Wilke. [Free online](https://clauswilke.com/dataviz/)
+: *The Visual Display of Quantitative Information* — Tufte. Buy it on paper.
+
+**Generative AI in the analytics workflow**
+: Use it. Then check it. A model that writes `glmnet` code will also confidently write `glmnet` code that standardises the wrong matrix — the exam asks you to read code, not to have generated it.
+
+## Datasets
+
+Datasets used in the labs land in `materials/` and are linked from the [schedule](index.qmd).

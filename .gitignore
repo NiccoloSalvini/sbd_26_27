@@ -1,0 +1,10 @@
+_site/
+.quarto/
+*_files/
+.Rproj.user/
+.Rhistory
+.RData
+.DS_Store
+.netlify/
+
+/.quarto/

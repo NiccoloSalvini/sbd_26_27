@@ -1,0 +1,41 @@
+---
+title: "Office hours"
+---
+
+## How it works
+
+**During and after each lecture — 1 hour.** Both lecturers stay in the room. No booking, just show up. This is the fastest channel and the one most students should use: the material is fresh and you are already there.
+
+**Online, by appointment — any time.** Always available. Pick a slot on the booking page below; you get a video-call link back.
+
+**Working students.** Prof. Salvini covers working students for **both** modules. Book an online slot and say you are a working student in the note — evening and off-hours slots are opened on request.
+
+## Book a slot
+
+::: {.qr}
+[![](images/qr-office-hours.svg)]({{< var booking-url >}})
+
+[**Book online →**]({{< var booking-url >}})
+
+::: {.cap}
+Point your phone at the projector.
+:::
+:::
+
+If the QR does not scan, the link is <{{< var booking-url >}}>.
+
+## Before you book
+
+A question with a script attached gets answered in five minutes. A question without one takes the whole slot. Bring:
+
+- the code that fails, as a file, not a screenshot
+- the exact error message, copied
+- what you expected to happen instead
+
+For anything answerable in two lines — a date, an exam rule, where a dataset lives — check the [schedule](index.qmd) and the [syllabus](syllabus.qmd) first, then email.
+
+## Contacts
+
+Updated schedule and location are published on each lecturer's Personal Page at [docenti.unicatt.it](http://docenti.unicatt.it).
+
+Thesis assignments: consult the lecturers' Personal Pages (PPD) and [Blackboard]({{< var blackboard-url >}}).

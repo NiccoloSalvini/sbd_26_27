@@ -1,0 +1,139 @@
+/*-- scss:defaults --*/
+
+$primary:       #002f57;
+$link-color:    #125ea0;
+$body-color:    #1c2226;
+$font-family-sans-serif: "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+$headings-font-weight: 600;
+$navbar-bg: $primary;
+$toc-color: #5a6672;
+
+/*-- scss:rules --*/
+
+.nav-year {
+  font-weight: 400;
+  opacity: .6;
+  font-size: .85em;
+  letter-spacing: .04em;
+}
+
+/* ---------- hero ---------- */
+.hero {
+  border-bottom: 1px solid #e6e9ec;
+  padding-bottom: 1.4rem;
+  margin-bottom: 2rem;
+}
+.hero h1 { margin-bottom: .2rem; }
+.hero .subtitle {
+  color: #5a6672;
+  font-size: 1.05rem;
+}
+
+/* ---------- logistics strip ---------- */
+.facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: .9rem;
+  margin: 1.6rem 0 2.4rem;
+}
+.facts > div {
+  border: 1px solid #e6e9ec;
+  border-left: 3px solid $primary;
+  border-radius: 4px;
+  padding: .75rem .9rem;
+  background: #fbfcfd;
+}
+.facts .k {
+  display: block;
+  font-size: .72rem;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: #7c8794;
+  margin-bottom: .25rem;
+}
+.facts .v { font-weight: 600; }
+
+/* ---------- schedule table (the Stanford bit) ---------- */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .94rem;
+  margin-bottom: 2rem;
+}
+thead th {
+  text-align: left;
+  font-size: .72rem;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: #7c8794;
+  font-weight: 600;
+  border-bottom: 2px solid $primary !important;
+  padding: .5rem .6rem;
+  white-space: nowrap;
+}
+tbody td {
+  padding: .7rem .6rem;
+  border-bottom: 1px solid #edf0f2;
+  vertical-align: top;
+}
+tbody tr:hover { background: #f7f9fb; }
+
+/* col 1 = lecture number, col 2 = date, col 3 = time+room */
+tbody td:first-child {
+  color: #a3adb8;
+  font-variant-numeric: tabular-nums;
+  width: 2.2rem;
+}
+tbody td:nth-child(2) { white-space: nowrap; font-weight: 600; }
+tbody td:nth-child(3) { white-space: nowrap; color: #5a6672; font-variant-numeric: tabular-nums; }
+
+/* "—" placeholders read as muted, not as content */
+td:last-child { color: #b4bcc4; }
+td:last-child a { color: $link-color; }
+
+/* ---------- module heading ---------- */
+h2.module {
+  margin-top: 2.6rem;
+  font-size: 1.15rem;
+}
+h2.module small {
+  display: block;
+  font-size: .82rem;
+  font-weight: 400;
+  color: #7c8794;
+  margin-top: .15rem;
+}
+
+/* ---------- instructors ---------- */
+.people {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  margin: 1.2rem 0 2rem;
+}
+.person { width: 150px; text-align: center; font-size: .9rem; }
+.person img {
+  width: 110px; height: 110px;
+  object-fit: cover;
+  border-radius: 50%;
+  margin-bottom: .6rem;
+}
+.person .role { color: #7c8794; font-size: .8rem; }
+
+/* ---------- callout-ish note ---------- */
+.qr {
+  text-align: center;
+  border: 1px solid #e6e9ec;
+  border-radius: 6px;
+  padding: 1.4rem;
+  max-width: 340px;
+  margin: 1.5rem 0;
+}
+.qr img { width: 220px; height: 220px; }
+.qr .cap {
+  font-size: .8rem;
+  color: #7c8794;
+  margin-top: .7rem;
+}
+
+.navbar-logo { max-height: 30px; margin-right: .6rem; }

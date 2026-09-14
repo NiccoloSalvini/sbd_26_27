@@ -1,0 +1,87 @@
+---
+title: "Syllabus"
+subtitle: "Statistics and Big Data (Business Statistics and Artificial Intelligence)"
+---
+
+Catholic University of the Sacred Heart, Rome — HEMA specialistic degree<br>
+Proff. Giuseppe Arbia · Niccolò Salvini — Academic year 2026–2027
+
+## Course objectives
+
+The course provides an advanced understanding of how classical and modern business statistical methods integrate with the rapidly expanding toolkit of Artificial Intelligence. You will develop the quantitative skills needed for data-driven decision making, with particular attention to **forecasting** and **classification** problems.
+
+A distinctive feature of the course is its focus on how AI — machine learning algorithms and generative AI tools — can *complement* statistical reasoning in business applications. Emphasis is placed on interpretation, managerial intuition and strategic decision-making.
+
+## Expected learning outcomes
+
+By the end of the course you will be able to:
+
+**Knowledge and understanding** — describe the foundations of advanced statistical and predictive modelling: regularised regression, GLMs, time-series analysis, unsupervised learning, and core machine learning algorithms.
+
+**Applying knowledge and understanding** — build and evaluate advanced statistical and predictive models, employ time-series and forecasting techniques for planning decisions, and use AI and machine learning to complement classical models.
+
+**Making judgements** — compare the predictive performance of machine learning models against statistical models, and assess the trade-off between predictive accuracy and interpretability in managerial decision-making.
+
+**Communication skills** — detect and communicate uncertainty effectively to executives, through executive dashboards, storytelling with data, and the avoidance of misleading charts.
+
+**Learning skills** — develop a full AI-enhanced analytical project addressing real business problems, leveraging generative AI (e.g. ChatGPT) for data exploration, coding, simulation and reporting.
+
+## Programme
+
+### Module 1 — weeks 1–6 · Prof. Giuseppe Arbia
+
+**Statistical and AI foundations.** Review of hypothesis testing, confidence intervals, OLS and notions of prediction. Introduction to machine learning principles: bias–variance tradeoff, cross-validation.
+
+**Advanced regression modelling.** Multiple and nonlinear regression. GLM extensions: logit, Poisson, survival models. Regularisation and high-dimensional methods: Ridge, LASSO, Elastic Net.
+
+**Time series analysis and forecasting.** Time series components. Visualization. Smoothing methods. Trend and seasonality. AR and ARIMA models. Space–time modelling. Applications in business cycle analysis, stock price movements, macro-economic trends, credit scoring, consumer behaviour, and demand forecasting in health services.
+
+### Module 2 — weeks 7–12 · Prof. Niccolò Salvini
+
+**Unsupervised learning.** Classification methods: customer segmentation, hospital and patient grouping in healthcare analytics. Principal components: identifying latent drivers of customer behaviour, discovering dimensions of brand perception.
+
+**Machine learning for business analytics.** Neural networks. Decision trees, random forests, gradient boosting. Model interpretability; predictive accuracy vs interpretability in managerial decision-making.
+
+**Data visualization and communication.** Executive dashboards, uncertainty communication, storytelling with data, avoiding misleading charts, human–AI collaboration in the analytics workflow.
+
+## Teaching method
+
+Frontal lectures complemented by exercises in the computer lab using **R** (`tidyverse`, `glmnet`, `fable`, `forecast`), **Python** (`pandas`, `scikit-learn`, `statsmodels`, `PyMC`), **Excel** (advanced analytics), and the optional use of ChatGPT for workflow acceleration. Business case studies are discussed throughout both modules.
+
+**No individual or group assignments are required.** The practice material on this site is optional — see [Practice](homework.qmd).
+
+## Assessment
+
+The final exam consists of **open and closed questions** covering both theory and practice (coding part). You may be asked to provide results, the code leading to those results, or to write code that solves a given exercise. The exam takes place in the **computer lab classroom**; personal laptops are not allowed during the exam.
+
+Two **optional intermediate exams** are offered, each covering half of the course content:
+
+| | When | Content |
+|---|---|---|
+| First intermediate | typically November | Module 1 · Prof. Arbia |
+| Second intermediate | January/February | Module 2 · Prof. Salvini |
+
+Rules of engagement:
+
+- A student who sits the first intermediate may complete the assessment by taking the second intermediate **within the winter exam session**.
+- **Intermediates cannot be rejected.** Once the first intermediate is taken, if the second is failed the student must sit the full exam.
+- The final grade is the weighted average of the two modules: **50% Module 1, 50% Module 2**.
+- In line with Faculty good practices, the score split between closed (multiple-choice) and open questions is published on [Blackboard]({{< var blackboard-url >}}) ahead of each exam session, together with detailed grading criteria.
+
+## Prerequisites
+
+Introductory statistics (descriptive statistics, estimation, hypothesis testing), basic regression analysis (OLS), and familiarity with **R**.
+
+**Working students** are invited to contact Prof. Salvini for specific arrangements — he covers working students for both modules.
+
+For **thesis assignments**, consult the lecturers' Personal Pages (PPD) on [docenti.unicatt.it](http://docenti.unicatt.it) and Blackboard.
+
+## Bibliography
+
+See [Resources](resources.qmd) for links and reading notes.
+
+- James, G., Witten, D., Hastie, T., Tibshirani, R. (2021). *An Introduction to Statistical Learning*. Springer. [Free online](https://www.statlearning.com/)
+- Provost, F., Fawcett, T. (2013). *Data Science for Business: What You Need to Know About Data Mining and Data-Analytic Thinking*. O'Reilly.
+- Shmueli, G., Polak, J. (2024). *Practical Time Series Forecasting with R*. Axelrod Schnall Publishers.
+
+Additional readings and support material are made available on [Blackboard]({{< var blackboard-url >}}).

@@ -1,0 +1,51 @@
+---
+title: "Practice"
+subtitle: "Optional exercises — not graded"
+---
+
+::: {.callout-important appearance="simple"}
+The syllabus states it plainly: **no individual or group assignments are required**. Nothing on this page is graded and nothing is handed in. It exists because the exam has a coding part, and the only way that part goes well is if you have typed the code before.
+:::
+
+## How to use this page
+
+Each set goes live after the lecture it belongs to. A set is small on purpose — 30 to 45 minutes, one dataset, a handful of questions. Solutions are posted one week later.
+
+Work in R unless a set says otherwise. Bring what breaks to [office hours](office-hours.qmd) — a broken script is a better question than a vague one.
+
+## Module 1 · Prof. Arbia
+
+| Set | After lecture | Topic | Exercises | Solutions |
+|---|---|---|---|---|
+| 1 | 2 Nov | Hypothesis testing, CIs, OLS refresher | — | — |
+| 2 | 3 Nov | Bias–variance, cross-validation | — | — |
+| 3 | 9 Nov | Multiple and nonlinear regression | — | — |
+| 4 | 13 Nov | GLMs: logit, Poisson, survival | — | — |
+| 5 | 16 Nov | Ridge, LASSO, Elastic Net | — | — |
+| 6 | 17 Nov | ARIMA and forecasting | — | — |
+
+: {tbl-colwidths="[6,14,44,18,18]"}
+
+## Module 2 · Prof. Salvini
+
+| Set | After lecture | Topic | Exercises | Solutions |
+|---|---|---|---|---|
+| 7 | 23 Nov | Clustering and segmentation | — | — |
+| 8 | 27 Nov | PCA and correspondence analysis | — | — |
+| 9 | 30 Nov | Trees, random forests, boosting | — | — |
+| 10 | 4 Dec | Neural networks | — | — |
+| 11 | 9 Dec | Interpretability | — | — |
+| 12 | 11 Dec | Dashboards and communication | — | — |
+
+: {tbl-colwidths="[6,14,44,18,18]"}
+
+## Exam simulations
+
+Past intermediate exams and mock papers appear here before each session.
+
+| | Session | Paper | Solutions |
+|---|---|---|---|
+| Mock — Module 1 | before first intermediate | — | — |
+| Mock — Module 2 | before second intermediate | — | — |
+
+: {tbl-colwidths="[24,26,25,25]"}
