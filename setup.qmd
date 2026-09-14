@@ -34,77 +34,92 @@ We walk through this in class, but the room is not the place to discover that yo
 
 ## Install R {#install-r}
 
-R is maintained by an international team of developers and distributed through **CRAN**, the Comprehensive R Archive Network. R is the *engine*; RStudio, next section, is the car around it. You need both, and you install them separately.
+R is the *engine*; RStudio, next section, is the car around it. You install them separately, and you need both.
+
+The course targets **R 4.6.x or newer**. Check what you have:
+
+```r
+R.version.string
+```
 
 ::: {.panel-tabset}
 
-### macOS
+### rig — recommended
 
-1. Go to [r-project.org](https://www.r-project.org/)
+[rig](https://github.com/r-lib/rig), the R Installation Manager, installs R with one command and picks the right build for your machine. On an Apple silicon Mac it will not ask you whether you want arm64 or Intel — a question that sends half a classroom down the wrong link every year.
 
-   ![](images/setup/00_r_project_page.png)
+**macOS**
 
-2. Click **CRAN** under *Download*.
+```bash
+brew tap r-lib/rig
+brew trust r-lib/rig
+brew install --cask rig
+```
 
-3. Choose a mirror in your country — they all work, the close one is just faster.
+**Windows**
 
-   ![](images/setup/01_r_project_cran_mirror.png)
+```powershell
+winget install posit.rig
+```
 
-4. Select **Download R for macOS**.
+**Linux (Ubuntu/Debian)**
 
-   ![](images/setup/02_r_project_os_choice.png)
+```bash
+sudo curl -L https://rig.r-pkg.org/deb/rig.gpg -o /etc/apt/trusted.gpg.d/rig.gpg
+sudo sh -c 'echo "deb http://rig.r-pkg.org/deb rig main" > /etc/apt/sources.list.d/rig.list'
+sudo apt update
+sudo apt install r-rig
+```
 
-5. Pick the latest version. Check whether you need the **Apple silicon (arm64)** or the **Intel** build — Apple silicon is anything from the M1 on.
+Then, on any OS:
 
-   ![](images/setup/03_r_project_version_choice.png)
+```bash
+rig add release      # install the current R release
+rig default release  # make it the one that starts by default
+rig list             # see what you have
+```
 
-6. Open the downloaded `.pkg` and keep the suggested settings.
+When R 4.7 lands mid-semester, `rig add release` again. Old versions stay installed side by side, so nothing you wrote in October stops working in December.
 
-### Windows
+### Manual, from CRAN
 
-1. Go to [r-project.org](https://www.r-project.org/) → **CRAN** → a mirror near you.
-2. Click **Download R for Windows**, then **base**, then the download link at the top of the page.
-3. Run the installer and step through the wizard. Defaults are fine.
+If you would rather not install another tool, go to [cran.r-project.org](https://cran.r-project.org/), pick a mirror, and follow **Download R for** your system.
 
-You need administrator privileges on the machine. If you are on a locked-down work laptop, sort that out *before* the lab.
+One thing to get right, because it is the only genuinely confusing step: on macOS you must choose between the **Apple silicon (arm64)** build and the **Intel (x86_64)** build. Apple silicon is any Mac from the M1 onwards — if `uname -m` prints `arm64`, that is you. Install the wrong one and packages will fail to load with errors that look like something else entirely.
 
-### Linux
+On Windows: **base** subdirectory, then the download link at the top. You need administrator rights, so if this is a locked-down work laptop, sort that out before the lab.
 
-R ships with many distributions, but usually at a version old enough to cause trouble. Follow **Download R for Linux** on CRAN and pick your distribution — Debian, Fedora/Redhat, SUSE and Ubuntu each have their own instructions, and on Linux building from source is the normal path rather than the exotic one.
+On Linux, follow the instructions for your distribution rather than your distribution's own `r-base` package, which is usually several versions behind.
 
 :::
 
 ::: {.callout-note collapse="true"}
-## Binaries versus source — what the installer is actually doing
+## If a package install ever fails while compiling
 
-On Windows and macOS you install R from a **precompiled binary**: someone else already ran the compiler, and the installer just puts the finished files in place. On Linux it is more common to **build from source**, which compiles R on your machine.
+Most packages arrive precompiled. A few build from source, and then you need a compiler:
 
-This matters exactly once: when a package needs compilation and you have no compiler. On macOS that is fixed by installing the Xcode command line tools (`xcode-select --install`), on Windows by installing [Rtools](https://cran.r-project.org/bin/windows/Rtools/). Do that only if a package install actually fails with a compilation error.
+- macOS: `xcode-select --install`
+- Windows: [Rtools](https://cran.r-project.org/bin/windows/Rtools/), matched to your R version
+- Linux: `sudo apt install build-essential gfortran`
+
+Do this only when an install actually fails with a compilation error — not preemptively.
 :::
 
 ## Install RStudio {#install-rstudio}
 
-R by itself has no user interface worth the name. RStudio is an **IDE** — an integrated development environment — and it is where you will actually spend your time: editor, console, plots, files and environment in one window.
+R by itself has no user interface worth the name. RStudio is an **IDE** — editor, console, plots, environment and files in one window — and it is what we use in class and what the lab machines run.
 
-The company behind RStudio used to be called RStudio too; since 2023 it is **Posit**, because the product now covers Python as well. The IDE kept its name.
+Download **RStudio Desktop** (free, open source) from [posit.co/download/rstudio-desktop](https://posit.co/download/rstudio-desktop/). Take the installer for your OS and keep the default settings. From then on you open RStudio, never R directly: RStudio starts R for you.
 
-1. Go to [posit.co](https://posit.co/)
+The company behind it used to be called RStudio as well; since 2023 it is **Posit**, because the product line now covers Python too. The IDE kept its name.
 
-   ![](images/setup/01_rstudio_main_page.png)
+::: {.callout-note collapse="true"}
+## What about Positron?
 
-2. **Download RStudio** in the top right.
+Posit also ships [Positron](https://positron.posit.co/), a newer IDE built on the VS Code core with first-class R *and* Python support. It is genuinely good, and Posit maintains both.
 
-3. Choose **RStudio Desktop** — not RStudio Server.
-
-   ![](images/setup/03_rstudio_select_version.png)
-
-4. Scroll to the installer table and take the row for your OS. Different OS versions need different builds, so read the row rather than clicking the big button.
-
-   ![](images/setup/04_rstudio_select_edition.png)
-
-5. Install with the default settings.
-
-From now on you only ever open **RStudio**. It starts R for you.
+For this course, use RStudio. Every demo, every screenshot below and every lab machine is RStudio, and in an exam room you do not want to be translating menu locations. If you already live in Positron, keep it — just know that when a lecture says "the Environment pane is over there", you are on your own.
+:::
 
 ## Settings that matter {#settings-that-matter}
 
@@ -325,6 +340,8 @@ You are not expected to be fluent in both languages. The exam's coding part is i
 **Install fails with compilation errors** — you need the build tools: `xcode-select --install` on macOS, [Rtools](https://cran.r-project.org/bin/windows/Rtools/) on Windows.
 
 **`cannot open file 'data.csv'`** — a working directory problem. Open the Project, then use `here()`.
+
+**A package refuses to install: "is not available for this version of R"** — your R is too old. Check `R.version.string`; if it starts with anything below 4.6, run `rig add release` (or reinstall from CRAN). This bites people who installed R for a bachelor course three years ago and never touched it again.
 
 **It worked yesterday** — check `R.version.string` and whether you updated something. Restart R with `⌘⇧F10` / `Ctrl+Shift+F10` and run the script top to bottom in a clean session.
 
