@@ -92,6 +92,20 @@ Both routes are marked out of 30 and the pass mark is **18/30**.
   and open questions is published on [Blackboard]({{< var blackboard-url >}}) ahead of
   each exam session, together with detailed grading criteria.
 
+### Which exam you end up sitting
+
+Same rules as above, as a picture. Skipping an intermediate, scoring below 18 and
+refusing a mark all land in the same place — the full exam.
+
+```{mermaid}
+flowchart TD
+    S([Start of the course]) --> A{First intermediate<br>November}
+    A -->|18 or more, and you keep it| B{Second intermediate<br>by February}
+    A -->|anything else| F[Full exam<br>on the whole course]
+    B -->|18 or more, and you keep it| D([Done<br>50% Module 1 + 50% Module 2])
+    B -->|anything else| F
+```
+
 ### Registering
 
 | | Do you register? |
