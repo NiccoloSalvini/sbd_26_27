@@ -1,0 +1,20 @@
+{
+  "mcpServers": {
+    "blackboard": {
+      "command": "uv",
+      "args": [
+        "run",
+        "--directory",
+        "/Users/niccolo/Desktop/py_projects/mcp-blackboard-ucsc",
+        "mcp-blackboard"
+      ],
+      "env": {
+        "BB_BASE_URL": "https://blackboard.unicatt.it",
+        "BB_APP_KEY": "",
+        "BB_APP_SECRET": "",
+        "BB_ALLOW_WRITES": "0",
+        "BB_ALLOW_GRADE_WRITES": "0"
+      }
+    }
+  }
+}

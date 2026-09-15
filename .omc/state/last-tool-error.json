@@ -1,0 +1,7 @@
+{
+  "tool_name": "mcp__claude-in-chrome__computer",
+  "tool_input_preview": "{\"action\":\"screenshot\",\"tabId\":599003687}",
+  "error": "Error capturing screenshot: Script injection timed out after 5000ms — the page is busy or mid-navigation (a long-running script, or a navigation the previous action triggered, may be in progress). Try again in a moment.",
+  "timestamp": "2026-09-15T09:29:23.901Z",
+  "retry_count": 1
+}
