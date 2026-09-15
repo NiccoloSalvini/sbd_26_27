@@ -23,6 +23,13 @@ main img {
 If you already have R and RStudio, skip to [Course packages](#course-packages) and run the install block. Everything else on this page is for when something does not work.
 :::
 
+::: {.callout-note appearance="simple"}
+**This is for your own machine, not for the exam.** Exams are sat on the computer-lab
+machines, which already have R and every course package installed — see
+[Assessment](syllabus.qmd#assessment). Set your laptop up so you can practise on it;
+you are never asked to bring it to an exam.
+:::
+
 We walk through this in class, but the room is not the place to discover that your laptop has no R on it. Come with:
 
 - [ ] **R** installed — [install R](#install-r)

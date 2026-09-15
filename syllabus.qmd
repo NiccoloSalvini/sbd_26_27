@@ -52,21 +52,52 @@ Frontal lectures complemented by exercises in the computer lab using **R** (`tid
 
 ## Assessment
 
-The final exam consists of **open and closed questions** covering both theory and practice (coding part). You may be asked to provide results, the code leading to those results, or to write code that solves a given exercise. The exam takes place in the **computer lab classroom**; personal laptops are not allowed during the exam.
+The exam is written, with **open and closed questions** covering both theory and the
+coding part. You may be asked to provide results, the code leading to those results,
+or to write code that solves a given exercise.
 
-Two **optional intermediate exams** are offered, each covering half of the course content:
+**Every exam is sat on a lab machine.** Exams are held in the computer labs — **Aula 1
+and the two labs next to the canteen**. The lab machines already have R and every
+course package installed. Personal laptops are for practising on; they are never used
+for the exam.
 
-| | When | Content |
+Before the first intermediate, and again before the second intermediate and the full
+exam, we run a session on the lab machines. Nobody should be meeting the exam
+environment for the first time on the day.
+
+### Two routes through the course
+
+| | What you sit | When |
 |---|---|---|
-| First intermediate | typically November | Module 1 · Prof. Arbia |
-| Second intermediate | January/February | Module 2 · Prof. Salvini |
+| **Full exam** | one exam, whole course | any exam session |
+| **Intermediate route** | first intermediate, then second | November, then within the winter session |
 
-Rules of engagement:
+Both routes are marked out of 30 and the pass mark is **18/30**.
 
-- A student who sits the first intermediate may complete the assessment by taking the second intermediate **within the winter exam session**.
-- **Intermediates cannot be rejected.** Once the first intermediate is taken, if the second is failed the student must sit the full exam.
+### Rules of the intermediate route
+
+- The route runs **in order**: first intermediate, then second. You cannot sit only the
+  second, and you cannot take them the other way round.
+- **Fail the first intermediate and the route is over.** From that point the only way
+  through the course is the full exam.
+- **Fail the second intermediate and you sit the full exam.**
+- **An intermediate mark cannot be refused and re-sat on its own.** If you would rather
+  not keep it — an 18 you are not happy with — the only alternative is the **full exam**.
+  This applies to both intermediates.
+- The route must be **completed within the winter session, by February**. The session
+  has two calls: if you would rather not sit the second intermediate at the first call,
+  you can take it at the second, in February.
 - The final grade is the weighted average of the two modules: **50% Module 1, 50% Module 2**.
-- In line with Faculty good practices, the score split between closed (multiple-choice) and open questions is published on [Blackboard]({{< var blackboard-url >}}) ahead of each exam session, together with detailed grading criteria.
+- In line with Faculty good practices, the score split between closed (multiple-choice)
+  and open questions is published on [Blackboard]({{< var blackboard-url >}}) ahead of
+  each exam session, together with detailed grading criteria.
+
+### Registering
+
+| | Do you register? |
+|---|---|
+| First intermediate — November | **No.** There is nothing to sign up for; just be there. |
+| Second intermediate, and the full exam | **Yes** — the usual way, through the enrolment portal. |
 
 ## Prerequisites
 
