@@ -16,6 +16,18 @@ Companion for the Module 1 forecasting block.
 
 Additional readings and support material: [Blackboard]({{< var blackboard-url >}}).
 
+## Materials on Blackboard
+
+Two folders are open on [Blackboard]({{< var blackboard-url >}}), one per module.
+
+They are **visible but empty for the moment** — deliberately so, so that you can
+find them and check they are there before there is anything to download. Prof.
+Arbia's material fills the Module 1 folder and Prof. Salvini's the Module 2
+folder, posted as each block runs rather than all at once.
+
+Slides, code and datasets linked from the [schedule](index.qmd) are the same
+files you will find in those folders. Nothing is published in one place only.
+
 ## Software
 
 Installing R, RStudio and Python, the RStudio settings that save you a semester of

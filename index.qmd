@@ -27,12 +27,18 @@ Everything you need for this course is on this page. Each lecture gets a row: sl
 | 3 | Fri 25 Sep | 09:00–13:00 · 204 | Multiple regression | — |
 | 4 | Tue 29 Sep | 10:00–12:00 · 204 | Nonlinear regression | — |
 | 5 | Fri 2 Oct | 09:00–13:00 · 204 | GLM extensions: logit and Poisson models | — |
-| 6 | Mon 5 Oct | 17:00–19:00 · 204 | Survival models | — |
+| 6 | Mon 5 Oct | 17:00–19:00 · 204 | Survival models · **lecture by Prof. Salvini** — [schedule change](#change-5-oct) | — |
 | 7 | Fri 9 Oct | 09:00–13:00 · 204 | Regularisation and high-dimensional methods: Ridge, LASSO, Elastic Net | — |
 | 8 | Fri 16 Oct | 09:00–13:00 · 204 | Time series: components, visualization, smoothing, trend and seasonality | — |
 | 9 | Fri 23 Oct | 09:00–13:00 · 204 | AR and ARIMA models · space–time modelling · business applications | — |
 
 : {tbl-colwidths="[4,12,16,48,20]"}
+
+::: {#change-5-oct .callout-important appearance="simple"}
+**Change to the published schedule — lecture 6, Monday 5 October.** Prof. Salvini
+lectures in place of Prof. Arbia, who has a supervening commitment. Date, time,
+room and topic are unchanged: 17:00–19:00, room 204, survival models.
+:::
 
 ::: {.callout-note appearance="simple"}
 **First intermediate exam** — typically November, on Module 1 content. Date published on [Blackboard]({{< var blackboard-url >}}).

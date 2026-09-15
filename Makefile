@@ -10,7 +10,10 @@ qr:
 preview:
 	quarto preview
 
-build: qr
+# `qr` is intentionally not a prerequisite: the booking page carries the link
+# itself, so a build no longer depends on a live booking-url. Run `make qr` by
+# hand if a printable code is ever needed.
+build:
 	quarto render
 
 deploy: build

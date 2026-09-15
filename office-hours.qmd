@@ -12,17 +12,12 @@ title: "Office hours"
 
 ## Book a slot
 
-::: {.qr}
-[![](images/qr-office-hours.svg)]({{< var booking-url >}})
+[**Book an online slot →**]({{< var booking-url >}})
 
-[**Book online →**]({{< var booking-url >}})
+Pick any free slot on the booking page. You get a video-call link back by email,
+so there is nothing to install beforehand.
 
-::: {.cap}
-Point your phone at the projector.
-:::
-:::
-
-If the QR does not scan, the link is <{{< var booking-url >}}>.
+Full link, if the button does not work: <{{< var booking-url >}}>
 
 ## Before you book
 
