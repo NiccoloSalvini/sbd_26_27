@@ -1,5 +1,6 @@
-# Edit here, the whole site updates (and `make qr` regenerates the QR code).
-booking-url: "https://calendar.app.google/REPLACE-ME"
+# Edit here, the whole site updates. `make qr` builds a printable QR of booking-url
+# on demand; it is not part of `make build`.
+booking-url: "https://calendar.google.com/calendar/appointments/schedules/AcZssZ3qQg_92Da0dPK3pXa8frARUgBXgEryLm9b3l5jmQmnimT0NHJodYmrAmYeokAcUa0DszUTeQN5?gv=true"
 blackboard-url: "https://blackboard.unicatt.it"
 drive-url: "https://drive.google.com/drive/folders/REPLACE-ME"
 repo-url: "https://github.com/NiccoloSalvini/sbd_26_27"

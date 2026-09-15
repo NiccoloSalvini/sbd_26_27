@@ -17,8 +17,6 @@ title: "Office hours"
 Pick any free slot on the booking page. You get a video-call link back by email,
 so there is nothing to install beforehand.
 
-Full link, if the button does not work: <{{< var booking-url >}}>
-
 ## Before you book
 
 A question with a script attached gets answered in five minutes. A question without one takes the whole slot. Bring:
