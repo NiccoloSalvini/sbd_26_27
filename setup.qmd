@@ -1,6 +1,6 @@
 ---
 title: "Setup"
-subtitle: "R, RStudio and Python — get this done before the first lab"
+subtitle: "Two installers and one pasted line — no terminal required"
 toc-depth: 3
 ---
 
@@ -18,9 +18,26 @@ main img {
 ```
 
 ::: {.callout-tip appearance="simple"}
-## The 5-minute version
+## The whole setup, in three steps
 
-If you already have R and RStudio, skip to [Course packages](#course-packages) and run the install block. Everything else on this page is for when something does not work.
+You do not need a terminal for any of this. If you do not know what a terminal
+is, good — you will not be asked to open one.
+
+1. **Install R** — download, double-click, Next, Next, Finish. [Where →](#install-r)
+2. **Install RStudio** — same. [Where →](#install-rstudio)
+3. **Open RStudio and paste one line** into the *Console* — the pane at the
+   bottom left, the one with the `>` prompt — then press Enter:
+
+```r
+source("https://sbd-26-27.netlify.app/materials/setup.R")
+```
+
+That line installs every course package you are missing, creates a project
+folder for the course, and ends with a plain-words report of what it did. It
+takes a few minutes the first time. Running it again later is harmless.
+
+If the report ends with ✓ on every line, **you are done** and the rest of this
+page is reference. If a line starts with `!`, it tells you what to do next.
 :::
 
 ::: {.callout-note appearance="simple"}
@@ -30,14 +47,15 @@ machines, which already have R and every course package installed — see
 you are never asked to bring it to an exam.
 :::
 
-We walk through this in class, but the room is not the place to discover that your laptop has no R on it. Come with:
+::: {.callout-warning appearance="simple"}
+## Stuck after twenty minutes? Use the browser instead
 
-- [ ] **R** installed — [install R](#install-r)
-- [ ] **RStudio** installed — [install RStudio](#install-rstudio)
-- [ ] RStudio's **restore settings turned off** — [settings that matter](#settings-that-matter)
-- [ ] the **course packages** installed — [course packages](#course-packages)
-- [ ] an **RStudio Project** for this course — [start a project properly](#start-a-project-properly)
-- [ ] optional: **Python** — [Python](#python)
+[**Posit Cloud**](https://posit.cloud/) is RStudio running in a browser tab —
+nothing to install, free for what this course needs. Sign up, *New Project*,
+and paste the same `source(...)` line into its Console. Your laptop's problem
+stops being your problem. Come to [office hours](office-hours.qmd) and we fix
+the laptop with no deadline hanging over it.
+:::
 
 ## Install R {#install-r}
 
@@ -49,11 +67,29 @@ The course targets **R 4.6.x or newer**. Check what you have:
 R.version.string
 ```
 
-::: {.panel-tabset}
+Go to [cran.r-project.org](https://cran.r-project.org/) and follow **Download R
+for** your system. It is an ordinary installer: download, open, keep the defaults.
 
-### rig — recommended
+The one step that genuinely trips people up is on a Mac, where CRAN offers two
+builds. **Apple silicon (arm64)** is any Mac from the M1 onwards — that is every
+MacBook sold since late 2020. **Intel (x86_64)** is older. If you are not sure:
+Apple menu → *About This Mac*; if the chip line says *Apple M-something*, take
+arm64. Install the wrong one and packages fail with errors that look like
+something else entirely.
 
-[rig](https://github.com/r-lib/rig), the R Installation Manager, installs R with one command and picks the right build for your machine. On an Apple silicon Mac it will not ask you whether you want arm64 or Intel — a question that sends half a classroom down the wrong link every year.
+On **Windows**: click *base*, then the big download link at the top. The
+installer asks for administrator rights — on a locked-down work laptop, sort
+that out before the lab, not during it.
+
+On **Linux**: follow CRAN's page for your distribution rather than your
+distribution's own `r-base` package, which is usually several versions behind.
+
+::: {.callout-note collapse="true"}
+## If you are comfortable in a terminal: rig
+
+[rig](https://github.com/r-lib/rig), the R Installation Manager, installs R with
+one command and picks the right build for your machine — no arm64/Intel
+question. Entirely optional; the installer above does the same job.
 
 **macOS**
 
@@ -87,17 +123,6 @@ rig list             # see what you have
 ```
 
 When R 4.7 lands mid-semester, `rig add release` again. Old versions stay installed side by side, so nothing you wrote in October stops working in December.
-
-### Manual, from CRAN
-
-If you would rather not install another tool, go to [cran.r-project.org](https://cran.r-project.org/), pick a mirror, and follow **Download R for** your system.
-
-One thing to get right, because it is the only genuinely confusing step: on macOS you must choose between the **Apple silicon (arm64)** build and the **Intel (x86_64)** build. Apple silicon is any Mac from the M1 onwards — if `uname -m` prints `arm64`, that is you. Install the wrong one and packages will fail to load with errors that look like something else entirely.
-
-On Windows: **base** subdirectory, then the download link at the top. You need administrator rights, so if this is a locked-down work laptop, sort that out before the lab.
-
-On Linux, follow the instructions for your distribution rather than your distribution's own `r-base` package, which is usually several versions behind.
-
 :::
 
 ::: {.callout-note collapse="true"}
@@ -187,7 +212,9 @@ install.packages(c("ggplot2", "dplyr", "glmnet"))
 
 ### Course packages {#course-packages}
 
-Run this once. It takes a few minutes.
+The `source(...)` line at the top of this page installs exactly this list, and
+only the ones you are missing. This is what it runs, so you can see there is
+nothing hidden in it:
 
 ```r
 install.packages(c(
@@ -255,6 +282,13 @@ Newer features, fewer guarantees. Fine for exploring, not what you want the nigh
 
 Do not work in loose scripts scattered across your Desktop. Make one **RStudio Project** for this course.
 
+If you ran the `source(...)` line, **this is already done**: it created
+`sbd_26_27` in your home folder with `data/`, `scripts/` and `output/` inside,
+and a project file. Open it with `File > Open Project`, pick
+`sbd_26_27/sbd_26_27.Rproj`, and skip to [why it matters](#why-the-project-matters-file-paths).
+
+To make one by hand instead:
+
 1. `File > New Project`
 
    ![](images/setup/00_r_project_file_menu.png)
@@ -291,7 +325,12 @@ dat <- read_csv(here("data", "bikeshare.csv"))
 
 ## Python {#python}
 
-A few labs use Python alongside R. If you have never installed Python, do not install it from python.org and do not fight your system Python.
+**Optional, and the only part of this page that uses a terminal.** A few labs
+show Python alongside R so you can see the same method in both ecosystems. The
+exam is in R. If the commands below mean nothing to you, skip this section
+entirely — you lose nothing that is examined.
+
+If you have never installed Python, do not install it from python.org and do not fight your system Python.
 
 ::: {.panel-tabset}
 
@@ -348,7 +387,7 @@ You are not expected to be fluent in both languages. The exam's coding part is i
 
 **`cannot open file 'data.csv'`** — a working directory problem. Open the Project, then use `here()`.
 
-**A package refuses to install: "is not available for this version of R"** — your R is too old. Check `R.version.string`; if it starts with anything below 4.6, run `rig add release` (or reinstall from CRAN). This bites people who installed R for a bachelor course three years ago and never touched it again.
+**A package refuses to install: "is not available for this version of R"** — your R is too old. Check `R.version.string`; if it starts with anything below 4.6, [reinstall R from CRAN](#install-r) — the installer replaces the old one. This bites people who installed R for a bachelor course three years ago and never touched it again.
 
 **It worked yesterday** — check `R.version.string` and whether you updated something. Restart R with `⌘⇧F10` / `Ctrl+Shift+F10` and run the script top to bottom in a clean session.
 

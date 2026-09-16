@@ -10,9 +10,9 @@ Live: <https://sbd-26-27.netlify.app> · Repo: `NiccoloSalvini/sbd_26_27`
 
 ```bash
 make preview   # quarto preview, live reload while editing
-make build     # regenerate the QR, then quarto render -> _site/
+make build     # quarto render -> _site/
 make deploy    # build, then netlify deploy --prod
-make qr        # QR only — run after changing booking-url
+make qr        # printable QR of booking-url, on demand — not part of build
 make clean     # rm -rf _site .quarto
 ```
 
@@ -69,7 +69,7 @@ the site verbatim — they are listed under `resources:` in `_quarto.yml`.
 | `setup.qmd` | R / RStudio / Python install guide, shown in class |
 | `homework.qmd` | optional practice sets — **not graded**, the syllabus says no assignments are required |
 | `resources.qmd` | textbooks, deep-dive reading |
-| `office-hours.qmd` | booking link + QR code |
+| `office-hours.qmd` | booking link, marks policy |
 | `_variables.yml` | links used on several pages |
 | `styles.scss` | theme: Cattolica navy `#002f57`, Libre Franklin, schedule table styling |
 | `.mcp.json` | Blackboard MCP server (see below) |
@@ -81,21 +81,21 @@ Anything appearing on more than one page lives in `_variables.yml` and is used a
 
 | Variable | Note |
 |---|---|
-| `booking-url` | Google appointment page — **also the QR target**, run `make qr` after changing it |
+| `booking-url` | Google appointment page (Prof. Salvini only) |
 | `blackboard-url` | Blackboard course page |
-| `drive-url` | shared drive, if used |
 | `repo-url` | this repository |
 
-The QR and the booking link are the same fact in two formats. Keeping them in two
-places means one eventually points at the old link while still *looking* correct —
-an error nobody can see. One source, regenerated.
+`materials/setup.R` is served verbatim and is what the Setup page tells students
+to `source()`. The package list in it and the one shown on the page must match;
+the page says "this is what it runs".
 
 ## Conventions
 
 - **Site language is English.** The syllabus and the degree are in English.
 - **Screenshots: photograph what is stable, write commands for what changes.**
   Vendor pages (CRAN, posit.co) get redesigned without warning and a stale
-  screenshot misleads silently, so installing goes through `rig` and prose. The
+  screenshot misleads silently, so installing goes through the CRAN installer and
+  prose, with `rig` as the terminal-user option. The
   RStudio *Preferences* and *New Project* screenshots stay: that UI has been
   stable for a decade and the image is where the teaching is.
 - Content is created hidden / unavailable by default wherever the option exists.
@@ -123,11 +123,23 @@ evidence the assignment is correct.
 for Blackboard Learn Ultra: course content, assessments, questions, gradebook,
 grading.
 
-It needs a bearer token. **The browser session cookie does not authenticate the
-API** — both `/learn/api/public/v1/*` and the internal `/learn/api/v1/*` return
-`401` for a logged-in browser. Getting a token takes an application registered at
-developer.anthology.com *and* a Blackboard administrator adding that Application
-ID under Admin → REST API Integrations. The admin step is the bottleneck.
+It needs a bearer token. Two ways, both documented in that repo's README:
+
+- **`BB_TOKEN`** — a token lifted from a logged-in Ultra session (DevTools →
+  Network → `tokeninfo`). Works now, lasts about an hour. The stopgap.
+- **client credentials** — an application registered at developer.anthology.com
+  *and* a Blackboard administrator adding its ID under Admin → REST API
+  Integrations. Niccolò is not an admin (`systemRoleIds: ["User"]`), so this
+  needs the Rome Blackboard support office. The proper arrangement.
+
+Course IDs: 26/27 is `_170037_1`, 25/26 is `_158385_1`.
+
+What the public API can and cannot do on this build (4000.21.0): content,
+folders, test *shells*, gradebook columns, attempts and grades all work.
+**Question content does not** — questions come back as opaque `QuestionBlock`
+handles, so tests are authored in the Ultra UI (or imported), and the API reads
+the gradebook side. Time limit, attempts and results-release settings are not
+exposed on any route.
 
 Writes are off by default; grade writes have a second switch of their own.
 
@@ -142,8 +154,8 @@ Copy the repo to `sbd_27_28` and work through:
    (they have been stable: two optional intermediates, cannot be rejected,
    50/50 weighting)
 4. `homework.qmd` — practice set dates
-5. `_variables.yml` — new Blackboard course URL, new booking link, then `make qr`
-6. `setup.qmd` — bump the target R version, check `rig` install commands still hold
+5. `_variables.yml` — new Blackboard course URL, new booking link
+6. `setup.qmd` and `materials/setup.R` — bump the target R version in both, and the site URL inside the script
 7. New Netlify site: `netlify sites:create --name sbd-27-28 --account-slug niccolo-salvini`, then `make deploy`
 
 **Do not carry over old exam simulations.** The 25/26 mocks were left behind on
