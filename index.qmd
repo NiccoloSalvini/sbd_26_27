@@ -41,7 +41,7 @@ room and topic are unchanged: 17:00–19:00, room 204, survival models.
 :::
 
 ::: {.callout-note appearance="simple"}
-**First intermediate exam** — Module 1 content, expected in November. **The date is not set yet.** It will be announced on [Blackboard]({{< var blackboard-url >}}) and added here as soon as it is.
+**First intermediate exam** — Module 1 content, expected at the end of October, once Module 1 closes on 23 October. Last year it fell on 27 October. **The date is not set yet.** It will be announced on [Blackboard]({{< var blackboard-url >}}) and added here as soon as it is.
 :::
 
 <h2 class="module">Module 2 — Unsupervised learning, machine learning, communication <small>Prof. Niccolò Salvini · 2 November – 11 December · rooms 202 / 204</small></h2>

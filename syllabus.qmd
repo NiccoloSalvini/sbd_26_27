@@ -70,7 +70,7 @@ environment for the first time on the day.
 | | What you sit | When |
 |---|---|---|
 | **Full exam** | one exam, whole course | any exam session |
-| **Intermediate route** | first intermediate, then second | November, then within the winter session |
+| **Intermediate route** | first intermediate, then second | end of October, then within the winter session |
 
 Both routes are marked out of 30 and the pass mark is **18/30**.
 
@@ -85,8 +85,9 @@ Both routes are marked out of 30 and the pass mark is **18/30**.
   not keep it — an 18 you are not happy with — the only alternative is the **full exam**.
   This applies to both intermediates.
 - The route must be **completed within the winter session, by February**. The session
-  has two calls: if you would rather not sit the second intermediate at the first call,
-  you can take it at the second, in February.
+  runs to **three calls** — last year mid-January, end of January and mid-February — so
+  missing the first one does not end the route: sit the second intermediate at whichever
+  call suits you, as long as it falls inside the session.
 - The final grade is the weighted average of the two modules: **50% Module 1, 50% Module 2**.
 - In line with Faculty good practices, the score split between closed (multiple-choice)
   and open questions is published on [Blackboard]({{< var blackboard-url >}}) ahead of
@@ -99,7 +100,7 @@ refusing a mark all land in the same place — the full exam.
 
 ```{mermaid}
 flowchart TD
-    S([Start of the course]) --> A{First intermediate<br>November}
+    S([Start of the course]) --> A{First intermediate<br>end of October}
     A -->|18 or more, and you keep it| B{Second intermediate<br>by February}
     A -->|anything else| F[Full exam<br>on the whole course]
     B -->|18 or more, and you keep it| D([Done<br>50% Module 1 + 50% Module 2])
@@ -110,7 +111,7 @@ flowchart TD
 
 | | Do you register? |
 |---|---|
-| First intermediate — November | **No.** There is nothing to sign up for; just be there. |
+| First intermediate — end of October | **No.** There is nothing to sign up for; just be there. |
 | Second intermediate, and the full exam | **Yes** — the usual way, through the enrolment portal. |
 
 ## Prerequisites
