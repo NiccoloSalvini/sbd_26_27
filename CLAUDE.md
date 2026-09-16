@@ -143,6 +143,20 @@ exposed on any route.
 
 Writes are off by default; grade writes have a second switch of their own.
 
+## Overleaf MCP
+
+`.mcp.json` also loads `~/dev/overleaf-mcp` (`NiccoloSalvini/overleaf-mcp`), so
+exam papers and handouts can be written as LaTeX projects on Overleaf from this
+session: `overleaf_list_projects`, `overleaf_push_dir`, `overleaf_compile`,
+`overleaf_download_pdf`.
+
+It authenticates with a browser session cookie, read from the shell environment
+as `OVERLEAF_COOKIE` — the `.mcp.json` entry says `${OVERLEAF_COOKIE}` and
+nothing more, because this file is public. Set it in the shell before starting
+Claude Code (the full `Cookie:` header from a logged-in overleaf.com tab; it must
+contain `overleaf_session2`). `overleaf_whoami` is the first call to make: it
+says whether the cookie is set and still valid.
+
 ## Starting the next academic year
 
 Copy the repo to `sbd_27_28` and work through:

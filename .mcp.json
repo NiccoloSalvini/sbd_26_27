@@ -2,12 +2,27 @@
   "mcpServers": {
     "blackboard": {
       "command": "/Users/niccolo/Desktop/py_projects/mcp-blackboard-ucsc/.venv/bin/python",
-      "args": ["-m", "bb_mcp.server"],
+      "args": [
+        "-m",
+        "bb_mcp.server"
+      ],
       "env": {
         "PYTHONPATH": "/Users/niccolo/Desktop/py_projects/mcp-blackboard-ucsc/src",
         "BB_BASE_URL": "https://blackboard.unicatt.it",
         "BB_ALLOW_WRITES": "0",
         "BB_ALLOW_GRADE_WRITES": "0"
+      }
+    },
+    "overleaf": {
+      "command": "uv",
+      "args": [
+        "--directory",
+        "/Users/niccolo/dev/overleaf-mcp",
+        "run",
+        "overleaf-mcp"
+      ],
+      "env": {
+        "OVERLEAF_COOKIE": "${OVERLEAF_COOKIE}"
       }
     }
   }
