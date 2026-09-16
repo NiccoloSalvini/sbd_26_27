@@ -46,7 +46,7 @@ By the end of the course you will be able to:
 
 ## Teaching method
 
-Frontal lectures complemented by exercises in the computer lab using **R** (`tidyverse`, `glmnet`, `fable`, `forecast`), **Python** (`pandas`, `scikit-learn`, `statsmodels`, `PyMC`), **Excel** (advanced analytics), and the optional use of ChatGPT for workflow acceleration. Business case studies are discussed throughout both modules.
+Frontal lectures complemented by exercises in the computer lab using **R** (`tidyverse`, `glmnet`, `fable`, `forecast`) and **Python** (`pandas`, `scikit-learn`, `statsmodels`, `PyMC`), with the optional use of generative AI for workflow acceleration. Business case studies are discussed throughout both modules.
 
 **No individual or group assignments are required.** The practice material on this site is optional — see [Practice](homework.qmd).
 
