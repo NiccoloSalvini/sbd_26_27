@@ -6,7 +6,7 @@ title: "Office hours"
 
 **During and after each lecture — 1 hour.** Both lecturers stay in the room. No booking, just show up. This is the fastest channel and the one most students should use: the material is fresh and you are already there.
 
-**Online, by appointment — any time.** Always available. Pick a slot on the booking page below; you get a video-call link back.
+**Online, by appointment — Prof. Salvini only.** Prof. Salvini takes online appointments; Prof. Arbia receives in person, after his lectures. Pick a slot on the booking page below and you get a video-call link back.
 
 **Working students.** Prof. Salvini covers working students for **both** modules. Book an online slot and say you are a working student in the note — evening and off-hours slots are opened on request.
 
@@ -26,6 +26,18 @@ A question with a script attached gets answered in five minutes. A question with
 - what you expected to happen instead
 
 For anything answerable in two lines — a date, an exam rule, where a dataset lives — check the [schedule](index.qmd) and the [syllabus](syllabus.qmd) first, then email.
+
+### Marks are not discussed here
+
+When a paper is marked, the feedback on [Blackboard]({{< var blackboard-url >}})
+sets out in full why each answer scored what it did. That feedback is the
+explanation. Read it before booking anything.
+
+**A mark is not reopened after the fact, and office hours are not where one gets
+argued upwards.** If, having read the feedback, something is still genuinely
+unclear, bring it and we will look at the paper together — that is a review, and
+it is worth having. It is not a negotiation, and booking a slot is not a step in
+one.
 
 ## Contacts
 

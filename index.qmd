@@ -80,4 +80,4 @@ room and topic are unchanged: 17:00–19:00, room 204, survival models.
 :::
 :::
 
-Both lecturers receive students after each lecture and by appointment — see [Office hours](office-hours.qmd). Working students are covered by Prof. Salvini for **both** modules; write to arrange a slot.
+Both lecturers receive students in person after each lecture. Online appointments are with Prof. Salvini — see [Office hours](office-hours.qmd). Working students are covered by Prof. Salvini for **both** modules; write to arrange a slot.
