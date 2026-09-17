@@ -8,6 +8,14 @@ Every scene: white ground, the site's palette, Libre Franklin for labels,
 slide, next to a sentence, not instead of one.
 """
 from manim import *
+import glob, os
+import manimpango
+
+# Libre Franklin is installed in ~/Library/Fonts, which Pango's render process
+# does not always pick up even when fontconfig lists it. Registering the files
+# directly is the documented, deterministic way.
+for _f in glob.glob(os.path.expanduser("~/Library/Fonts/LibreFranklin-*.otf")):
+    manimpango.register_font(_f)
 
 NAVY, GOLD, MUTED, INK, RULE = "#002f57", "#b8860b", "#5f6b75", "#1c2226", "#e6e9ec"
 FONT = "Libre Franklin"

@@ -26,5 +26,7 @@ clean:
 clips:
 	cd animations && uv run manim -qm --disable_caching scenes.py LearningRate Overfitting
 	mkdir -p lectures/media
-	cp animations/media/videos/scenes/720p30/LearningRate.mp4 lectures/media/gd-learning-rate.mp4
-	cp animations/media/videos/scenes/720p30/Overfitting.mp4  lectures/media/overfitting.mp4
+	# +faststart puts the moov atom first, so a browser can start playing before
+	# the file is fully fetched, and plays from servers without range support.
+	ffmpeg -v error -y -i animations/media/videos/scenes/720p30/LearningRate.mp4 -c copy -movflags +faststart lectures/media/gd-learning-rate.mp4
+	ffmpeg -v error -y -i animations/media/videos/scenes/720p30/Overfitting.mp4  -c copy -movflags +faststart lectures/media/overfitting.mp4
