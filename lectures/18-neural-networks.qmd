@@ -126,7 +126,7 @@ $$
 - For a network, computing $\partial L / \partial W$ layer by layer is called **backpropagation**. It is the chain rule, applied carefully, and nothing more.
 
 ::: {.callout-important title="Attention"}
-With a convex loss — a bowl — you reach *the* minimum. A network's loss is not a bowl. Gradient descent finds *a* valley, which depends on where you started. Same lesson as k-means: run it more than once.
+A convex loss is a bowl: you reach *the* minimum. A network's loss is not. You find *a* valley, which depends on where you started — as with k-means, run it more than once.
 :::
 
 ## The learning rate, and what it does to you

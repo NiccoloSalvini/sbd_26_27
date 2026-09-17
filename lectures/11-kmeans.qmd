@@ -38,11 +38,10 @@ W(C) \;=\; \sum_{j=1}^{k} \;\sum_{i \in C_j} \lVert x_i - \bar{x}_j \rVert^2
 $$
 
 - $\bar x_j$ is the **centroid** of cluster $j$: the mean of its points
-- Small $W$: each point is close to its own centroid
-- This is exactly the total variance *inside* groups — the same quantity ANOVA puts in the denominator
+- Small $W$: each point is close to its own centroid — the within-group variance ANOVA puts in its denominator
 
 ::: {.callout-note}
-Finding the true minimum over all partitions is impossible in practice: with $n = 100$ and $k = 3$ there are more partitions than atoms in the universe. k-means finds a *good* one, quickly.
+The true minimum over all partitions is out of reach: $n = 100$, $k = 3$ is more partitions than atoms in the universe. k-means finds a *good* one, fast.
 :::
 
 ## Lloyd's algorithm, four lines

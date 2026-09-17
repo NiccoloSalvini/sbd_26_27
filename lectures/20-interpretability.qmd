@@ -96,9 +96,9 @@ The last line: a two-way partial dependence. If the surface is not additive, the
 
 ## Explaining one prediction
 
-**LIME**: around *this* customer, perturb the inputs, get the model's predictions, fit a small **linear model** to them. The local coefficients are the explanation.
+**LIME**: perturb the inputs around *this* customer, fit a small **linear model** to the model's answers. Its coefficients are the explanation.
 
-**Shapley values**: from game theory. Each variable's contribution to *this* prediction is its average marginal contribution over all orderings of the variables. They **sum exactly** to the difference between this prediction and the average prediction — an accounting identity, which is why regulators like them.
+**Shapley values**: each variable's average marginal contribution over all orderings. They **sum exactly** to this prediction minus the average one — an accounting identity, which is why regulators like them.
 
 | | LIME | Shapley (SHAP) |
 |---|---|---|
@@ -140,9 +140,9 @@ The failure mode is *explanation theatre*: a SHAP plot next to a model nobody va
 | Which customers get the catalogue | low | none | far right: boosting, and move on |
 | Whom to call first for retention | medium | low | forest + importance |
 | Credit limit | high | high — regulated | left, or right with SHAP in every letter |
-| Readmission risk flag on a chart | high | very high — a clinician acts on it | GAM or tree; a network only with PDPs a doctor has signed off |
+| Readmission risk flag on a chart | high | very high — a clinician acts on it | GAM or tree; a network only with PDPs a doctor signed off |
 
-The column that decides is the last one, not the first. Accuracy is cheap to measure and easy to overvalue.
+The deciding column is the third, not the second.
 
 ## Saying it to the board
 

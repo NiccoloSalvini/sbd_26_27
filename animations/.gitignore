@@ -1,0 +1,7 @@
+# manim's venv and render cache. The scenes (.py) and manim.cfg are the source;
+# finished clips are copied to lectures/media/ by `make clips`, and that folder
+# is what the site serves.
+.venv/
+media/
+__pycache__/
+*.log

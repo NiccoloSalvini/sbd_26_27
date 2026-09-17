@@ -65,7 +65,7 @@ nn <- nnet(X[tr, ], churn$y[tr], size = best$size, decay = best$decay, maxit = 5
 p_nn <- predict(nn, X[-tr, ])
 ```
 
-Add logistic, forest and boosting **on the same `-tr` rows**, from last week's script. Then:
+Add logistic, forest and boosting **on the same `-tr` rows**, from last week's script:
 
 | Model | Accuracy | AUC | Log-loss |
 |---|---|---|---|
@@ -74,8 +74,6 @@ Add logistic, forest and boosting **on the same `-tr` rows**, from last week's s
 | Random forest | | | |
 | Gradient boosting | | | |
 | Neural network | | | |
-
-Fill it in. Then look at it for a while.
 
 ## [Section 2]{.section-kicker} What you will see {.section-slide background-color="#002f57"}
 
@@ -112,11 +110,11 @@ $$
 $$
 
 - *Deep*: more than one hidden layer. That is the whole definition.
-- Four million weights, sixty thousand images: it **will** overfit without **dropout** — randomly switching off neurons during training, an ensemble of sub-networks — and weight decay
+- Four million weights, sixty thousand images: it **will** overfit without **dropout** — neurons switched off at random during training, an implicit ensemble — and weight decay
 - The two architectures you will hear named: **CNNs** for images (convolution: local, shared filters — a 3×3 edge detector reused across the whole picture) and **RNNs** for sequences (the same weights applied at every time step — an autoregressive model with a memory)
 
 ::: {.callout-important title="Attention"}
-None of these apply to a customer table. They win where the data have *spatial or sequential structure* the architecture can exploit: images, text, audio, sensor streams. On rows and columns, use last week's tools.
+None of this applies to a customer table. They win on *spatial or sequential* data — images, text, audio, sensors. On rows and columns, use last week's tools.
 :::
 
 ## The one connection worth keeping

@@ -37,9 +37,7 @@ In every case the data came with **the answer attached**. The model's job was to
 | 4–6 | *Which will churn, default, be readmitted?* — trees, forests, boosting, neural networks | Yes |
 | 7 | *Why did the model say that, and how do I tell the board?* | — |
 
-::: {.callout-note}
-The second half is supervised, like Module 1 — but with **algorithms** in place of **equations**. That change is the subject of this lecture.
-:::
+The second half is supervised, like Module 1 — with **algorithms** in place of **equations**.
 
 ## [Section 2]{.section-kicker} Two dialects, one subject {.section-slide background-color="#002f57"}
 
