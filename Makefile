@@ -1,6 +1,6 @@
 BOOKING := $(shell sed -n 's/^booking-url: *"\(.*\)"/\1/p' _variables.yml)
 
-.PHONY: qr preview build deploy clean
+.PHONY: qr preview build deploy clean clips
 
 ## regenerate the office-hours QR code from booking-url in _variables.yml
 qr:
@@ -21,3 +21,10 @@ deploy: build
 
 clean:
 	rm -rf _site .quarto
+
+## render every manim scene at deck quality and copy the clips where the site serves them
+clips:
+	cd animations && uv run manim -qm --disable_caching scenes.py LearningRate Overfitting
+	mkdir -p lectures/media
+	cp animations/media/videos/scenes/720p30/LearningRate.mp4 lectures/media/gd-learning-rate.mp4
+	cp animations/media/videos/scenes/720p30/Overfitting.mp4  lectures/media/overfitting.mp4

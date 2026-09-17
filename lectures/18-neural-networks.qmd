@@ -131,11 +131,9 @@ A convex loss is a bowl: you reach *the* minimum. A network's loss is not. You f
 
 ## The learning rate, and what it does to you
 
-- $\eta$ **too small**: the loss creeps down; thousands of iterations; on a large dataset, days
-- $\eta$ **too large**: the loss oscillates, jumps the valley, may never settle
-- **Just right**: a smooth, decelerating descent — and you know it only by watching the curve
+{{< video media/gd-learning-rate.mp4 width="1000" height="562" >}}
 
-Practical variants: shrink $\eta$ over time (*annealing*); add inertia so consistent gradients accelerate (*momentum*, $\mu \approx 0.9$). Each is one more hyperparameter.
+**Too small**: it creeps — thousands of steps. **Too large**: it overshoots the valley and oscillates. **Right**: a smooth, decelerating descent. Practical variants: shrink $\eta$ over time (*annealing*), or add inertia (*momentum*, $\mu \approx 0.9$) — each one more hyperparameter.
 
 ## Gradient descent on linear regression
 
@@ -218,12 +216,9 @@ A hidden layer with linear activations is over-parameterised linear regression. 
 Ten inputs, one hidden layer of five sigmoid neurons, 90/10 split
 :::
 
-Plot the error against training iterations. Two curves:
+{{< video media/overfitting.mp4 width="1000" height="562" >}}
 
-- **Training MSE** falls, and keeps falling
-- **Test MSE** falls, reaches a minimum — the *optimum* — then **rises**
-
-Past that point the network is learning the noise in the training set. It fits the data it has seen better and better, and the data it has not seen worse and worse. **Overfitting**, drawn.
+**Training error** keeps falling. **Test error** falls, reaches a minimum, then **rises**: past that point the network is learning the noise of the training set. Overfitting, drawn.
 
 ## Three ways to stop it
 

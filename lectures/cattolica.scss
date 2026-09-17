@@ -171,3 +171,15 @@ $presentation-block-margin: 14px;
 .reveal .footer { color: $muted; font-size: 0.42em; left: 1.6em; bottom: 0.9em; }
 .reveal .slide-number { color: $muted; font-size: 0.42em; right: 1.6em; bottom: 0.9em; background: none; }
 .reveal .slide-logo { display: none; }   // the logo lives on the title slide only
+
+// ---- Visual intuition: two SVGs side by side, driven by reveal fragments ----
+.reveal .viz { display: flex; gap: 1.2em; align-items: flex-start; margin-top: 0.2em; }
+.reveal .viz svg { flex: 1 1 0; height: auto; max-height: 460px; }
+.reveal .viz svg:last-child { flex: 0 0 36%; }
+.reveal .viz .fragment { opacity: 0; transition: opacity .25s; }
+.reveal .viz .fragment.visible { opacity: 1; }
+.reveal .viz g.fragment[opacity] { opacity: 0 !important; }
+.reveal .viz g.fragment[opacity].visible { opacity: .13 !important; }
+// ---- manim clips ----
+.reveal .clip { display: block; margin: 0.3em auto 0; max-width: 100%; max-height: 520px; border: 1px solid $rule; }
+
