@@ -143,6 +143,30 @@ exposed on any route.
 
 Writes are off by default; grade writes have a second switch of their own.
 
+## Slides: one Beamer theme for every lecture
+
+`latex/beamer/` holds `beamerthemeCattolica.sty`, `template.tex` and the logo.
+A lecture starts as a copy of the template: change `\lecture{n}{title}`,
+`\author`, `\date`, write frames. Everything visual is the theme's job — a
+lecture file that sets a colour or a font is wrong. Push the whole folder to
+an Overleaf project with `overleaf_push_dir`; it is self-contained.
+
+It compiles with pdflatex (Overleaf's default), xelatex and lualatex. Fonts
+come from CTAN (`librefranklin`, `sourcecodepro`), not the system, so the
+deck looks the same on every machine; a TeX lacking them falls back to
+Helvetica with one log warning rather than failing in a lecture.
+
+Three names it must never define, learnt the hard way: `\note` (beamer's
+speaker notes), `\accent` (a TeX primitive), and loading tcolorbox with
+`[most]` (pulls listingsutf8, absent on minimal installs). The callout
+environments are `remark`, `important`, `definition*`; the colour helpers
+`\navy`, `\muted`, `\gold`; code goes in `rcode`.
+
+Final PDFs go to `slides/` (served by the site); build artefacts are ignored.
+
+**Git on this repo: add files by path.** `git add -A` scans `_site/` and
+`setup_files/` on iCloud and hangs for minutes. `git add index.qmd` is instant.
+
 ## Overleaf MCP
 
 `.mcp.json` also loads `~/dev/overleaf-mcp` (`NiccoloSalvini/overleaf-mcp`), so

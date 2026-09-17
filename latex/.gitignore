@@ -1,0 +1,15 @@
+# LaTeX build artefacts. The .tex, the theme and the logo are the source;
+# lecture PDFs go to slides/ once they are final, not here.
+*.aux
+*.log
+*.nav
+*.snm
+*.toc
+*.out
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.xdv
+*.bbl
+*.blg
+template.pdf

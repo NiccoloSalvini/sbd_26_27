@@ -1,0 +1,212 @@
+% beamerthemeCattolica.sty — Statistics & Big Data, Università Cattolica, Rome
+%
+% One theme for every lecture, so the deck for lecture 14 looks like the deck
+% for lecture 1. Load it with
+%
+%     \documentclass[aspectratio=169]{beamer}
+%     \usetheme{Cattolica}
+%
+% and keep this file next to the .tex (Overleaf: push the whole latex/beamer
+% folder). Compiles with pdflatex, xelatex and lualatex; pdflatex is the one
+% Overleaf defaults to, so nothing here needs fontspec or a system font.
+%
+% Colours and type follow the course site (styles.scss): Cattolica navy
+% #002f57, Libre Franklin for text. The site's code font, JetBrains Mono, is
+% not on CTAN, so code is set in Source Code Pro — same weight, same feel.
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{beamerthemeCattolica}[2026/09/17 v1.0 Cattolica beamer theme]
+
+\RequirePackage{ifluatex,ifxetex}
+\RequirePackage{xcolor}
+\RequirePackage{tikz}
+\RequirePackage{booktabs}
+\RequirePackage{listings}
+% skins only: it provides enhanced, leftrule and attach-title. The listings
+% library would drag in listingsutf8, which a minimal TeX lacks, and code here
+% is set with the listings package directly.
+\RequirePackage[skins]{tcolorbox}
+
+% ---- Type ------------------------------------------------------------------
+\ifluatex\else\ifxetex\else
+  \RequirePackage[T1]{fontenc}
+  \RequirePackage[utf8]{inputenc}
+\fi\fi
+% Libre Franklin and Source Code Pro come from CTAN packages present on
+% Overleaf and in a full TeX Live. A minimal local install may lack them, and
+% a missing font must not stop a lecture: fall back to Helvetica and the
+% default typewriter, and say so once in the log.
+\IfFileExists{librefranklin.sty}{%
+  \RequirePackage[sfdefault]{librefranklin}%
+}{%
+  \RequirePackage{helvet}%
+  \PackageWarningNoLine{beamerthemeCattolica}{librefranklin not installed, using Helvetica}%
+}
+\IfFileExists{sourcecodepro.sty}{%
+  \RequirePackage[scale=0.88]{sourcecodepro}%
+}{%
+  \PackageWarningNoLine{beamerthemeCattolica}{sourcecodepro not installed, using default monospace}%
+}
+\RequirePackage{microtype}
+\renewcommand{\familydefault}{\sfdefault}
+
+% ---- Palette (mirrors styles.scss) -----------------------------------------
+\definecolor{cattnavy}{HTML}{002F57}   % $primary
+\definecolor{cattink}{HTML}{1C2226}    % body text on the site
+\definecolor{cattmuted}{HTML}{5F6B75}  % secondary text
+\definecolor{cattrule}{HTML}{E6E9EC}   % hairlines, code background edge
+\definecolor{cattpaper}{HTML}{FAFAFA}  % off-white ground
+\definecolor{cattaccent}{HTML}{B8860B} % one warm accent for emphasis, used sparingly
+\definecolor{cattcode}{HTML}{F3F5F7}   % code block background
+
+\setbeamercolor{normal text}{fg=cattink,bg=white}
+\setbeamercolor{structure}{fg=cattnavy}
+\setbeamercolor{alerted text}{fg=cattaccent}
+\setbeamercolor{example text}{fg=cattnavy}
+\setbeamercolor{frametitle}{fg=cattnavy,bg=white}
+\setbeamercolor{framesubtitle}{fg=cattmuted}
+\setbeamercolor{title}{fg=white}
+\setbeamercolor{subtitle}{fg=white!85!cattnavy}
+\setbeamercolor{author}{fg=white}
+\setbeamercolor{institute}{fg=white!80!cattnavy}
+\setbeamercolor{date}{fg=white!80!cattnavy}
+\setbeamercolor{footline}{fg=cattmuted}
+\setbeamercolor{block title}{fg=white,bg=cattnavy}
+\setbeamercolor{block body}{fg=cattink,bg=cattnavy!5}
+\setbeamercolor{itemize item}{fg=cattnavy}
+\setbeamercolor{itemize subitem}{fg=cattmuted}
+\setbeamercolor{enumerate item}{fg=cattnavy}
+\setbeamercolor{caption name}{fg=cattmuted}
+\setbeamercolor{section in toc}{fg=cattink}
+
+% ---- No chrome we would have to explain ------------------------------------
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{blocks}[rounded=false]
+\setbeamertemplate{itemize items}{\raisebox{0.12ex}{\scriptsize$\blacksquare$}}
+\setbeamertemplate{itemize subitem}{\textendash}
+\setbeamertemplate{enumerate items}[default]
+\setbeamertemplate{caption}[numbered]
+\setbeamerfont{frametitle}{size=\Large,series=\bfseries}
+\setbeamerfont{framesubtitle}{size=\normalsize,series=\mdseries}
+\setbeamerfont{title}{size=\LARGE,series=\bfseries}
+\setbeamerfont{subtitle}{size=\large,series=\mdseries}
+\setbeamerfont{author}{size=\normalsize}
+\setbeamerfont{institute}{size=\small}
+\setbeamerfont{date}{size=\small}
+\setbeamerfont{footline}{size=\tiny}
+\setbeamerfont{caption}{size=\footnotesize}
+\setbeamersize{text margin left=1.1cm,text margin right=1.1cm}
+
+% ---- Course metadata the footline repeats ----------------------------------
+% \course{...} once in the preamble; \lecture{n}{title} is beamer's own, we read it.
+\newcommand{\cattcourse}{Statistics \& Big Data}
+\newcommand{\course}[1]{\renewcommand{\cattcourse}{#1}}
+\newcommand{\cattlecturenumber}{}
+\newcommand{\cattlecturetitle}{}
+\renewcommand{\lecture}[2]{%
+  \renewcommand{\cattlecturenumber}{#1}%
+  \renewcommand{\cattlecturetitle}{#2}%
+  \title{#2}%
+  \subtitle{Lecture #1}%
+}
+
+% ---- Frame title: navy text, hairline underneath, logo at the right ---------
+% The frametitle is typeset inside the frame's text area, which already has
+% the 1.1cm margins. Everything here is \textwidth wide; adding the margin
+% again put the hairline 1.1cm past the right edge on every slide.
+\setbeamertemplate{frametitle}{%
+  \vskip 0.55cm
+  \begin{beamercolorbox}[wd=\textwidth]{frametitle}
+    \usebeamerfont{frametitle}\insertframetitle
+    \ifx\insertframesubtitle\@empty\else
+      \\[0.1ex]{\usebeamerfont{framesubtitle}\usebeamercolor[fg]{framesubtitle}\insertframesubtitle}%
+    \fi
+  \end{beamercolorbox}
+  \vskip 0.15cm
+  {\color{cattrule}\rule{\textwidth}{0.6pt}}
+  \vskip 0.25cm
+}
+
+% ---- Footline: course · lecture · page, in muted small type ----------------
+\setbeamertemplate{footline}{%
+  \begin{beamercolorbox}[wd=\paperwidth,ht=2.6ex,dp=1.2ex,leftskip=1.1cm,rightskip=1.1cm]{footline}
+    \usebeamerfont{footline}%
+    \cattcourse
+    \ifx\cattlecturenumber\@empty\else\ \textperiodcentered\ Lecture \cattlecturenumber\ \textperiodcentered\ \cattlecturetitle\fi
+    \hfill
+    \insertframenumber\,/\,\inserttotalframenumber
+  \end{beamercolorbox}
+}
+
+% ---- Title page: full navy, logo, and nothing else competing ----------------
+\setbeamertemplate{title page}{%
+  \begin{tikzpicture}[remember picture,overlay]
+    \fill[cattnavy] (current page.south west) rectangle (current page.north east);
+    \node[anchor=north east,inner sep=0pt] at ([xshift=-1.1cm,yshift=-0.9cm]current page.north east)
+      {\includegraphics[height=1.6cm]{cattolica-logo}};
+    \node[anchor=south west,text width=\dimexpr\paperwidth-2.2cm\relax,align=left]
+      at ([xshift=1.1cm,yshift=1.3cm]current page.south west) {%
+        {\usebeamerfont{subtitle}\usebeamercolor[fg]{subtitle}\insertsubtitle\par}
+        \vskip 0.3cm
+        {\usebeamerfont{title}\usebeamercolor[fg]{title}\inserttitle\par}
+        \vskip 0.7cm
+        {\usebeamerfont{author}\usebeamercolor[fg]{author}\insertauthor\par}
+        \vskip 0.15cm
+        {\usebeamerfont{institute}\usebeamercolor[fg]{institute}\insertinstitute\par}
+        \vskip 0.15cm
+        {\usebeamerfont{date}\usebeamercolor[fg]{date}\insertdate\par}
+      };
+  \end{tikzpicture}%
+}
+
+% ---- Section slides: navy band, so the deck has a visible spine -----------
+\AtBeginSection[]{%
+  \begin{frame}[plain,noframenumbering]
+    \begin{tikzpicture}[remember picture,overlay]
+      \fill[cattnavy] (current page.south west) rectangle (current page.north east);
+      \node[anchor=west,text width=\dimexpr\paperwidth-2.2cm\relax]
+        at ([xshift=1.1cm]current page.west) {%
+          {\usebeamerfont{subtitle}\color{white!70!cattnavy}Section \thesection\par}
+          \vskip 0.25cm
+          {\usebeamerfont{title}\color{white}\insertsection\par}
+        };
+    \end{tikzpicture}
+  \end{frame}
+}
+
+% ---- Code: R by default, quiet background, no frame -------------------------
+\lstdefinestyle{catt}{
+  language=R,
+  basicstyle=\ttfamily\footnotesize\color{cattink},
+  keywordstyle=\color{cattnavy}\bfseries,
+  commentstyle=\color{cattmuted}\itshape,
+  stringstyle=\color{cattaccent},
+  backgroundcolor=\color{cattcode},
+  frame=none, framexleftmargin=6pt, xleftmargin=6pt, xrightmargin=6pt,
+  aboveskip=0.6em, belowskip=0.6em,
+  breaklines=true, showstringspaces=false, columns=fullflexible, keepspaces=true,
+  literate={<-}{{$\leftarrow$}}1 {~}{{$\sim$}}1
+}
+\lstset{style=catt}
+\lstnewenvironment{rcode}{\lstset{style=catt}}{}
+
+% ---- Callouts: the site's three, as boxes ----------------------------------
+% remark, not note: beamer already owns \note for speaker notes.
+\newtcolorbox{remark}[1][Note]{enhanced,colback=cattnavy!4,colframe=cattnavy,
+  boxrule=0pt,leftrule=3pt,arc=0pt,left=8pt,right=8pt,top=6pt,bottom=6pt,
+  fonttitle=\bfseries,coltitle=cattnavy,title=#1,attach title to upper={\ \ }}
+\newtcolorbox{important}[1][Important]{enhanced,colback=cattaccent!6,colframe=cattaccent,
+  boxrule=0pt,leftrule=3pt,arc=0pt,left=8pt,right=8pt,top=6pt,bottom=6pt,
+  fonttitle=\bfseries,coltitle=cattaccent!70!black,title=#1,attach title to upper={\ \ }}
+\newtcolorbox{definition*}[1][Definition]{enhanced,colback=white,colframe=cattnavy,
+  boxrule=0.6pt,arc=0pt,left=8pt,right=8pt,top=6pt,bottom=6pt,
+  fonttitle=\bfseries,coltitle=white,colbacktitle=cattnavy,title=#1}
+
+% ---- Small conveniences ----------------------------------------------------
+\newcommand{\muted}[1]{{\color{cattmuted}#1}}
+\newcommand{\navy}[1]{{\color{cattnavy}#1}}
+\newcommand{\gold}[1]{{\color{cattaccent}#1}}   % not \accent: that is a TeX primitive
+% A slide that is one big statement.
+\newcommand{\statement}[1]{\begin{frame}[c]\centering{\usebeamerfont{title}\color{cattnavy}#1\par}\end{frame}}
+
+\endinput

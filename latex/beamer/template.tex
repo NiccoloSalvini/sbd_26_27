@@ -1,0 +1,59 @@
+% Copy this file to start a lecture. Everything visual comes from the theme;
+% a lecture file should contain only its own content.
+\documentclass[aspectratio=169,11pt,t]{beamer}   % t: top-aligned, same title-to-body gap on every slide
+\usetheme{Cattolica}
+
+\lecture{3}{Multiple regression}          % number and title: title page + footline
+\author{Prof. Giuseppe Arbia}
+\institute{HEMA \textperiodcentered\ Università Cattolica del Sacro Cuore, Rome}
+\date{Friday 25 September 2026 \textperiodcentered\ room 204}
+
+\begin{document}
+
+\begin{frame}[plain,noframenumbering]
+  \titlepage
+\end{frame}
+
+\begin{frame}{Today}
+  \tableofcontents
+\end{frame}
+
+\section{From one predictor to many}
+
+\begin{frame}{The model}{One line, then a semester of consequences}
+  \[
+    y_i = \beta_0 + \beta_1 x_{i1} + \dots + \beta_p x_{ip} + \varepsilon_i,
+    \qquad \varepsilon_i \sim \mathcal{N}(0,\sigma^2)
+  \]
+  \begin{itemize}
+    \item Each $\beta_j$ is the effect of $x_j$ \emph{holding the others fixed}
+    \item \gold{That clause} is the whole difference from simple regression
+    \item Estimated by least squares, exactly as before: $\hat\beta = (X^\top X)^{-1}X^\top y$
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{In R}
+\begin{rcode}
+fit <- lm(mpg ~ wt + hp + qsec, data = mtcars)
+summary(fit)          # coefficients, standard errors, R^2
+confint(fit)          # 95% intervals for each beta
+\end{rcode}
+  \begin{remark}
+    \texttt{summary()} tests each coefficient against zero \emph{given the others}. A variable that is significant alone can vanish once its correlates enter.
+  \end{remark}
+\end{frame}
+
+\statement{Adding a predictor never lowers $R^2$.\\[0.3em]\muted{\normalsize That is why $R^2$ cannot choose a model.}}
+
+\section{Judging the fit}
+
+\begin{frame}{Adjusted $R^2$ and beyond}
+  \begin{definition*}[Adjusted $R^2$]
+    $\bar R^2 = 1 - (1 - R^2)\,\dfrac{n-1}{n-p-1}$ --- penalises $p$ so that an irrelevant predictor lowers it.
+  \end{definition*}
+  \begin{important}[Before the lab]
+    Fit \texttt{mpg \textasciitilde{} .} on \texttt{mtcars}, then drop predictors one at a time. Watch $R^2$ and $\bar R^2$ move in different directions.
+  \end{important}
+\end{frame}
+
+\end{document}
