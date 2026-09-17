@@ -48,19 +48,18 @@ room and topic are unchanged: 17:00–19:00, room 204, survival models.
 
 | # | Date | Time · Room | Topic | Materials |
 |---|------|-------------|-------|-----------|
-| 10 | Mon 2 Nov | 17:00–19:00 · 202 | Module 2 opening · software setup check · the unsupervised learning problem | [setup](setup.qmd) |
-| 11 | Tue 3 Nov | 09:00–12:00 · 204 | k-means clustering · customer segmentation | — |
-| 12 | Mon 9 Nov | 17:00–19:00 · 202 | Hierarchical clustering · hospital and patient grouping | — |
-| 13 | Fri 13 Nov | 09:00–12:00 · 204 | Lab — clustering end to end in R | — |
-| 14 | Mon 16 Nov | 17:00–19:00 · 202 | Principal components · latent drivers of customer behaviour | — |
-| 15 | Tue 17 Nov | 10:00–13:00 · 204 | Correspondence analysis · dimensions of brand perception · lab | — |
-| 16 | Mon 23 Nov | 17:00–19:00 · 202 | Decision trees | — |
-| 17 | Fri 27 Nov | 10:00–13:00 · 204 | Random forests and gradient boosting · lab | — |
-| 18 | Mon 30 Nov | 17:00–19:00 · 202 | Neural networks | — |
-| 19 | Fri 4 Dec | 10:00–13:00 · 204 | Lab — neural networks, and when not to reach for them | — |
-| 20 | Wed 9 Dec | 17:00–19:00 · 202 | Model interpretability · predictive accuracy vs interpretability in managerial decision-making | — |
-| 21 | Fri 11 Dec | 10:00–13:00 · **108** | Executive dashboards · communicating uncertainty · storytelling with data · human–AI collaboration | — |
-
+| 10 | Mon 2 Nov | 17:00–19:00 · 202 | Module 2 opening · software setup check · the unsupervised learning problem | [slides](lectures/10-opening.html) · [setup](setup.qmd) |
+| 11 | Tue 3 Nov | 09:00–12:00 · 204 | k-means clustering · customer segmentation | [slides](lectures/11-kmeans.html) |
+| 12 | Mon 9 Nov | 17:00–19:00 · 202 | Hierarchical clustering · hospital and patient grouping | [slides](lectures/12-hierarchical.html) |
+| 13 | Fri 13 Nov | 09:00–12:00 · 204 | Lab — clustering end to end in R | [slides](lectures/13-lab-clustering.html) · [data](materials/customers.csv) |
+| 14 | Mon 16 Nov | 17:00–19:00 · 202 | Principal components · latent drivers of customer behaviour | [slides](lectures/14-pca.html) |
+| 15 | Tue 17 Nov | 10:00–13:00 · 204 | Correspondence analysis · dimensions of brand perception · lab | [slides](lectures/15-correspondence.html) · [data](materials/brands.csv) |
+| 16 | Mon 23 Nov | 17:00–19:00 · 202 | Decision trees | [slides](lectures/16-trees.html) |
+| 17 | Fri 27 Nov | 10:00–13:00 · 204 | Random forests and gradient boosting · lab | [slides](lectures/17-forests-boosting.html) · [data](materials/churn.csv) |
+| 18 | Mon 30 Nov | 17:00–19:00 · 202 | Neural networks | [slides](lectures/18-neural-networks.html) |
+| 19 | Fri 4 Dec | 10:00–13:00 · 204 | Lab — neural networks, and when not to reach for them | [slides](lectures/19-lab-neural-networks.html) |
+| 20 | Wed 9 Dec | 17:00–19:00 · 202 | Model interpretability · predictive accuracy vs interpretability in managerial decision-making | [slides](lectures/20-interpretability.html) |
+| 21 | Fri 11 Dec | 10:00–13:00 · **108** | Executive dashboards · communicating uncertainty · storytelling with data · human–AI collaboration | [slides](lectures/21-communication.html) |
 : {tbl-colwidths="[4,12,16,48,20]"}
 
 ::: {.callout-note appearance="simple"}

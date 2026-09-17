@@ -1,0 +1,151 @@
+---
+title: "Learning without a label"
+subtitle: "Lecture 10 · room 202"
+author: "Prof. Niccolò Salvini"
+institute: "HEMA · Università Cattolica del Sacro Cuore, Rome"
+date: 2026-11-02
+date-format: "dddd D MMMM YYYY"
+---
+
+## Objectives
+
+- See what Module 2 adds to Module 1, and why it comes second
+- Speak both dialects: the statistician's and the machine learner's
+- State the unsupervised problem precisely — and see why it is harder to grade
+- Check that R, RStudio and the course packages run on your machine
+
+## [Section 1]{.section-kicker} Where we are {.section-slide background-color="#002f57"}
+
+## Module 1 gave you a target
+
+::: {.subtitle-frame}
+Every method so far had a $y$
+:::
+
+- Regression: a number to predict — sales, length of stay, cost
+- Logistic and Poisson: a class or a count
+- Time series: tomorrow, from yesterday
+- Ridge, LASSO: the same, with too many predictors
+
+In every case the data came with **the answer attached**. The model's job was to reproduce it.
+
+## Module 2 takes the target away — then gives it back
+
+| Weeks | Question | Has a $y$? |
+|---|---|---|
+| 1–3 | *Which customers resemble each other?* — clustering, PCA, correspondence analysis | **No** |
+| 4–6 | *Which will churn, default, be readmitted?* — trees, forests, boosting, neural networks | Yes |
+| 7 | *Why did the model say that, and how do I tell the board?* | — |
+
+::: {.callout-note}
+The second half is supervised, like Module 1 — but with **algorithms** in place of **equations**. That change is the subject of this lecture.
+:::
+
+## [Section 2]{.section-kicker} Two dialects, one subject {.section-slide background-color="#002f57"}
+
+## The same things, with different names
+
+::: {.subtitle-frame}
+Machine learning grew up next door to statistics and renamed the furniture
+:::
+
+| Statistics | Machine learning |
+|---|---|
+| Explanatory variable | **Input**, feature |
+| Response variable | **Output**, target, label |
+| Observations | **Training set** |
+| Estimation, fitting | **Training** the model |
+| Intercept | **Bias** |
+| Transformation | **Activation function** |
+| Coefficients, parameters | **Weights** |
+
+You will hear both in this room. They are the same objects.
+
+## What actually differs
+
+- **Statistics** starts from a *sample* and reasons about a *population*. Standard errors, tests, confidence intervals — all of it lives there.
+- **Machine learning** starts from a *training set* and is judged on a *test set*. There is no population in the picture. The question is only: does it predict well on data it has not seen?
+- Statistics tends to *impose* the form of the relationship; machine learning tries to *learn* it, whatever it is.
+
+::: {.callout-important title="The trade you are about to make"}
+Flexibility and interpretability pull in opposite directions. The further you move toward complex models, the more you predict and the less you can explain, test, or defend. Module 2 is about spending that budget deliberately.
+:::
+
+## Prediction is not inference — a manager's version
+
+::: {.subtitle-frame}
+Same model, two different questions
+:::
+
+- **Inference**: *does a loyalty card increase spend, and by how much?* — you need a coefficient you can trust, with an interval around it
+- **Prediction**: *which of these 40 000 customers will spend most next quarter?* — you need a ranking that holds up, and you do not care why
+
+Module 1 was mostly the first question. Module 2 is mostly the second. Confusing them is the most common analytical mistake in business, and the most expensive.
+
+## [Section 3]{.section-kicker} The unsupervised problem {.section-slide background-color="#002f57"}
+
+## No label, no error, no "correct"
+
+::: {.subtitle-frame}
+The problem stated plainly
+:::
+
+You have $n$ rows and $p$ columns — customers and their behaviour, patients and their measurements — and **nothing to predict**.
+
+You are asked: is there *structure*? Do these rows fall into groups? Can $p$ columns be summarised by fewer?
+
+- In supervised learning, a wrong prediction is a visible number: $y - \hat y$
+- In unsupervised learning there is no $y$. **No residual, no accuracy, no test set.**
+- Two analysts can produce two different segmentations of the same customers, and neither is *wrong*
+
+## Then how do you judge it?
+
+- **Internal coherence**: are the groups tight and far apart? (numbers exist — we will use them — but they measure geometry, not truth)
+- **Stability**: does the structure survive a different sample, a different seed, a different $k$?
+- **Usefulness**: can marketing *act* on the segments? Do clinicians *recognise* the patient groups?
+
+::: {.callout-note}
+That last criterion is not a soft one. A segmentation nobody can act on is a wrong segmentation, however tight its clusters.
+:::
+
+## The three tools of the next three weeks
+
+| Tool | Question it answers | Business example |
+|---|---|---|
+| **Clustering** (k-means, hierarchical) | Which rows are alike? | Customer segments; patient case-mix groups |
+| **Principal components** | Which few directions carry most of the variation? | The two or three drivers behind twenty survey items |
+| **Correspondence analysis** | How do two categorical variables relate? | Brands × attributes — the perception map |
+
+All three are *descriptive*. They organise data; they do not predict anything. That is their strength and their limit.
+
+## Every unsupervised method is a choice you make.  {.statement}
+
+[What counts as "similar" is decided by you, not by the data.]{.muted}
+
+## [Section 4]{.section-kicker} Setup check {.section-slide background-color="#002f57"}
+
+## Ten minutes, now, on your own machine
+
+Open RStudio, paste into the Console:
+
+```{.r code-line-numbers="1|3-5|7"}
+source("https://sbd-26-27.netlify.app/materials/setup.R")
+
+library(tidyverse)
+library(cluster)
+library(factoextra)
+
+fviz_nbclust(scale(USArrests), kmeans, method = "wss")
+```
+
+If a plot appears, you are ready for Tuesday. If not, that is what the next ten minutes and [office hours](../office-hours.html) are for — not Tuesday's lab.
+
+::: {.callout-important title="Before the lab"}
+Bring a laptop that runs the line above. Nobody discovers a missing package in a lab; they discover it tonight.
+:::
+
+## Reading
+
+- **ISLR** chapter 12, §12.1–12.2 — unsupervised learning, PCA
+- **Provost & Fawcett** chapter 6 — *similarity, neighbours, clusters*: read this one for the business framing
+- Optional: ISLR chapter 2, §2.1.4 — supervised vs unsupervised, two pages

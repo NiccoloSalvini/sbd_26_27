@@ -1,0 +1,168 @@
+---
+title: "Principal components"
+subtitle: "Lecture 14 · room 202"
+author: "Prof. Niccolò Salvini"
+institute: "HEMA · Università Cattolica del Sacro Cuore, Rome"
+date: 2026-11-16
+date-format: "dddd D MMMM YYYY"
+---
+
+## Objectives
+
+- See what a principal component *is*: a direction, not a variable
+- Read loadings, scores, and the scree plot — and stop at the right number
+- Find the **latent drivers** behind twenty questionnaire items
+- Meet the idea that comes back in week 5: compression as a model
+
+## Why a manager cares
+
+::: {.subtitle-frame}
+Twenty questions, three answers
+:::
+
+- A customer satisfaction survey has 24 items. The board wants to know *what drives satisfaction*. Not 24 things — two or three.
+- A hospital collects 30 quality indicators per ward. They move together in ways nobody can see in a spreadsheet.
+- Before a churn model, 80 behavioural columns — many of them near-copies of each other
+
+In each case the data are **wide** and **redundant**. PCA finds the few directions along which they actually vary, and throws away the rest.
+
+## [Section 1]{.section-kicker} The idea {.section-slide background-color="#002f57"}
+
+## A component is a direction
+
+::: {.subtitle-frame}
+Stated without matrices first
+:::
+
+Picture the data as a cloud of $n$ points in $p$ dimensions.
+
+- The **first principal component** is the line through the cloud along which the points are *most spread out*
+- The **second** is the line at right angles to the first with the most remaining spread
+- And so on, $p$ times — but the spread runs out fast
+
+Each point's **score** is its coordinate along that line. Each variable's **loading** is how much it contributes to the direction.
+
+::: {.callout-note}
+Nothing is dropped, yet. PCA is a *rotation*. Compression happens when you keep the first few components and discard the others — and you decide how many.
+:::
+
+## The same thing, in one line
+
+For centred data $X$ ($n \times p$), the first component is the unit vector $\phi_1$ that maximises the variance of the projection:
+
+$$
+\phi_1 = \arg\max_{\lVert \phi \rVert = 1} \; \operatorname{Var}(X \phi)
+$$
+
+- The solution is the leading **eigenvector of the covariance matrix** $X^\top X / n$
+- Its eigenvalue $\lambda_1$ is the variance it captures. $\lambda_1 / \sum_j \lambda_j$ is the *proportion of variance explained*
+- Components 2, 3, … are the next eigenvectors, orthogonal to the previous ones
+
+Everything you will read off a PCA is one of: a loading vector $\phi_k$, a score $X\phi_k$, or a variance share $\lambda_k / \sum \lambda$.
+
+## By hand: two variables, perfectly correlated
+
+Height and arm span, standardised, for four people: $(-1.5,-1.5), (-0.5,-0.5), (0.5,0.5), (1.5,1.5)$.
+
+- The cloud is a line at 45°. The first component is that line: $\phi_1 = (0.71, 0.71)$
+- Scores along it: $-2.1, -0.7, 0.7, 2.1$. Variance $= 2.5$
+- The second component is perpendicular: $\phi_2 = (0.71, -0.71)$. Every score is $0$. Variance $= 0$.
+
+**Two variables, one component, 100% of the variance.** You had two columns and one piece of information. That is the whole method, in the simplest case it can be seen in.
+
+## Scale, again
+
+PCA is a variance-hunter. A variable measured in thousands *is* the first component, whatever it means.
+
+- **Standardise** — `scale. = TRUE` — unless every column is already in the same unit and you *want* the large-variance ones to dominate
+- On a survey where every item is 1–5, you may leave it; on customer behaviour, you may not
+
+::: {.callout-important title="Attention"}
+Same trap as clustering, same fix, same reason. Distance and variance are both blind to units.
+:::
+
+## [Section 2]{.section-kicker} How many, and what do they mean {.section-slide background-color="#002f57"}
+
+## How many components to keep
+
+- **Scree plot**: variance explained per component. Keep the ones before the curve flattens — the *elbow*, again
+- **Cumulative share**: keep enough to reach 70–80% — a convention, not a law
+- **Kaiser**: keep components with eigenvalue $> 1$ on standardised data, i.e. that explain more than one original variable's worth
+
+They disagree often. When they do, prefer the smaller number you can **interpret**. A component nobody can name is not a driver; it is noise with a label.
+
+## Naming a component
+
+Read its loadings. Large positive and large negative loadings tell you what the direction *contrasts*.
+
+| Item | PC1 | PC2 |
+|---|---|---|
+| Staff courtesy | **0.48** | 0.05 |
+| Waiting time | **0.45** | −0.10 |
+| Clarity of explanations | **0.47** | 0.02 |
+| Price fairness | 0.08 | **0.71** |
+| Value for money | 0.11 | **0.68** |
+
+PC1: *service experience*. PC2: *price perception*. Two drivers, from five items — and now a regression of satisfaction on **two** scores instead of five collinear columns.
+
+## In R
+
+```{.r code-line-numbers="1-2|4|6-7|9-10|12"}
+library(tidyverse); library(factoextra)
+X <- USArrests                                  # 50 states, 4 crime rates + urban pop
+
+pca <- prcomp(X, scale. = TRUE)
+
+summary(pca)                                    # variance explained, cumulative
+fviz_eig(pca)                                   # scree
+
+pca$rotation                                    # loadings: variable × component
+head(pca$x)                                     # scores: state × component
+
+fviz_pca_biplot(pca, repel = TRUE)              # both at once — the plot to show
+```
+
+::: {.callout-note}
+On `USArrests`, PC1 loads on all three violent-crime rates: *overall crime*. PC2 is urban population alone: *urbanisation*. Two components, 87% of the variance, and both have a name.
+:::
+
+## The biplot, read properly
+
+- **Points** are observations, placed by their scores on PC1 and PC2
+- **Arrows** are variables, drawn from their loadings
+- A long arrow: the variable is well represented in these two components
+- Two arrows at a small angle: the variables are correlated. At 90°: not. Opposite: negatively.
+- A point far out along an arrow scores high on that variable
+
+It is the single most information-dense plot in this course. Spend the lab learning to read one.
+
+## [Section 3]{.section-kicker} Compression as a model {.section-slide background-color="#002f57"}
+
+## PCA reconstructs
+
+Keep $q < p$ components. From the scores you can *rebuild* an approximation of every row:
+
+$$
+\hat X \;=\; (X \Phi_q)\, \Phi_q^\top
+$$
+
+- $q = p$: perfect reconstruction. $q = 1$: each row is replaced by its projection on one line
+- The reconstruction error $\lVert X - \hat X \rVert^2$ is exactly the variance you threw away
+
+::: {.callout-note}
+Hold this thought for week 5. A neural network that learns to compress its input to $q$ numbers and rebuild it is called an **autoencoder** — and with linear activations, it *is* PCA. Nonlinear activations make it a PCA that can bend.
+:::
+
+## A component is what your variables have in common. Naming it is your job, not the algorithm's.  {.statement}
+
+## Before the lab
+
+- `prcomp` on `USArrests`, with and without `scale. = TRUE`. Compare the first loading vector. Which state moved most?
+- On `customers.csv` from Friday: PCA on the six behavioural columns. How many components for 80%? Name PC1 and PC2 from the loadings.
+- Then: `kmeans` on the first two scores instead of all six columns. Same segments?
+
+## Reading
+
+- **ISLR** §12.2 — principal components analysis; the `USArrests` example is the one we ran
+- **Provost & Fawcett** chapter 6, *Data reduction* — why fewer, better features beat more
+- Reference: `?prcomp`, `factoextra::fviz_pca_biplot`

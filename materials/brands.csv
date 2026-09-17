@@ -1,0 +1,2357 @@
+respondent,brand,attribute
+1,A,Cheap
+1,A,Innovative
+1,A,Reliable
+2,B,Cheap
+3,C,Innovative
+4,C,Reliable
+4,C,Premium
+5,D,Premium
+6,C,Reliable
+6,C,Innovative
+7,B,For young people
+8,C,Reliable
+9,D,Premium
+9,D,Reliable
+10,C,Innovative
+10,C,Premium
+10,C,For young people
+11,A,Innovative
+11,A,For young people
+11,A,Reliable
+12,B,Cheap
+12,B,Reliable
+12,B,Innovative
+13,A,Premium
+14,A,Reliable
+15,C,Reliable
+16,B,Premium
+16,B,For young people
+17,C,Cheap
+18,A,For young people
+19,C,Premium
+19,C,Reliable
+20,A,Reliable
+20,A,Innovative
+20,A,For young people
+21,D,Reliable
+22,A,For young people
+23,A,Reliable
+24,A,Premium
+24,A,Reliable
+25,C,Premium
+25,C,Reliable
+26,D,Premium
+26,D,Reliable
+26,D,Cheap
+27,A,Reliable
+27,A,Premium
+27,A,For young people
+28,B,Cheap
+28,B,For young people
+28,B,Innovative
+29,C,Innovative
+29,C,For young people
+29,C,Premium
+30,B,Cheap
+30,B,For young people
+31,B,For young people
+31,B,Cheap
+32,C,For young people
+32,C,Reliable
+33,D,Premium
+34,D,Premium
+35,B,Reliable
+36,A,Reliable
+36,A,For young people
+36,A,Premium
+37,C,Innovative
+38,D,Reliable
+38,D,Premium
+39,B,For young people
+39,B,Cheap
+39,B,Reliable
+40,C,Reliable
+41,A,Premium
+42,B,For young people
+42,B,Reliable
+42,B,Cheap
+43,B,Cheap
+43,B,Premium
+43,B,For young people
+44,B,Cheap
+45,B,Cheap
+45,B,For young people
+46,C,Innovative
+46,C,For young people
+47,A,Innovative
+48,B,For young people
+49,C,Premium
+49,C,Cheap
+49,C,Reliable
+50,D,Premium
+50,D,Reliable
+50,D,Innovative
+51,C,For young people
+51,C,Innovative
+51,C,Reliable
+52,A,Reliable
+52,A,Innovative
+52,A,For young people
+53,A,Cheap
+53,A,Innovative
+53,A,Reliable
+54,C,Premium
+55,A,Reliable
+55,A,Innovative
+55,A,For young people
+56,D,Reliable
+56,D,Premium
+57,D,Premium
+57,D,Reliable
+58,B,Cheap
+58,B,For young people
+58,B,Innovative
+59,B,For young people
+59,B,Cheap
+59,B,Reliable
+60,C,Innovative
+60,C,For young people
+61,D,Reliable
+61,D,Premium
+61,D,Innovative
+62,C,Innovative
+62,C,Cheap
+62,C,Premium
+63,A,Reliable
+63,A,Innovative
+64,D,Innovative
+65,A,Innovative
+66,C,For young people
+66,C,Innovative
+66,C,Premium
+67,A,Premium
+67,A,Innovative
+68,B,For young people
+68,B,Innovative
+69,A,Premium
+69,A,Reliable
+69,A,Innovative
+70,C,Premium
+71,A,Reliable
+72,B,Cheap
+72,B,For young people
+73,D,Premium
+73,D,Reliable
+73,D,Innovative
+74,C,Reliable
+74,C,Innovative
+75,D,Reliable
+75,D,Premium
+76,A,Innovative
+77,C,Innovative
+77,C,Premium
+77,C,Reliable
+78,B,Cheap
+78,B,Reliable
+78,B,For young people
+79,C,Cheap
+80,A,Innovative
+80,A,Reliable
+81,C,For young people
+81,C,Reliable
+81,C,Premium
+82,B,Innovative
+82,B,For young people
+83,D,Premium
+84,D,Premium
+85,D,Premium
+85,D,For young people
+85,D,Reliable
+86,C,For young people
+87,D,Innovative
+88,D,Reliable
+88,D,For young people
+88,D,Premium
+89,C,Innovative
+89,C,Reliable
+89,C,For young people
+90,C,Innovative
+90,C,Premium
+90,C,Cheap
+91,C,Premium
+91,C,Innovative
+92,B,For young people
+93,C,Cheap
+93,C,Premium
+94,B,For young people
+94,B,Cheap
+94,B,Reliable
+95,B,Cheap
+95,B,Premium
+96,B,Cheap
+96,B,Innovative
+97,D,Premium
+98,D,Reliable
+98,D,Innovative
+98,D,Premium
+99,D,Premium
+99,D,For young people
+100,B,For young people
+101,C,Innovative
+101,C,For young people
+102,D,Reliable
+102,D,Innovative
+103,B,Cheap
+104,D,Premium
+104,D,Reliable
+105,A,Reliable
+105,A,Premium
+105,A,Innovative
+106,A,Innovative
+107,A,Premium
+107,A,Reliable
+107,A,Innovative
+108,C,Innovative
+109,C,Innovative
+110,A,Premium
+110,A,Innovative
+110,A,Reliable
+111,B,For young people
+112,C,Innovative
+113,C,Premium
+113,C,For young people
+113,C,Reliable
+114,D,Premium
+114,D,Reliable
+115,B,Cheap
+115,B,Reliable
+115,B,For young people
+116,C,Reliable
+116,C,Premium
+116,C,For young people
+117,A,Premium
+117,A,Innovative
+117,A,Cheap
+118,B,Cheap
+118,B,Innovative
+119,B,Reliable
+119,B,For young people
+120,B,Cheap
+121,A,Reliable
+122,D,Premium
+123,B,For young people
+124,C,Innovative
+125,D,Reliable
+126,C,For young people
+126,C,Innovative
+126,C,Cheap
+127,A,Premium
+127,A,Reliable
+128,D,Reliable
+129,C,Innovative
+130,D,For young people
+131,B,Cheap
+132,B,Cheap
+133,C,Innovative
+133,C,For young people
+134,B,Reliable
+134,B,Cheap
+135,C,Innovative
+135,C,Reliable
+136,D,Premium
+137,C,Innovative
+138,C,For young people
+139,C,Innovative
+139,C,Reliable
+139,C,For young people
+140,A,Premium
+140,A,Innovative
+141,C,For young people
+141,C,Innovative
+142,D,Reliable
+142,D,Premium
+142,D,Innovative
+143,A,Reliable
+143,A,Innovative
+143,A,For young people
+144,B,For young people
+145,A,For young people
+145,A,Reliable
+145,A,Innovative
+146,D,Innovative
+146,D,Premium
+146,D,Reliable
+147,C,For young people
+147,C,Premium
+147,C,Reliable
+148,D,Premium
+148,D,Innovative
+148,D,Reliable
+149,A,Premium
+149,A,Reliable
+149,A,For young people
+150,D,Reliable
+150,D,Premium
+150,D,Innovative
+151,D,Innovative
+152,D,Reliable
+152,D,Innovative
+152,D,Cheap
+153,B,Cheap
+153,B,For young people
+153,B,Innovative
+154,D,Premium
+154,D,Innovative
+155,D,Reliable
+155,D,Premium
+155,D,Innovative
+156,B,Innovative
+157,B,Reliable
+157,B,Cheap
+157,B,Premium
+158,A,Cheap
+158,A,Innovative
+158,A,Premium
+159,D,For young people
+159,D,Premium
+159,D,Reliable
+160,C,Premium
+160,C,Cheap
+160,C,Innovative
+161,D,Reliable
+161,D,Premium
+162,A,For young people
+163,B,Cheap
+163,B,Innovative
+164,B,Premium
+164,B,Innovative
+164,B,Cheap
+165,C,Premium
+165,C,Reliable
+166,B,Cheap
+167,B,For young people
+167,B,Cheap
+168,B,For young people
+168,B,Cheap
+169,B,Cheap
+169,B,Innovative
+169,B,Reliable
+170,D,Premium
+170,D,Reliable
+171,B,Cheap
+172,B,Premium
+173,D,Reliable
+174,D,Reliable
+175,D,Premium
+175,D,Innovative
+176,A,Reliable
+176,A,Innovative
+177,D,For young people
+178,D,Premium
+178,D,Reliable
+179,C,Premium
+179,C,Innovative
+180,D,Reliable
+181,A,Reliable
+182,B,Premium
+182,B,Cheap
+183,D,Innovative
+183,D,Reliable
+183,D,Premium
+184,A,Innovative
+185,C,Premium
+186,D,Innovative
+187,C,Innovative
+187,C,For young people
+188,C,Cheap
+189,A,Reliable
+190,A,Premium
+190,A,For young people
+191,A,Reliable
+192,B,Reliable
+192,B,Cheap
+193,B,Reliable
+194,D,Reliable
+194,D,Innovative
+195,D,Premium
+195,D,Innovative
+196,C,Reliable
+197,A,For young people
+197,A,Innovative
+197,A,Premium
+198,A,For young people
+198,A,Innovative
+199,D,Innovative
+200,A,For young people
+201,A,Reliable
+202,A,Innovative
+202,A,Premium
+202,A,Reliable
+203,D,Innovative
+204,C,For young people
+204,C,Innovative
+205,C,Innovative
+205,C,For young people
+206,A,Reliable
+207,D,Premium
+207,D,Reliable
+208,B,Reliable
+209,D,Premium
+209,D,Reliable
+209,D,For young people
+210,D,Reliable
+211,D,Premium
+211,D,Reliable
+211,D,Innovative
+212,B,Cheap
+212,B,For young people
+213,C,Cheap
+214,B,Reliable
+214,B,Premium
+215,D,Premium
+215,D,Reliable
+216,A,Reliable
+216,A,Premium
+217,B,Cheap
+217,B,For young people
+218,A,Reliable
+218,A,Premium
+218,A,Innovative
+219,B,Reliable
+220,C,Reliable
+221,D,Premium
+222,D,Premium
+222,D,Reliable
+222,D,For young people
+223,B,Cheap
+223,B,For young people
+223,B,Innovative
+224,D,Premium
+224,D,Reliable
+224,D,Cheap
+225,B,Cheap
+225,B,For young people
+225,B,Innovative
+226,D,Premium
+226,D,Reliable
+227,B,Reliable
+227,B,Cheap
+227,B,For young people
+228,D,Cheap
+229,A,Premium
+229,A,Innovative
+230,A,For young people
+230,A,Premium
+231,C,Innovative
+231,C,Reliable
+231,C,Premium
+232,B,Cheap
+232,B,Innovative
+232,B,For young people
+233,A,Premium
+233,A,Innovative
+233,A,Cheap
+234,B,Cheap
+235,A,For young people
+236,B,For young people
+236,B,Cheap
+236,B,Innovative
+237,A,Reliable
+237,A,Innovative
+237,A,Premium
+238,A,Reliable
+238,A,Premium
+238,A,Innovative
+239,B,Reliable
+239,B,For young people
+240,C,For young people
+240,C,Reliable
+241,C,Innovative
+242,D,Reliable
+243,C,Innovative
+243,C,Cheap
+243,C,Premium
+244,A,Reliable
+245,B,Cheap
+246,B,Reliable
+247,B,Cheap
+247,B,Innovative
+247,B,For young people
+248,C,Cheap
+248,C,Innovative
+249,B,Cheap
+249,B,For young people
+250,D,Premium
+251,B,Cheap
+251,B,Innovative
+251,B,Reliable
+252,D,Premium
+252,D,Reliable
+252,D,Innovative
+253,C,Innovative
+253,C,For young people
+253,C,Premium
+254,B,Cheap
+255,A,Innovative
+255,A,Reliable
+256,D,Reliable
+257,D,Premium
+258,D,Premium
+259,A,For young people
+259,A,Innovative
+259,A,Premium
+260,C,Reliable
+261,A,For young people
+261,A,Premium
+262,B,Innovative
+262,B,For young people
+263,A,Reliable
+263,A,For young people
+263,A,Innovative
+264,C,Premium
+264,C,For young people
+265,A,For young people
+265,A,Premium
+266,A,Innovative
+266,A,Premium
+267,C,Innovative
+268,C,Reliable
+268,C,Innovative
+269,A,Reliable
+269,A,Innovative
+270,A,Premium
+271,A,Reliable
+272,C,Reliable
+273,D,Reliable
+273,D,For young people
+273,D,Premium
+274,C,Innovative
+274,C,Cheap
+275,B,Cheap
+275,B,Reliable
+276,D,Premium
+276,D,Reliable
+276,D,Cheap
+277,D,Premium
+277,D,Cheap
+277,D,Reliable
+278,C,Cheap
+279,A,Innovative
+280,D,Innovative
+280,D,Reliable
+280,D,Premium
+281,D,Reliable
+281,D,Innovative
+282,D,Reliable
+282,D,Premium
+282,D,Innovative
+283,D,Premium
+283,D,Reliable
+283,D,For young people
+284,D,Innovative
+284,D,Premium
+285,D,Premium
+285,D,Reliable
+286,D,Innovative
+287,D,Cheap
+288,C,Innovative
+288,C,For young people
+289,C,Innovative
+290,C,Innovative
+290,C,Reliable
+291,D,Premium
+291,D,Reliable
+292,A,For young people
+292,A,Premium
+293,A,Premium
+293,A,Reliable
+294,D,Reliable
+295,B,Cheap
+295,B,Reliable
+295,B,Innovative
+296,A,Reliable
+296,A,Premium
+296,A,Innovative
+297,C,For young people
+298,A,Innovative
+298,A,Reliable
+299,D,Premium
+300,A,Premium
+301,A,Premium
+302,B,For young people
+303,C,Reliable
+303,C,Innovative
+304,C,Innovative
+304,C,Premium
+304,C,Reliable
+305,C,Innovative
+305,C,Reliable
+306,D,For young people
+307,B,Cheap
+308,D,Premium
+308,D,Reliable
+309,C,Reliable
+309,C,Premium
+309,C,For young people
+310,C,Innovative
+311,B,Reliable
+311,B,For young people
+311,B,Innovative
+312,C,Innovative
+312,C,Reliable
+313,D,Reliable
+313,D,Premium
+314,B,For young people
+315,D,Premium
+315,D,Reliable
+315,D,Cheap
+316,D,Premium
+316,D,Reliable
+316,D,Cheap
+317,C,Innovative
+317,C,Reliable
+318,A,Innovative
+319,B,Cheap
+319,B,For young people
+319,B,Reliable
+320,C,Innovative
+320,C,For young people
+321,A,Reliable
+321,A,Innovative
+321,A,Premium
+322,A,Premium
+323,B,For young people
+323,B,Cheap
+324,C,Reliable
+324,C,Innovative
+324,C,Premium
+325,D,Reliable
+325,D,Premium
+326,D,For young people
+326,D,Reliable
+327,B,For young people
+327,B,Cheap
+327,B,Premium
+328,B,Reliable
+329,B,Cheap
+329,B,For young people
+329,B,Reliable
+330,D,Premium
+330,D,For young people
+330,D,Reliable
+331,D,Reliable
+331,D,Premium
+331,D,Innovative
+332,C,Innovative
+332,C,Premium
+333,C,Innovative
+333,C,Cheap
+334,C,For young people
+334,C,Innovative
+334,C,Reliable
+335,C,Reliable
+335,C,For young people
+336,A,Reliable
+337,A,Reliable
+337,A,Innovative
+337,A,Premium
+338,D,Premium
+339,D,Reliable
+339,D,Innovative
+340,A,Premium
+341,C,For young people
+341,C,Innovative
+342,D,Premium
+342,D,Reliable
+343,B,Cheap
+344,B,For young people
+345,D,Reliable
+345,D,Premium
+345,D,Cheap
+346,D,For young people
+346,D,Reliable
+347,C,Innovative
+347,C,For young people
+348,C,Innovative
+348,C,Cheap
+348,C,For young people
+349,D,Premium
+350,A,Innovative
+350,A,Reliable
+350,A,Premium
+351,A,Premium
+351,A,Cheap
+352,A,Premium
+352,A,For young people
+352,A,Innovative
+353,A,For young people
+353,A,Innovative
+354,B,Cheap
+355,B,Cheap
+355,B,Reliable
+356,C,Premium
+356,C,Reliable
+356,C,For young people
+357,B,Cheap
+358,B,Cheap
+358,B,For young people
+358,B,Reliable
+359,C,For young people
+360,C,Reliable
+361,A,Innovative
+361,A,For young people
+361,A,Premium
+362,A,Cheap
+362,A,Reliable
+363,D,Premium
+363,D,Reliable
+364,D,Reliable
+364,D,Premium
+365,A,Reliable
+365,A,Cheap
+365,A,Innovative
+366,C,Cheap
+366,C,For young people
+366,C,Premium
+367,D,Premium
+368,C,For young people
+368,C,Reliable
+369,C,Innovative
+369,C,Premium
+370,D,Premium
+371,C,Reliable
+372,B,For young people
+373,B,Cheap
+373,B,For young people
+374,D,Reliable
+374,D,Innovative
+375,C,Reliable
+375,C,Premium
+376,D,Reliable
+377,C,Innovative
+377,C,Cheap
+378,A,Reliable
+379,B,For young people
+380,B,Reliable
+380,B,Cheap
+381,A,Reliable
+381,A,Premium
+382,B,For young people
+382,B,Cheap
+382,B,Innovative
+383,A,Innovative
+383,A,Reliable
+384,C,Innovative
+385,D,Premium
+385,D,Reliable
+385,D,Innovative
+386,B,For young people
+386,B,Cheap
+387,D,Premium
+388,D,Premium
+388,D,Reliable
+388,D,Innovative
+389,A,For young people
+390,B,Cheap
+391,A,Innovative
+391,A,Premium
+391,A,Reliable
+392,A,Innovative
+393,C,Cheap
+393,C,Innovative
+394,A,Innovative
+395,C,Premium
+395,C,Innovative
+396,D,Reliable
+396,D,Premium
+397,B,Cheap
+398,B,Premium
+399,A,Innovative
+400,C,For young people
+400,C,Reliable
+400,C,Innovative
+401,C,Innovative
+401,C,Cheap
+401,C,Premium
+402,A,Premium
+403,D,Reliable
+404,D,Cheap
+405,B,Innovative
+405,B,For young people
+406,A,Premium
+406,A,Reliable
+406,A,Innovative
+407,D,Reliable
+408,C,Innovative
+408,C,For young people
+408,C,Cheap
+409,A,Cheap
+409,A,Reliable
+409,A,Premium
+410,A,Reliable
+411,A,Innovative
+411,A,Reliable
+412,B,Cheap
+413,B,Cheap
+414,B,Cheap
+415,B,For young people
+416,C,Reliable
+416,C,Innovative
+417,A,Reliable
+417,A,Cheap
+417,A,For young people
+418,C,Premium
+418,C,Cheap
+418,C,Innovative
+419,D,Premium
+419,D,For young people
+419,D,Reliable
+420,B,Reliable
+420,B,For young people
+420,B,Cheap
+421,B,Innovative
+421,B,For young people
+422,C,For young people
+423,B,Cheap
+423,B,For young people
+423,B,Reliable
+424,B,For young people
+424,B,Cheap
+425,B,Cheap
+425,B,For young people
+426,A,Reliable
+426,A,Premium
+427,C,Reliable
+427,C,Innovative
+427,C,Cheap
+428,A,Reliable
+428,A,Cheap
+428,A,Premium
+429,C,Innovative
+429,C,For young people
+430,D,Innovative
+430,D,Reliable
+431,B,For young people
+432,B,For young people
+432,B,Reliable
+433,B,For young people
+433,B,Cheap
+433,B,Reliable
+434,C,Premium
+434,C,For young people
+435,D,Reliable
+435,D,Innovative
+436,C,Reliable
+436,C,Innovative
+437,D,Innovative
+437,D,Premium
+438,B,Cheap
+439,A,Premium
+439,A,For young people
+440,C,Innovative
+440,C,For young people
+440,C,Reliable
+441,C,For young people
+441,C,Reliable
+441,C,Premium
+442,D,Premium
+442,D,Reliable
+443,A,Reliable
+444,C,Reliable
+444,C,Premium
+444,C,Cheap
+445,D,For young people
+446,B,Cheap
+446,B,Premium
+447,C,Innovative
+447,C,Reliable
+448,B,For young people
+448,B,Cheap
+449,A,Premium
+449,A,Innovative
+449,A,Reliable
+450,A,Reliable
+451,C,Innovative
+451,C,Premium
+451,C,For young people
+452,B,Cheap
+452,B,For young people
+453,D,Reliable
+454,D,Reliable
+454,D,Premium
+455,B,For young people
+455,B,Cheap
+456,B,For young people
+457,C,Reliable
+457,C,Innovative
+458,D,Premium
+458,D,Reliable
+459,C,Premium
+460,C,Innovative
+460,C,Reliable
+460,C,Premium
+461,A,Reliable
+462,D,Premium
+463,A,Premium
+463,A,Innovative
+463,A,For young people
+464,A,Innovative
+465,B,Reliable
+465,B,Cheap
+466,A,Premium
+466,A,Reliable
+467,A,Innovative
+468,C,For young people
+468,C,Innovative
+469,C,Premium
+469,C,Innovative
+470,B,Cheap
+470,B,Reliable
+470,B,Innovative
+471,C,For young people
+471,C,Innovative
+472,B,Reliable
+473,B,For young people
+473,B,Cheap
+474,C,Premium
+474,C,Innovative
+475,D,Premium
+475,D,For young people
+475,D,Reliable
+476,D,Premium
+476,D,Innovative
+476,D,Reliable
+477,C,Innovative
+478,C,Innovative
+478,C,Premium
+478,C,Reliable
+479,A,For young people
+480,C,Premium
+480,C,Innovative
+481,C,Premium
+481,C,For young people
+481,C,Innovative
+482,D,Innovative
+482,D,Premium
+482,D,Reliable
+483,C,For young people
+484,D,Reliable
+485,C,Innovative
+486,C,Premium
+486,C,For young people
+486,C,Reliable
+487,A,Reliable
+487,A,For young people
+487,A,Innovative
+488,D,Premium
+489,A,Premium
+490,A,Premium
+490,A,Innovative
+490,A,Reliable
+491,C,Premium
+491,C,Innovative
+491,C,For young people
+492,D,Premium
+492,D,Reliable
+492,D,Innovative
+493,C,Premium
+493,C,Innovative
+493,C,For young people
+494,A,Premium
+494,A,Reliable
+495,D,Reliable
+495,D,Innovative
+495,D,Premium
+496,B,For young people
+497,B,Cheap
+497,B,For young people
+497,B,Reliable
+498,B,Cheap
+499,C,For young people
+499,C,Innovative
+500,D,Reliable
+500,D,Premium
+501,B,Cheap
+501,B,For young people
+501,B,Reliable
+502,C,Reliable
+502,C,For young people
+502,C,Premium
+503,C,Premium
+504,D,Reliable
+505,B,Innovative
+505,B,For young people
+505,B,Cheap
+506,D,Reliable
+506,D,Cheap
+506,D,Premium
+507,C,For young people
+507,C,Premium
+508,D,Innovative
+508,D,Premium
+509,B,For young people
+509,B,Cheap
+509,B,Reliable
+510,A,Reliable
+510,A,For young people
+511,D,Reliable
+512,D,Reliable
+513,A,Innovative
+513,A,Reliable
+513,A,Premium
+514,B,Cheap
+514,B,For young people
+514,B,Reliable
+515,A,Innovative
+515,A,Premium
+515,A,Reliable
+516,A,Innovative
+517,B,For young people
+517,B,Innovative
+518,B,Cheap
+519,C,Premium
+519,C,Innovative
+520,C,For young people
+521,B,Innovative
+521,B,Cheap
+521,B,For young people
+522,C,Innovative
+522,C,For young people
+522,C,Cheap
+523,C,For young people
+524,C,For young people
+524,C,Innovative
+524,C,Cheap
+525,B,Cheap
+525,B,Innovative
+525,B,For young people
+526,D,Reliable
+527,D,Reliable
+527,D,Premium
+528,B,Cheap
+528,B,For young people
+528,B,Premium
+529,B,Cheap
+530,A,Innovative
+530,A,Reliable
+531,C,Reliable
+531,C,For young people
+532,D,Premium
+532,D,Reliable
+533,B,Reliable
+533,B,Cheap
+534,B,Cheap
+534,B,Innovative
+535,D,Innovative
+535,D,Premium
+535,D,Reliable
+536,C,Innovative
+536,C,For young people
+536,C,Premium
+537,C,Innovative
+538,B,Cheap
+539,C,Innovative
+540,A,Reliable
+540,A,Innovative
+540,A,For young people
+541,D,Premium
+541,D,Innovative
+541,D,For young people
+542,C,Innovative
+542,C,For young people
+542,C,Cheap
+543,B,Cheap
+543,B,For young people
+544,A,Premium
+544,A,For young people
+545,C,Cheap
+545,C,Premium
+545,C,Reliable
+546,A,For young people
+547,D,Cheap
+547,D,Innovative
+547,D,Reliable
+548,D,For young people
+549,D,Innovative
+550,C,Innovative
+551,C,Cheap
+551,C,Reliable
+552,A,Innovative
+553,A,Innovative
+553,A,Premium
+553,A,Reliable
+554,A,Premium
+554,A,Reliable
+554,A,Cheap
+555,D,Reliable
+555,D,Premium
+556,C,Innovative
+556,C,Premium
+556,C,Cheap
+557,B,Cheap
+558,A,Premium
+558,A,Reliable
+559,C,Innovative
+559,C,For young people
+560,C,Reliable
+560,C,Premium
+561,C,Reliable
+561,C,For young people
+562,A,Innovative
+562,A,Reliable
+563,C,Reliable
+564,A,For young people
+564,A,Reliable
+565,A,Premium
+565,A,Reliable
+565,A,Innovative
+566,A,Innovative
+566,A,Reliable
+567,A,Premium
+567,A,For young people
+568,A,Reliable
+568,A,Innovative
+568,A,For young people
+569,C,For young people
+569,C,Innovative
+569,C,Reliable
+570,A,Premium
+570,A,For young people
+571,C,For young people
+571,C,Premium
+572,D,Innovative
+572,D,Premium
+573,B,For young people
+574,C,Innovative
+574,C,Reliable
+575,A,Premium
+575,A,Innovative
+575,A,Reliable
+576,A,Reliable
+577,A,Reliable
+577,A,Premium
+577,A,Innovative
+578,D,Innovative
+579,A,Innovative
+579,A,For young people
+580,C,Innovative
+580,C,For young people
+581,A,Premium
+581,A,Reliable
+582,A,Innovative
+582,A,Reliable
+582,A,For young people
+583,D,Reliable
+583,D,Innovative
+583,D,Cheap
+584,C,Innovative
+584,C,Reliable
+584,C,For young people
+585,D,Premium
+586,B,Cheap
+586,B,For young people
+586,B,Reliable
+587,D,Premium
+587,D,Reliable
+587,D,Cheap
+588,B,For young people
+588,B,Reliable
+589,A,Premium
+589,A,Innovative
+590,D,Premium
+591,C,For young people
+592,C,For young people
+593,B,Cheap
+594,C,For young people
+594,C,Reliable
+595,A,Reliable
+595,A,Premium
+595,A,Innovative
+596,D,Premium
+596,D,Innovative
+596,D,Reliable
+597,A,Innovative
+597,A,Reliable
+597,A,Premium
+598,A,Premium
+598,A,Reliable
+598,A,For young people
+599,C,Innovative
+600,D,Premium
+600,D,Reliable
+600,D,Innovative
+601,B,For young people
+601,B,Cheap
+602,A,Cheap
+603,C,For young people
+603,C,Innovative
+604,A,Innovative
+604,A,Premium
+605,B,Cheap
+606,B,Cheap
+607,D,Premium
+608,D,Premium
+608,D,Innovative
+609,C,Innovative
+609,C,Reliable
+609,C,Cheap
+610,B,Innovative
+610,B,Reliable
+611,C,Innovative
+611,C,Reliable
+611,C,Premium
+612,A,Reliable
+612,A,Premium
+613,C,Innovative
+613,C,For young people
+614,B,Cheap
+614,B,Reliable
+615,A,Reliable
+616,B,Cheap
+617,D,Innovative
+617,D,Reliable
+618,B,Cheap
+618,B,For young people
+619,D,Premium
+620,C,Reliable
+620,C,Innovative
+620,C,For young people
+621,A,Premium
+621,A,Reliable
+621,A,Cheap
+622,C,Innovative
+623,B,For young people
+624,A,Innovative
+624,A,Reliable
+624,A,For young people
+625,A,Innovative
+626,C,Premium
+626,C,Innovative
+627,C,Reliable
+627,C,Innovative
+628,C,Innovative
+628,C,Reliable
+628,C,For young people
+629,C,Innovative
+629,C,Reliable
+629,C,Cheap
+630,D,Cheap
+630,D,Reliable
+630,D,Premium
+631,D,Reliable
+631,D,Premium
+631,D,Cheap
+632,B,Cheap
+632,B,For young people
+633,A,Innovative
+633,A,Cheap
+633,A,Premium
+634,C,Reliable
+634,C,Premium
+635,B,For young people
+635,B,Cheap
+635,B,Reliable
+636,D,Reliable
+636,D,Premium
+636,D,Innovative
+637,D,Premium
+637,D,Innovative
+638,B,Cheap
+638,B,Reliable
+639,D,Premium
+640,A,Premium
+640,A,Innovative
+641,B,For young people
+641,B,Reliable
+641,B,Cheap
+642,C,Premium
+642,C,Innovative
+642,C,For young people
+643,D,Reliable
+643,D,Premium
+644,D,Premium
+645,A,For young people
+646,A,Premium
+647,C,Reliable
+647,C,Innovative
+648,B,For young people
+648,B,Cheap
+648,B,Innovative
+649,A,Reliable
+650,B,Cheap
+651,B,Cheap
+651,B,Innovative
+652,D,Premium
+652,D,For young people
+653,A,Innovative
+653,A,Premium
+653,A,For young people
+654,B,Cheap
+655,B,For young people
+655,B,Cheap
+655,B,Premium
+656,C,For young people
+657,A,Reliable
+657,A,Innovative
+657,A,Premium
+658,B,Cheap
+658,B,Innovative
+659,C,Reliable
+659,C,Innovative
+659,C,Cheap
+660,A,Cheap
+660,A,Premium
+661,C,For young people
+661,C,Innovative
+661,C,Premium
+662,A,Reliable
+663,C,Innovative
+663,C,Premium
+663,C,Reliable
+664,A,For young people
+664,A,Reliable
+665,B,Cheap
+665,B,Innovative
+666,B,Cheap
+666,B,Reliable
+666,B,Innovative
+667,D,Reliable
+667,D,Premium
+667,D,Innovative
+668,C,Cheap
+668,C,For young people
+668,C,Innovative
+669,A,Premium
+669,A,Innovative
+670,D,Reliable
+671,A,For young people
+671,A,Premium
+671,A,Innovative
+672,D,Reliable
+672,D,Innovative
+673,A,Reliable
+673,A,For young people
+674,C,Premium
+675,D,Premium
+675,D,Innovative
+676,D,Innovative
+677,A,Reliable
+677,A,Innovative
+678,A,Premium
+678,A,Innovative
+678,A,For young people
+679,C,Innovative
+679,C,Reliable
+680,A,Innovative
+681,D,Premium
+682,A,Reliable
+683,C,Innovative
+683,C,Reliable
+683,C,For young people
+684,B,For young people
+685,C,For young people
+685,C,Cheap
+686,C,Innovative
+686,C,Reliable
+687,B,Cheap
+687,B,Reliable
+688,B,Cheap
+689,A,Cheap
+690,B,Cheap
+690,B,For young people
+690,B,Reliable
+691,A,For young people
+691,A,Reliable
+692,A,Premium
+692,A,Innovative
+693,C,For young people
+693,C,Premium
+694,C,Cheap
+694,C,Premium
+694,C,Innovative
+695,A,Reliable
+695,A,Innovative
+695,A,Premium
+696,C,Cheap
+696,C,Innovative
+696,C,Reliable
+697,C,Innovative
+697,C,Premium
+698,D,Reliable
+698,D,Premium
+699,D,Premium
+699,D,Reliable
+700,B,Cheap
+700,B,For young people
+700,B,Reliable
+701,B,Cheap
+701,B,Premium
+702,B,Cheap
+702,B,For young people
+702,B,Premium
+703,A,Premium
+703,A,Reliable
+703,A,Innovative
+704,D,Premium
+704,D,Reliable
+704,D,Innovative
+705,A,Reliable
+705,A,Premium
+706,A,For young people
+707,B,Premium
+707,B,Cheap
+707,B,For young people
+708,C,Premium
+708,C,Innovative
+708,C,Reliable
+709,B,For young people
+710,C,For young people
+710,C,Innovative
+710,C,Reliable
+711,A,Innovative
+711,A,Reliable
+712,D,Premium
+712,D,For young people
+713,C,Innovative
+713,C,Cheap
+713,C,For young people
+714,A,Reliable
+714,A,Premium
+714,A,Innovative
+715,A,Reliable
+716,C,Premium
+716,C,Innovative
+716,C,Reliable
+717,B,Cheap
+717,B,For young people
+718,A,For young people
+718,A,Innovative
+719,A,Reliable
+720,B,Cheap
+720,B,For young people
+720,B,Innovative
+721,B,Cheap
+721,B,Innovative
+722,C,Premium
+722,C,Reliable
+722,C,Innovative
+723,A,Premium
+723,A,Reliable
+723,A,For young people
+724,B,Cheap
+724,B,For young people
+725,A,Reliable
+726,D,Premium
+727,B,For young people
+727,B,Cheap
+727,B,Reliable
+728,C,Innovative
+729,C,For young people
+729,C,Premium
+729,C,Innovative
+730,A,Reliable
+731,C,For young people
+731,C,Premium
+732,A,Reliable
+733,A,Reliable
+734,D,Innovative
+734,D,Premium
+734,D,Reliable
+735,D,Premium
+736,B,For young people
+737,A,Reliable
+738,A,Reliable
+739,A,Reliable
+739,A,Innovative
+739,A,Premium
+740,B,For young people
+741,B,Cheap
+741,B,Reliable
+741,B,For young people
+742,C,For young people
+742,C,Innovative
+743,A,Premium
+744,D,Premium
+744,D,Reliable
+745,A,Reliable
+746,A,Innovative
+747,D,Innovative
+747,D,Premium
+748,B,For young people
+749,A,Innovative
+750,A,Reliable
+750,A,Innovative
+750,A,Premium
+751,B,Cheap
+751,B,For young people
+751,B,Innovative
+752,A,Innovative
+752,A,Reliable
+752,A,For young people
+753,A,Innovative
+753,A,Reliable
+754,C,Innovative
+754,C,Reliable
+754,C,Premium
+755,A,Reliable
+755,A,Premium
+756,B,Cheap
+757,C,Reliable
+758,B,Cheap
+758,B,Reliable
+758,B,For young people
+759,A,Cheap
+759,A,Innovative
+760,A,Reliable
+760,A,Premium
+760,A,Innovative
+761,C,Innovative
+761,C,For young people
+761,C,Premium
+762,C,Premium
+763,C,For young people
+763,C,Cheap
+764,D,Premium
+764,D,Innovative
+764,D,Reliable
+765,A,Cheap
+765,A,Premium
+765,A,For young people
+766,B,Cheap
+766,B,For young people
+766,B,Reliable
+767,A,Reliable
+767,A,Innovative
+767,A,Premium
+768,A,Premium
+768,A,Reliable
+768,A,Innovative
+769,A,Premium
+770,B,For young people
+770,B,Reliable
+770,B,Cheap
+771,C,Innovative
+771,C,For young people
+771,C,Reliable
+772,B,Cheap
+773,A,Premium
+773,A,Innovative
+773,A,Cheap
+774,D,Premium
+774,D,Reliable
+775,A,Reliable
+776,D,Cheap
+777,A,Premium
+778,C,Innovative
+778,C,For young people
+779,C,Innovative
+779,C,Premium
+780,A,Premium
+781,C,Innovative
+781,C,For young people
+781,C,Premium
+782,D,Cheap
+783,D,Innovative
+784,D,Premium
+784,D,Reliable
+784,D,Cheap
+785,B,Cheap
+785,B,Innovative
+785,B,Reliable
+786,B,Cheap
+786,B,Innovative
+786,B,For young people
+787,B,Innovative
+788,B,For young people
+788,B,Cheap
+789,D,Premium
+789,D,For young people
+789,D,Reliable
+790,A,Reliable
+790,A,Premium
+790,A,Innovative
+791,D,Innovative
+792,B,Cheap
+792,B,For young people
+793,A,For young people
+793,A,Reliable
+794,C,For young people
+795,A,Premium
+796,B,Cheap
+796,B,Premium
+796,B,Reliable
+797,B,Innovative
+797,B,Cheap
+797,B,Reliable
+798,C,Premium
+799,C,Reliable
+800,C,Cheap
+800,C,Premium
+801,B,For young people
+802,B,Reliable
+803,C,For young people
+803,C,Innovative
+804,A,Reliable
+805,A,Innovative
+805,A,Reliable
+806,D,Reliable
+806,D,Premium
+807,A,Innovative
+808,B,Innovative
+808,B,For young people
+808,B,Cheap
+809,A,Reliable
+810,B,Cheap
+810,B,For young people
+810,B,Innovative
+811,C,Reliable
+812,C,Innovative
+813,D,Premium
+814,A,For young people
+814,A,Premium
+814,A,Reliable
+815,D,Reliable
+815,D,Innovative
+815,D,Premium
+816,A,Reliable
+816,A,Premium
+817,A,Innovative
+818,A,Reliable
+819,C,For young people
+819,C,Reliable
+820,D,Reliable
+820,D,Premium
+820,D,For young people
+821,A,Premium
+822,B,Premium
+822,B,Cheap
+822,B,Innovative
+823,B,Reliable
+824,C,For young people
+825,C,Innovative
+825,C,Reliable
+825,C,Premium
+826,A,Premium
+826,A,Reliable
+826,A,For young people
+827,B,For young people
+827,B,Premium
+828,D,Premium
+828,D,Innovative
+828,D,Reliable
+829,A,Reliable
+829,A,Innovative
+830,D,Reliable
+830,D,Innovative
+831,B,Cheap
+832,D,Premium
+832,D,Reliable
+832,D,Innovative
+833,D,Innovative
+833,D,For young people
+833,D,Reliable
+834,B,For young people
+834,B,Cheap
+834,B,Reliable
+835,A,For young people
+835,A,Reliable
+836,A,Reliable
+836,A,Innovative
+837,A,Reliable
+837,A,For young people
+838,C,Reliable
+838,C,Premium
+838,C,Innovative
+839,A,Reliable
+839,A,Cheap
+839,A,Premium
+840,C,Innovative
+841,D,Premium
+841,D,Innovative
+842,C,Innovative
+843,C,Innovative
+843,C,Reliable
+844,D,Innovative
+844,D,Premium
+844,D,Reliable
+845,B,Innovative
+845,B,For young people
+846,D,Reliable
+846,D,For young people
+846,D,Premium
+847,A,Innovative
+847,A,Reliable
+847,A,Cheap
+848,B,Cheap
+849,B,Cheap
+850,C,For young people
+851,D,Premium
+852,C,Innovative
+853,D,Reliable
+854,C,Premium
+855,A,Premium
+855,A,Innovative
+855,A,Reliable
+856,C,Innovative
+856,C,Reliable
+857,B,Cheap
+857,B,For young people
+857,B,Reliable
+858,C,For young people
+858,C,Reliable
+858,C,Innovative
+859,C,Innovative
+859,C,Premium
+859,C,For young people
+860,A,Reliable
+861,A,Innovative
+861,A,Reliable
+862,C,Premium
+862,C,Innovative
+862,C,Reliable
+863,C,Innovative
+864,C,For young people
+864,C,Innovative
+864,C,Reliable
+865,C,Reliable
+865,C,For young people
+865,C,Innovative
+866,D,Premium
+866,D,Reliable
+867,C,Innovative
+867,C,Premium
+868,A,Innovative
+869,A,Premium
+870,B,Reliable
+870,B,For young people
+870,B,Cheap
+871,A,Innovative
+871,A,Reliable
+872,A,Reliable
+872,A,Innovative
+872,A,Premium
+873,D,Premium
+873,D,For young people
+874,B,For young people
+875,A,Reliable
+875,A,Premium
+876,A,Innovative
+876,A,Premium
+877,D,For young people
+877,D,Premium
+878,A,For young people
+878,A,Innovative
+879,D,Cheap
+880,B,For young people
+880,B,Cheap
+881,B,Premium
+882,A,For young people
+882,A,Premium
+883,B,Premium
+884,C,Premium
+885,D,Premium
+885,D,For young people
+885,D,Reliable
+886,D,Premium
+886,D,Cheap
+887,D,Reliable
+888,A,Premium
+888,A,Cheap
+888,A,Reliable
+889,D,Innovative
+890,A,Reliable
+891,D,Reliable
+891,D,Premium
+892,A,Innovative
+892,A,Cheap
+893,C,Reliable
+894,C,Premium
+895,D,Innovative
+895,D,Premium
+896,B,Cheap
+896,B,Reliable
+896,B,Innovative
+897,B,For young people
+897,B,Innovative
+898,D,Innovative
+898,D,Premium
+898,D,Reliable
+899,C,Innovative
+899,C,For young people
+900,C,Reliable
+901,D,Premium
+901,D,Cheap
+902,C,Reliable
+903,C,Innovative
+903,C,For young people
+904,C,Innovative
+904,C,Premium
+904,C,For young people
+905,C,Innovative
+905,C,For young people
+906,D,Reliable
+906,D,Premium
+906,D,For young people
+907,C,Reliable
+907,C,Innovative
+907,C,For young people
+908,D,Premium
+909,A,Reliable
+909,A,Innovative
+910,D,Reliable
+911,D,Innovative
+911,D,Reliable
+912,B,For young people
+913,D,Premium
+913,D,Reliable
+913,D,Innovative
+914,A,Premium
+914,A,Cheap
+914,A,Innovative
+915,D,Innovative
+916,C,Premium
+917,B,Cheap
+918,C,Reliable
+918,C,Premium
+919,B,Cheap
+920,B,Cheap
+920,B,For young people
+920,B,Reliable
+921,D,Reliable
+922,A,Reliable
+922,A,Innovative
+923,C,Premium
+923,C,Innovative
+924,C,Innovative
+924,C,Cheap
+925,B,Innovative
+926,D,Reliable
+927,A,Reliable
+927,A,Innovative
+927,A,For young people
+928,A,Cheap
+928,A,Reliable
+929,D,Premium
+929,D,Innovative
+930,C,Innovative
+930,C,Reliable
+931,A,For young people
+931,A,Reliable
+932,B,Cheap
+932,B,For young people
+932,B,Innovative
+933,C,Innovative
+933,C,Reliable
+933,C,For young people
+934,B,Cheap
+934,B,Reliable
+934,B,For young people
+935,B,Cheap
+936,A,For young people
+936,A,Innovative
+937,D,Reliable
+938,C,Innovative
+938,C,Premium
+938,C,Reliable
+939,C,Innovative
+940,B,For young people
+941,B,Cheap
+942,B,Cheap
+942,B,For young people
+943,D,Innovative
+943,D,Premium
+944,C,Innovative
+944,C,Reliable
+944,C,Premium
+945,A,Innovative
+946,B,Cheap
+946,B,For young people
+946,B,Reliable
+947,A,Cheap
+948,C,Premium
+949,A,Innovative
+949,A,Reliable
+949,A,Premium
+950,C,For young people
+950,C,Innovative
+950,C,Reliable
+951,D,Premium
+952,C,Premium
+953,D,Premium
+953,D,Innovative
+954,A,Innovative
+955,B,Cheap
+955,B,For young people
+955,B,Innovative
+956,B,For young people
+956,B,Reliable
+956,B,Premium
+957,D,Innovative
+957,D,Reliable
+957,D,Premium
+958,C,Cheap
+959,B,Cheap
+959,B,For young people
+960,B,For young people
+961,D,Premium
+962,A,Reliable
+963,B,Reliable
+964,B,Cheap
+964,B,For young people
+965,A,Premium
+966,A,Reliable
+966,A,Cheap
+966,A,Premium
+967,A,Reliable
+968,D,Innovative
+969,D,For young people
+970,A,Reliable
+970,A,Premium
+971,A,Reliable
+971,A,For young people
+972,D,Reliable
+973,D,Premium
+973,D,Reliable
+974,D,Reliable
+974,D,Premium
+975,B,For young people
+976,D,Premium
+976,D,Reliable
+976,D,Cheap
+977,B,Cheap
+977,B,For young people
+978,C,For young people
+979,B,Cheap
+979,B,Innovative
+979,B,For young people
+980,C,Premium
+980,C,Innovative
+980,C,For young people
+981,A,Reliable
+981,A,Cheap
+981,A,Premium
+982,A,Reliable
+982,A,Premium
+983,C,Premium
+983,C,Innovative
+983,C,Reliable
+984,C,Premium
+984,C,Innovative
+984,C,For young people
+985,D,Reliable
+986,C,For young people
+986,C,Reliable
+986,C,Innovative
+987,B,Cheap
+987,B,For young people
+988,B,Cheap
+988,B,Reliable
+988,B,For young people
+989,A,Premium
+990,D,Premium
+990,D,Innovative
+990,D,Reliable
+991,D,Premium
+991,D,Reliable
+992,A,Reliable
+993,A,For young people
+993,A,Reliable
+994,B,For young people
+994,B,Innovative
+995,B,Premium
+995,B,For young people
+995,B,Reliable
+996,B,Reliable
+996,B,For young people
+997,B,Cheap
+997,B,For young people
+997,B,Innovative
+998,D,For young people
+998,D,Reliable
+998,D,Premium
+999,D,Innovative
+1000,B,Cheap
+1001,C,Premium
+1001,C,Innovative
+1002,C,Innovative
+1003,A,Reliable
+1004,D,Premium
+1004,D,Reliable
+1004,D,Innovative
+1005,B,Cheap
+1005,B,Reliable
+1006,A,Reliable
+1006,A,Innovative
+1007,C,Premium
+1007,C,Cheap
+1008,C,Cheap
+1008,C,Innovative
+1008,C,For young people
+1009,B,For young people
+1009,B,Innovative
+1009,B,Reliable
+1010,D,Premium
+1011,A,Reliable
+1011,A,Innovative
+1011,A,Premium
+1012,C,Reliable
+1012,C,Innovative
+1012,C,Cheap
+1013,C,For young people
+1013,C,Innovative
+1013,C,Reliable
+1014,B,Cheap
+1015,C,Reliable
+1015,C,Cheap
+1015,C,Innovative
+1016,D,Premium
+1016,D,Innovative
+1016,D,Reliable
+1017,C,Innovative
+1017,C,Reliable
+1017,C,Cheap
+1018,B,For young people
+1018,B,Cheap
+1018,B,Reliable
+1019,A,Reliable
+1019,A,Innovative
+1020,D,Premium
+1021,A,Innovative
+1022,C,Innovative
+1022,C,Premium
+1023,D,Reliable
+1024,B,Innovative
+1024,B,For young people
+1024,B,Cheap
+1025,D,Innovative
+1025,D,Premium
+1026,C,Premium
+1027,B,Cheap
+1027,B,Innovative
+1027,B,For young people
+1028,C,For young people
+1028,C,Innovative
+1028,C,Premium
+1029,A,Reliable
+1029,A,For young people
+1030,A,Innovative
+1031,D,Premium
+1031,D,Innovative
+1032,A,For young people
+1032,A,Innovative
+1032,A,Reliable
+1033,B,Innovative
+1034,C,For young people
+1034,C,Innovative
+1034,C,Reliable
+1035,B,Cheap
+1035,B,For young people
+1035,B,Premium
+1036,C,Premium
+1036,C,Innovative
+1036,C,For young people
+1037,D,Premium
+1038,A,Innovative
+1039,D,Premium
+1040,A,For young people
+1040,A,Innovative
+1041,A,Innovative
+1042,C,Premium
+1042,C,Innovative
+1042,C,For young people
+1043,C,Innovative
+1044,D,Premium
+1044,D,Reliable
+1045,A,Premium
+1045,A,Innovative
+1046,A,Reliable
+1046,A,Innovative
+1047,B,Cheap
+1047,B,For young people
+1047,B,Innovative
+1048,C,Innovative
+1049,A,Reliable
+1049,A,For young people
+1049,A,Innovative
+1050,B,Cheap
+1050,B,Innovative
+1051,A,Reliable
+1051,A,Cheap
+1051,A,Innovative
+1052,B,Cheap
+1052,B,For young people
+1052,B,Premium
+1053,D,Premium
+1054,B,Innovative
+1054,B,For young people
+1055,A,Innovative
+1055,A,For young people
+1055,A,Reliable
+1056,A,Reliable
+1056,A,Innovative
+1056,A,For young people
+1057,C,Innovative
+1057,C,For young people
+1058,C,Cheap
+1059,D,Premium
+1060,A,Reliable
+1060,A,Premium
+1061,B,For young people
+1061,B,Innovative
+1062,C,Cheap
+1063,D,Premium
+1063,D,Reliable
+1063,D,For young people
+1064,B,Cheap
+1065,B,For young people
+1066,A,Innovative
+1066,A,Premium
+1067,B,For young people
+1067,B,Cheap
+1067,B,Innovative
+1068,D,For young people
+1069,C,Innovative
+1070,D,Premium
+1071,D,Premium
+1072,D,Reliable
+1072,D,Premium
+1073,D,Reliable
+1074,D,Premium
+1074,D,Reliable
+1075,A,Reliable
+1076,A,For young people
+1076,A,Reliable
+1077,D,Cheap
+1077,D,Premium
+1078,D,Premium
+1078,D,Innovative
+1079,B,Cheap
+1079,B,For young people
+1080,C,Innovative
+1080,C,Premium
+1080,C,For young people
+1081,D,Premium
+1082,A,For young people
+1083,A,Premium
+1084,D,For young people
+1084,D,Premium
+1085,A,Reliable
+1086,B,Cheap
+1086,B,Reliable
+1087,D,Reliable
+1088,B,Reliable
+1089,A,Reliable
+1089,A,Innovative
+1090,B,For young people
+1091,C,For young people
+1091,C,Innovative
+1091,C,Cheap
+1092,A,Cheap
+1092,A,Innovative
+1093,B,Cheap
+1094,B,Cheap
+1095,B,For young people
+1095,B,Reliable
+1095,B,Cheap
+1096,B,Reliable
+1096,B,For young people
+1097,C,For young people
+1097,C,Reliable
+1098,A,For young people
+1098,A,Reliable
+1099,A,Premium
+1100,C,Reliable
+1100,C,Innovative
+1100,C,Premium
+1101,A,Reliable
+1102,B,For young people
+1102,B,Cheap
+1103,D,Premium
+1104,B,Cheap
+1105,A,Innovative
+1106,C,Premium
+1106,C,Innovative
+1106,C,For young people
+1107,D,Innovative
+1108,C,Reliable
+1108,C,For young people
+1109,B,For young people
+1109,B,Reliable
+1109,B,Cheap
+1110,A,Reliable
+1110,A,Innovative
+1111,D,Reliable
+1111,D,Premium
+1112,B,Cheap
+1112,B,Reliable
+1113,A,Reliable
+1114,A,Reliable
+1114,A,Innovative
+1114,A,Premium
+1115,D,Premium
+1115,D,Reliable
+1115,D,Innovative
+1116,C,For young people
+1116,C,Premium
+1116,C,Reliable
+1117,C,For young people
+1117,C,Innovative
+1117,C,Reliable
+1118,C,Premium
+1119,A,Premium
+1119,A,Innovative
+1119,A,Cheap
+1120,A,For young people
+1120,A,Innovative
+1120,A,Cheap
+1121,C,Reliable
+1122,D,Premium
+1123,C,Reliable
+1123,C,For young people
+1124,A,Reliable
+1124,A,Premium
+1125,A,Reliable
+1126,D,Premium
+1126,D,Reliable
+1126,D,Innovative
+1127,A,Reliable
+1127,A,Cheap
+1128,A,Reliable
+1128,A,Innovative
+1128,A,For young people
+1129,A,Innovative
+1130,D,Premium
+1130,D,Innovative
+1131,A,Cheap
+1132,A,Innovative
+1132,A,Reliable
+1132,A,Premium
+1133,D,Innovative
+1133,D,Premium
+1134,A,For young people
+1134,A,Premium
+1135,B,For young people
+1135,B,Innovative
+1135,B,Cheap
+1136,D,For young people
+1137,A,Reliable
+1137,A,Cheap
+1138,C,Innovative
+1138,C,Premium
+1138,C,Cheap
+1139,D,Premium
+1139,D,For young people
+1139,D,Reliable
+1140,A,Premium
+1141,D,For young people
+1142,A,Innovative
+1143,C,Innovative
+1143,C,Premium
+1144,C,Innovative
+1144,C,For young people
+1144,C,Reliable
+1145,C,Innovative
+1146,C,Innovative
+1147,A,Cheap
+1147,A,Innovative
+1147,A,Reliable
+1148,B,Cheap
+1148,B,For young people
+1149,B,Cheap
+1149,B,Reliable
+1149,B,For young people
+1150,B,Cheap
+1151,B,For young people
+1151,B,Cheap
+1151,B,Reliable
+1152,A,Reliable
+1153,B,For young people
+1154,C,Innovative
+1154,C,For young people
+1155,D,Premium
+1155,D,Reliable
+1155,D,For young people
+1156,D,Premium
+1157,C,Reliable
+1157,C,Innovative
+1158,B,Cheap
+1158,B,For young people
+1158,B,Reliable
+1159,C,Innovative
+1160,B,Cheap
+1160,B,For young people
+1161,A,Reliable
+1162,B,Cheap
+1163,D,Premium
+1163,D,Reliable
+1163,D,Innovative
+1164,C,Premium
+1164,C,Innovative
+1165,D,Premium
+1165,D,Reliable
+1166,C,For young people
+1167,C,Reliable
+1167,C,Innovative
+1168,D,Reliable
+1168,D,Premium
+1169,C,Innovative
+1169,C,Premium
+1170,B,Cheap
+1170,B,For young people
+1171,A,Reliable
+1172,A,Innovative
+1172,A,Reliable
+1172,A,For young people
+1173,B,For young people
+1174,B,Reliable
+1174,B,For young people
+1175,C,Innovative
+1175,C,Cheap
+1176,C,For young people
+1177,D,Premium
+1178,B,For young people
+1178,B,Cheap
+1178,B,Reliable
+1179,C,For young people
+1180,B,Cheap
+1180,B,For young people
+1180,B,Innovative
+1181,A,Reliable
+1182,B,Cheap
+1182,B,For young people
+1182,B,Innovative
+1183,D,Premium
+1183,D,Reliable
+1184,C,Innovative
+1184,C,Reliable
+1185,B,Cheap
+1185,B,For young people
+1185,B,Reliable
+1186,D,Premium
+1186,D,Innovative
+1187,D,Premium
+1187,D,Reliable
+1187,D,Innovative
+1188,D,Premium
+1188,D,Reliable
+1189,D,For young people
+1189,D,Premium
+1189,D,Reliable
+1190,A,Innovative
+1190,A,Reliable
+1191,D,Innovative
+1191,D,Reliable
+1191,D,Premium
+1192,B,Innovative
+1192,B,Reliable
+1192,B,Cheap
+1193,B,Cheap
+1194,C,Reliable
+1195,C,Reliable
+1195,C,Innovative
+1196,D,Premium
+1197,B,For young people
+1198,B,Cheap
+1199,B,Cheap
+1200,C,Reliable

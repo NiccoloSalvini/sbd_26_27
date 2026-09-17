@@ -1,0 +1,185 @@
+---
+title: "Dashboards, uncertainty, and the story"
+subtitle: "Lecture 21 · room 108"
+author: "Prof. Niccolò Salvini"
+institute: "HEMA · Università Cattolica del Sacro Cuore, Rome"
+date: 2026-12-11
+date-format: "dddd D MMMM YYYY"
+---
+
+## Objectives
+
+- Communicate a model's output to someone who will decide with it and never see the code
+- Show **uncertainty** honestly — and make it *reduce* anxiety, not add to it
+- Recognise the six ways a chart lies, so you neither produce nor believe one
+- Structure an analysis as a story with a decision at the end
+- Work with generative AI in the loop without letting it hold the pen
+- Close the course: what to bring to the exam, and what to bring to work
+
+## Why a manager cares
+
+::: {.subtitle-frame}
+The analysis that is not understood was not done
+:::
+
+- Every model in this course ends in a room where someone decides
+- That person has fifteen minutes, no R, and a different question from yours
+- The difference between an analysis that changes a decision and one that is filed is almost never the model. It is the last slide.
+
+Twelve lectures of methods. This one is about the last slide.
+
+## [Section 1]{.section-kicker} Dashboards {.section-slide background-color="#002f57"}
+
+## A dashboard is a set of decisions, not a set of charts
+
+Before any chart, three questions per panel:
+
+1. **Who** looks at this, and **how often**? A CFO monthly is not a ward nurse hourly.
+2. **What decision** does it inform? If none, delete it.
+3. **What would make them act?** That threshold goes *on the chart*.
+
+::: {.callout-note}
+The typical failure is a dashboard with twenty panels and no decision — an analyst's exploration, printed. A dashboard for a decision has three to five panels, and every one has a *so what*.
+:::
+
+## The panel that works
+
+- **Title is the finding**, not the variable: *Churn risk is concentrated in month-to-month fibre customers*, not *Churn by contract type*
+- One comparison per chart. Two, if they are the point.
+- The number that matters, large; the context — last period, target, range — small and adjacent
+- Colour means one thing across the whole dashboard. Navy is *us*, grey is *everyone else*, one accent for *look here*.
+- Direct labels. A legend is a chart that failed to explain itself.
+
+## Model output on a dashboard
+
+The model produces a probability per customer. The dashboard shows:
+
+- **Not** the probabilities. A ranked **list of the top 200 to contact**, with the two SHAP reasons per row
+- The **lift**: *contacting these 200 reaches 4× the churners of a random 200*
+- **Model health**: accuracy on last month's outcomes, so the reader knows when to stop trusting it
+- **A date**: when it was retrained. A model is a perishable good.
+
+## [Section 2]{.section-kicker} Uncertainty {.section-slide background-color="#002f57"}
+
+## Show it, always — but show it as a decision aid
+
+A point forecast of *€1.42M next quarter* is a lie of precision. An interval of *€1.1M–€1.8M* is honest and, presented badly, paralysing.
+
+- **Fan charts** for forecasts: darker where likely, lighter where possible. The eye reads the width as *how much to hedge*.
+- **Bands** on estimates, not error bars on bars — bars imply a floor; an interval has none
+- **Probability of the thing that matters**: not *the interval is 1.1–1.8*, but *there is a 20% chance we miss the €1.2M covenant*
+- **Scenarios** when the uncertainty is about the world, not the estimate: *if the competitor cuts prices…*
+
+::: {.callout-important title="Attention"}
+An interval from a model is uncertainty *given the model is right*. It says nothing about the model being wrong. Say that, once, in words.
+:::
+
+## How much uncertainty to show
+
+| Audience | Show |
+|---|---|
+| Executive decision | the probability of the outcome they fear, and one interval |
+| Operations | the range, and what to do at each end |
+| Regulator, auditor | everything, with method |
+| Public, patients | the risk in natural frequencies: *3 in 100*, never *3%* |
+
+The last row is not style. Natural frequencies are understood correctly by most people; percentages and relative risks are not, including by doctors.
+
+## [Section 3]{.section-kicker} Charts that lie {.section-slide background-color="#002f57"}
+
+## Six ways, so you recognise them
+
+1. **Truncated axis** — a bar chart from 95 to 100 makes a 2% difference look like a collapse
+2. **Dual axes** — two lines, two scales, any story you like
+3. **Cumulative** where the reader expects per-period — everything goes up forever
+4. **Cherry-picked window** — the series started in the trough
+5. **Area encoding** — bubbles scaled by radius, not area; the big one is 4× too big
+6. **The 3-D pie** — the front slice is always bigger
+
+::: {.callout-note}
+Each one is a legitimate technique in some context. The lie is in the mismatch between what the reader sees and what the data say. Your job is to know which side of that line you are on — and to check which side the vendor's deck is on.
+:::
+
+## The honest chart, in five rules
+
+- Start bars at zero; start lines where the data start
+- One axis, one unit
+- Show the raw counts somewhere near any rate
+- Label the *n*
+- If a chart needs a paragraph to be read correctly, redraw it
+
+## [Section 4]{.section-kicker} The story {.section-slide background-color="#002f57"}
+
+## Structure that survives a fifteen-minute meeting
+
+1. **The decision** you recommend — first sentence, first slide
+2. **The evidence** — three findings, one chart each, titles as sentences
+3. **The uncertainty** — what could make this wrong, and how you would know
+4. **The ask** — what you need, from whom, by when
+5. Appendix: the method, the model, the code — for the one person who will ask
+
+Fifteen minutes. Eight slides. If the decision-maker leaves after slide 1 they should still know what you want.
+
+## The four-line summary, from Wednesday
+
+> We should contact the 2 000 highest-risk customers before their renewal date.
+> The model identifies 71% of churners in that group, against 27% by chance.
+> Risk is highest in the first year and after a support call — the second is fixable.
+> The model finds patterns, not causes: we will measure the offer's effect with a holdout of 200.
+
+That is the whole of Module 2, in four sentences a CFO can act on. Everything before today was so that the four sentences are *true*.
+
+## [Section 5]{.section-kicker} Human and AI {.section-slide background-color="#002f57"}
+
+## Generative AI in the analytics workflow
+
+Use it. Then check it. The rule of this course, from the first day.
+
+- **Good at**: writing the `ggplot` you can describe; explaining an error message; drafting the eight slides from your notes; the first version of any code you could write yourself in twenty minutes
+- **Bad at**: knowing your data; the difference between correlation and the thing you need; whether the `glmnet` matrix was standardised; anything you cannot check
+
+::: {.callout-important title="Attention"}
+It will write `glmnet` code that standardises the wrong matrix, confidently. The exam asks you to *read* code and say what it does, precisely because in your career you will be the one who checks.
+:::
+
+## Division of labour that works
+
+| The model, or the assistant, does | You do |
+|---|---|
+| Fit, tune, predict, draft | Decide what question is worth asking |
+| Explain what it computed | Decide whether the answer is plausible |
+| Produce the chart | Decide what the chart is *for* |
+| Generate options | Own the recommendation |
+
+The last row is the whole thing. Nothing in this course transfers responsibility for a decision to a model, and nothing in your career will.
+
+## [Section 6]{.section-kicker} Closing {.section-slide background-color="#002f57"}
+
+## What Module 2 was
+
+| Weeks | You can now |
+|---|---|
+| 1–3 | find structure with no label: segment customers, group patients, reduce twenty items to two drivers, map a brand |
+| 4–5 | predict with algorithms: trees, forests, boosting, networks — and choose between them on evidence |
+| 6 | open the box you chose, and explain what is in it |
+| 7 | put it in front of someone who decides |
+
+## The exam
+
+- **Second intermediate**: Module 2, within the winter session — first call mid-January. Date on Blackboard and on the site as soon as it is fixed.
+- Lab machines, no laptops. A session in the lab before, so nobody meets the environment for the first time on the day.
+- Open and closed questions; a coding part where you read R and say what it does, or write it
+- Everything examinable is in these twelve decks, the practice sets, and ISLR chapters 8, 10, 12. Nothing from the *Going deeper* list.
+
+::: {.callout-note}
+Marks are not discussed at office hours. The feedback on Blackboard says why each answer scored what it did. Read that first.
+:::
+
+## Every model in this course ends in a sentence a person can act on. If you cannot write that sentence, you are not finished.  {.statement}
+
+## Reading
+
+- **Wilke**, *Fundamentals of Data Visualization* — chapters 1–4, and 16 (uncertainty). Free online.
+- **Tufte**, *The Visual Display of Quantitative Information* — chapter 2, *graphical integrity*: the lie factor
+- **Provost & Fawcett** chapter 13 — *Data science and business strategy*: read it in January, after the exam, when you have time to think
+- And thank you. Office hours continue through the session — book online, bring a script.

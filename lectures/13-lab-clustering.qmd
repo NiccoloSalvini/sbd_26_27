@@ -1,0 +1,180 @@
+---
+title: "Lab — clustering end to end"
+subtitle: "Lecture 13 · room 204"
+author: "Prof. Niccolò Salvini"
+institute: "HEMA · Università Cattolica del Sacro Cuore, Rome"
+date: 2026-11-13
+date-format: "dddd D MMMM YYYY"
+---
+
+## Today
+
+Three hours, one table, one deliverable: **a segmentation a marketing director could act on Monday**.
+
+1. Load and look
+2. Prepare — the step everyone skips
+3. Explore the structure with a tree
+4. Decide $k$, deploy with k-means
+5. Profile, name, and hand over
+
+No new theory. Every slide is a step you run.
+
+## The table
+
+::: {.subtitle-frame}
+`customers.csv` — on Blackboard, folder *Prof. Salvini*, and linked from the schedule
+:::
+
+| Column | Meaning |
+|---|---|
+| `id` | customer |
+| `recency` | days since last purchase |
+| `frequency` | purchases in the last 12 months |
+| `monetary` | total spend, last 12 months (€) |
+| `tenure` | months since first purchase |
+| `returns` | items returned, last 12 months |
+| `channel_online` | share of purchases made online |
+
+6 000 rows. Save it in your project's `data/` folder, then open the project.
+
+## [Section 1]{.section-kicker} Load and look {.section-slide background-color="#002f57"}
+
+## Step 1 — read it, then read it
+
+```{.r code-line-numbers="1-3|5|7|9"}
+library(tidyverse); library(cluster); library(factoextra); library(here)
+
+cust <- read_csv(here("data", "customers.csv"))
+
+glimpse(cust)               # types right? id is not a feature
+
+summary(cust)               # ranges, NAs, and the first surprise
+
+cust |> select(-id) |> pivot_longer(everything()) |>
+  ggplot(aes(value)) + geom_histogram(bins = 40) + facet_wrap(~name, scales = "free")
+```
+
+Before any model: what does `monetary` look like? Almost certainly skewed — a few customers spend a hundred times the median. k-means will build a cluster around them alone.
+
+## What to write down before step 2
+
+Answer on paper, one line each:
+
+- Which columns are **behaviour** and which are **identity**? (`id` leaves now)
+- Which variable would dominate an unscaled distance? Why?
+- Are there rows that are not customers — test accounts, staff, `monetary = 0` with `frequency = 12`?
+
+::: {.callout-important title="Attention"}
+Ten minutes here save an afternoon of explaining a segment that is "the three people who bought a car".
+:::
+
+## [Section 2]{.section-kicker} Prepare {.section-slide background-color="#002f57"}
+
+## Step 2 — transform, then scale
+
+```{.r code-line-numbers="1-4|6-7|9"}
+feat <- cust |>
+  select(-id) |>
+  mutate(monetary  = log1p(monetary),        # tame the tail
+         frequency = log1p(frequency))
+
+X <- scale(feat)                              # mean 0, sd 1, every column
+attr(X, "scaled:center")                      # keep these: you need them to profile
+
+colMeans(X) |> round(3)                       # all zero. Good.
+```
+
+- `log1p` because `log(0)` is not a number and some customers spent nothing
+- `scale()` because distance in euros² + distance in days² is not a distance
+
+## [Section 3]{.section-kicker} Explore {.section-slide background-color="#002f57"}
+
+## Step 3 — a tree on a sample
+
+Six thousand rows is $18$ million pairwise distances — fine. Sixty thousand would not be. The habit: **explore the structure on a sample, deploy on everything**.
+
+```{.r code-line-numbers="1-2|4-5|7"}
+set.seed(26)
+idx <- sample(nrow(X), 1500)
+
+hc <- hclust(dist(X[idx, ]), method = "ward.D2")
+fviz_dend(hc, k = 5, rect = TRUE, show_labels = FALSE)
+
+fviz_nbclust(X[idx, ], hcut, method = "silhouette", k.max = 8)
+```
+
+Look at the tree. Where is the big vertical gap? Two groups? Four? Six? Write down your $k$ *before* you run the silhouette, then compare.
+
+## [Section 4]{.section-kicker} Decide and deploy {.section-slide background-color="#002f57"}
+
+## Step 4 — k-means on everything
+
+```{.r code-line-numbers="1-2|4|6-7"}
+fviz_nbclust(X, kmeans, method = "wss", k.max = 8)        # elbow, full data
+fviz_nbclust(X, kmeans, method = "silhouette", k.max = 8)
+
+k <- 4                                        # your decision, with a reason
+
+set.seed(26)
+km <- kmeans(X, centers = k, nstart = 50)
+```
+
+Then, the test that matters more than any index:
+
+```{.r}
+set.seed(27); km2 <- kmeans(X, centers = k, nstart = 50)
+table(km$cluster, km2$cluster)               # same groups, different seed?
+```
+
+If the table is not close to a permutation matrix, the structure is not stable at this $k$. Try $k - 1$.
+
+## [Section 5]{.section-kicker} Profile and hand over {.section-slide background-color="#002f57"}
+
+## Step 5 — back to the units people understand
+
+```{.r code-line-numbers="1-2|4-8|10"}
+cust$segment <- factor(km$cluster)
+
+profile <- cust |>
+  group_by(segment) |>
+  summarise(n = n(), share = n() / nrow(cust),
+            across(c(recency, frequency, monetary, tenure, returns, channel_online),
+                   ~ round(median(.x), 1)))
+profile
+
+fviz_cluster(km, data = X, geom = "point", ellipse.type = "norm")
+```
+
+Medians, not means — you logged `monetary` for a reason, and the mean is back under the tail's control.
+
+## The deliverable
+
+One table, four rows, in the language of the person who will use it:
+
+| Segment | Name | Who they are | What to do |
+|---|---|---|---|
+| 1 | *Lapsed high-value* | high monetary, recency > 180 d | win-back, personal, now |
+| 2 | *Online regulars* | frequent, small, 90% online | app push, bundle offers |
+| 3 | *New and undecided* | tenure < 6 mo, moderate | onboarding journey; watch churn |
+| 4 | *Store loyalists* | frequent, in-store, long tenure | protect, do not discount |
+
+::: {.callout-note}
+Names from the numbers, not from imagination. Every adjective in the table must point at a column in `profile`.
+:::
+
+## A segmentation is finished when someone else can act on it without you in the room.  {.statement}
+
+## Hand in — optional, ungraded
+
+Push to the `homework/` set for this week, or just keep it:
+
+- your `profile` table
+- your $k$, and the two sentences that justify it
+- the four names
+
+We open Monday's lecture with three of yours on the screen.
+
+## Reading
+
+- **ISLR** §12.4.3 — practical issues in clustering: scaling, $k$, and validation. Short, and everything today came from it.
+- **Provost & Fawcett** chapter 6, *Clustering* — reread the last section after doing this lab

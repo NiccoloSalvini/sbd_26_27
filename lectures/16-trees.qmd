@@ -1,0 +1,152 @@
+---
+title: "Decision trees"
+subtitle: "Lecture 16 · room 202"
+author: "Prof. Niccolò Salvini"
+institute: "HEMA · Università Cattolica del Sacro Cuore, Rome"
+date: 2026-11-23
+date-format: "dddd D MMMM YYYY"
+---
+
+## Objectives
+
+- Grow a tree by hand: one split, one impurity calculation, one decision
+- Understand why trees overfit on purpose, and how pruning fixes it
+- Read a fitted tree the way a manager can — because that is the point of them
+- Set up Friday: why one tree is weak and a hundred are strong
+
+## Why a manager cares
+
+::: {.subtitle-frame}
+The only model you can print on one page and hand to the credit committee
+:::
+
+- *If income < 30k and no prior account → decline. Else if age < 25 and balance > 800 → review.*
+- Every branch is a **rule**. Every leaf is a **decision**. No coefficients, no link functions.
+- Regulators, clinicians and sales managers can *read* a tree, disagree with a branch, and tell you which one
+
+We are back to supervised learning. The $y$ is back. What changes is that the model is an **algorithm**, not an equation.
+
+## [Section 1]{.section-kicker} Growing a tree {.section-slide background-color="#002f57"}
+
+## One question at a time
+
+A tree splits the data with **yes/no questions on one variable**, recursively:
+
+1. Look at all variables and all possible cut points
+2. Choose the one split that makes the two resulting groups *purest*
+3. Repeat inside each group
+4. Stop when groups are small, or pure, or a depth limit is hit
+
+The result partitions the predictor space into rectangles. Each rectangle gets one prediction: the majority class, or the mean of $y$.
+
+::: {.callout-note}
+"Purest" is where the whole method lives. For regression it is the residual sum of squares. For classification, two measures — next slide.
+:::
+
+## Measuring impurity
+
+For a node with class proportions $p_1, \dots, p_K$:
+
+- **Gini**: $\;G = \sum_k p_k (1 - p_k)$ — the probability two random draws disagree. Zero when pure.
+- **Entropy**: $\;D = -\sum_k p_k \log p_k$ — zero when pure, maximal at even split.
+
+A split is scored by the **weighted impurity of its two children**. The best split lowers it most. Both measures rank splits almost identically; `rpart` uses Gini by default.
+
+## By hand: one split
+
+::: {.subtitle-frame}
+Ten customers, will they churn? Candidate: `tenure < 12 months`
+:::
+
+Parent node: 5 churn, 5 stay. $G = 2 \times 0.5 \times 0.5 = 0.50$
+
+| | Churn | Stay | $G$ |
+|---|---|---|---|
+| tenure < 12 | 4 | 1 | $2 \times 0.8 \times 0.2 = 0.32$ |
+| tenure ≥ 12 | 1 | 4 | $0.32$ |
+
+Weighted child impurity: $\tfrac{5}{10} \times 0.32 + \tfrac{5}{10} \times 0.32 = 0.32$.
+
+**Gain: $0.50 - 0.32 = 0.18$.** Try `balance < 500` and get a gain of 0.02? Then tenure wins, the node splits on it, and the algorithm moves down to each child and starts again.
+
+## [Section 2]{.section-kicker} Too far, and back {.section-slide background-color="#002f57"}
+
+## A fully grown tree is a lookup table
+
+Left alone, the algorithm splits until every leaf is pure — with $n$ leaves for $n$ points if it has to.
+
+- Training error: zero
+- Test error: terrible. It has memorised the noise, one rectangle per accident
+- This is **overfitting**, in its most visible form: you can *see* the absurd leaves
+
+Trees are high-variance: change a few rows, get a different first split, get a different tree.
+
+## Pruning: grow big, then cut back
+
+Grow the full tree $T_0$. Then for a penalty $\alpha \ge 0$ find the subtree minimising
+
+$$
+\text{RSS}(T) \;+\; \alpha \,|T|
+$$
+
+where $|T|$ is the number of leaves. Larger $\alpha$: smaller tree. Choose $\alpha$ by **cross-validation** — the same logic as choosing $\lambda$ in LASSO, and for the same reason.
+
+::: {.callout-important title="Attention"}
+`rpart` does this for you, and prints the cross-validation table as `cptable`. Read it. Pick the `cp` at the minimum `xerror` — or the simplest tree within one standard error of it. The default tree it draws is *not* the pruned one.
+:::
+
+## In R
+
+```{.r code-line-numbers="1-2|4|6|8|10-11|13"}
+library(tidyverse); library(rpart); library(rpart.plot); library(ISLR2)
+d <- Default                                    # 10 000 credit-card customers; default yes/no
+
+set.seed(1); tr <- sample(nrow(d), 7000)
+
+fit <- rpart(default ~ balance + income + student, data = d[tr, ], method = "class")
+
+printcp(fit)                                    # the cross-validation table
+
+best <- fit$cptable[which.min(fit$cptable[, "xerror"]), "CP"]
+pruned <- prune(fit, cp = best)
+
+rpart.plot(pruned)                              # the one-page model
+```
+
+Then `predict(pruned, d[-tr, ], type = "class")` against `d$default[-tr]` — the confusion matrix — and you have a test error to report.
+
+## Reading the tree you printed
+
+- **Top node**: the single most useful question in the data. On `Default`, it is `balance < 1800`. One variable, and most of the signal.
+- Each node shows the predicted class, the class probability, and the share of data reaching it
+- A leaf with 2% of the data and a 51% probability is a leaf that should not exist — the pruning failed, or the `cp` was too small
+
+::: {.callout-note}
+Notice what is *not* in the tree: `income`. It was available, and it never split. That is a finding, and it is free.
+:::
+
+## Trees: the honest scorecard
+
+| | For | Against |
+|---|---|---|
+| Interpretability | unmatched — the model is the explanation | |
+| Interactions | found automatically | |
+| Scale, transformations | irrelevant — splits are ordinal | |
+| Accuracy | | usually beaten by everything on Friday |
+| Stability | | change the data a little, get a different tree |
+
+The last two rows are one problem, and Friday's lecture is one answer: **many trees**.
+
+## A tree is a model you can argue with, branch by branch. Keep that in mind on Friday, when you give it up.  {.statement}
+
+## Before the lab
+
+- Run today's block. Prune at the 1-SE `cp` instead of the minimum. How many leaves do you lose? Does test error move?
+- Fit a tree on `customers.csv` with `segment` (from week 1) as the target. Which variable is at the top? Is that the variable *you* would have named the segments by?
+- Bootstrap: `d[sample(nrow(d), replace = TRUE), ]` three times, three trees. Compare the top splits.
+
+## Reading
+
+- **ISLR** §8.1 — the basics of decision trees; the *Hitters* example
+- **Provost & Fawcett** chapter 3 — *Introduction to predictive modelling*: entropy, information gain, and the tree as a set of rules
+- Reference: `?rpart`, `?rpart.plot`, `?prune`

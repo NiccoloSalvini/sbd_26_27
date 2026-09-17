@@ -1,0 +1,146 @@
+---
+title: "Hierarchical clustering"
+subtitle: "Lecture 12 · room 202"
+author: "Prof. Niccolò Salvini"
+institute: "HEMA · Università Cattolica del Sacro Cuore, Rome"
+date: 2026-11-09
+date-format: "dddd D MMMM YYYY"
+---
+
+## Objectives
+
+- Build a dendrogram and read it — height, merges, and where to cut
+- Understand *linkage*: the one choice that changes everything, and what each option does
+- Know when hierarchical beats k-means, and when it cannot be run at all
+- Apply it where it fits best: grouping **patients** and **hospitals** into case-mix classes
+
+## Why a manager cares
+
+::: {.subtitle-frame}
+Sometimes the number of groups is the question, not the input
+:::
+
+- A hospital director asks: *how many kinds of patient do we actually treat?* — k-means demands the answer before it starts
+- A payer groups hospitals into peer sets for benchmarking: *which are comparable?* — and needs to see the structure at several levels, not one
+- Brand managers want a tree of products, not a flat list of four segments
+
+Hierarchical clustering gives you **all the partitions at once**, from $n$ groups down to one, and lets you choose after looking.
+
+## [Section 1]{.section-kicker} Growing the tree {.section-slide background-color="#002f57"}
+
+## Agglomerative clustering, three lines
+
+1. Start with every point as its own cluster: $n$ clusters
+2. **Merge the two closest clusters**
+3. Repeat until one cluster remains
+
+$n - 1$ merges. Record the distance at each. That record *is* the dendrogram.
+
+- Deterministic: no random starts, no seed, the same tree every time
+- $k$ is not an input. You cut the tree afterwards, at any height, and read off the groups.
+
+::: {.callout-note}
+Step 2 hides the whole subject. "Closest" between two *points* is obvious. "Closest" between two *clusters* of points is a choice — the **linkage**.
+:::
+
+## Linkage: the distance between two groups
+
+| Linkage | Distance between clusters $A$, $B$ | Produces |
+|---|---|---|
+| **Complete** | farthest pair: $\max_{a \in A, b \in B} d(a,b)$ | compact, similar-sized groups |
+| **Single** | nearest pair: $\min d(a,b)$ | long chains; finds odd shapes, and noise |
+| **Average** | mean of all pairs | a compromise, often sensible |
+| **Ward** | merge that increases within-SS least | k-means-like blobs; the usual default |
+
+Same data, four linkages, four different trees. **Ward** and **complete** are the two you will use; single is the one you should know exists so you recognise its chaining when you see it.
+
+## By hand: five patients, one variable
+
+::: {.subtitle-frame}
+Length of stay, in days. Complete linkage.
+:::
+
+$$\{2\},\ \{3\},\ \{6\},\ \{10\},\ \{11\}$$
+
+- Closest pair: 2 and 3 (distance 1) → $\{2,3\}$
+- Next: 10 and 11 (distance 1) → $\{10,11\}$
+- Now $\{2,3\}$, $\{6\}$, $\{10,11\}$. Complete linkage: $d(\{2,3\},\{6\}) = 4$, $d(\{6\},\{10,11\}) = 5$ → merge $\{2,3,6\}$ at height **4**
+- Last merge at height $11 - 2 = $ **9**
+
+Cut the tree at height 5 → two groups: *short stays* $\{2,3,6\}$ and *long stays* $\{10,11\}$. Cut at 2 → three groups. Same tree, different question.
+
+## Reading a dendrogram
+
+- **Leaves** are observations; **height** of a merge is the distance at which it happened
+- Two leaves that merge low are similar. Two that merge only at the top are not — *even if they are drawn side by side*
+- **Horizontal position carries no information.** Any subtree can be flipped. Nearness along the bottom axis means nothing.
+- A long vertical gap before a merge is a natural place to cut: the groups below were far apart
+
+::: {.callout-important title="Attention"}
+The most common misreading is the third bullet. Students — and consultants — see two leaves next to each other and call them similar. Look at the height they join at, nothing else.
+:::
+
+## [Section 2]{.section-kicker} Choosing and using {.section-slide background-color="#002f57"}
+
+## Hierarchical or k-means?
+
+| | k-means | Hierarchical |
+|---|---|---|
+| $k$ | needed in advance | chosen after seeing the tree |
+| Result | one partition | every partition, nested |
+| Randomness | yes — `nstart` | none |
+| Scale | millions of rows | $n^2$ distances: a few thousand rows, then it stops |
+| Shape | round blobs | depends on linkage |
+
+Rule of practice: **hierarchical to explore and decide $k$; k-means to deploy at scale** with that $k$. They are colleagues, not rivals.
+
+## In R
+
+```{.r code-line-numbers="1-2|4|6|8-9|11"}
+library(tidyverse); library(factoextra)
+X <- scale(USArrests)
+
+d  <- dist(X)                               # Euclidean, on scaled data
+
+hc <- hclust(d, method = "ward.D2")         # or "complete", "average"
+
+fviz_dend(hc, k = 4, rect = TRUE)           # the tree, cut at 4
+groups <- cutree(hc, k = 4)                 # group label per row
+
+table(groups)
+```
+
+::: {.callout-note}
+`ward.D2` is Ward's method on Euclidean distance as Ward defined it. Plain `ward.D` squares nothing and is there for backward compatibility. Use `ward.D2`.
+:::
+
+## Patients into case-mix groups
+
+::: {.subtitle-frame}
+The application where this method earns its keep
+:::
+
+- Rows: admissions. Columns: length of stay, number of procedures, comorbidity count, ICU hours, cost
+- Scale, Ward, dendrogram. The tree typically shows a clear top split — *simple* vs *complex* stays — and then a fan of subgroups
+- Cut at the level clinicians recognise: they will tell you whether "four" or "seven" matches the wards they actually run
+- The groups become **the units of cost accounting and benchmarking**. This is, in outline, how DRG systems were born.
+
+::: {.callout-important title="Attention"}
+Cost dominates everything if you do not scale it. And a cluster with three patients is not a case-mix group; it is three outliers. Check group sizes before you name them.
+:::
+
+## The tree is not the answer. The cut is.  {.statement}
+
+[And the cut is a decision you defend with the height it was made at.]{.muted}
+
+## Before the lab
+
+- Run today's block on `USArrests` with `ward.D2`, `complete` and `single`. Three trees. Which one chains?
+- Cut Ward at $k=4$ and compare `cutree()` with Tuesday's `kmeans(k = 4)` — `table(km$cluster, groups)`. How many states move?
+- Friday's lab does this on a real customer table, start to finish, and ends with segment names.
+
+## Reading
+
+- **ISLR** §12.4.2 — hierarchical clustering; the linkage figure is worth an hour
+- **Provost & Fawcett** chapter 6 — the *whisky* example is a hierarchical clustering, read it for the dendrogram walk-through
+- Reference: `?hclust`, `?cutree`, `factoextra::fviz_dend`

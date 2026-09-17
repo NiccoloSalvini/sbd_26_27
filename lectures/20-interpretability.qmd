@@ -1,0 +1,168 @@
+---
+title: "Interpretability"
+subtitle: "Lecture 20 · room 202"
+author: "Prof. Niccolò Salvini"
+institute: "HEMA · Università Cattolica del Sacro Cuore, Rome"
+date: 2026-12-09
+date-format: "dddd D MMMM YYYY"
+---
+
+## Objectives
+
+- Name the trade-off precisely: what you give up when accuracy goes up, and who pays
+- Open a black box with three tools — importance, partial dependence, local explanations — and know what each one *cannot* tell you
+- Decide, for a real business case, where on the accuracy–interpretability line to stand
+- Say it to a non-technical decision-maker without either lying or losing them
+
+## Why a manager cares
+
+::: {.subtitle-frame}
+"The model declined her loan. Why?" — and you must answer.
+:::
+
+- **Regulation**: credit, insurance, hiring, healthcare — in the EU you owe an explanation for an automated decision that affects a person
+- **Trust**: a clinician will not act on a readmission score they cannot interrogate; a sales director will not restructure territories on a number from a box
+- **Debugging**: the boosting model that wins by 3 points of AUC may have learned that customers with `id > 5000` churn — because those were the ones onboarded during a bad quarter
+
+Accuracy without interpretability is a liability you have not priced yet.
+
+## [Section 1]{.section-kicker} The trade-off {.section-slide background-color="#002f57"}
+
+## The line, and where things sit on it
+
+$$
+\text{interpretable} \quad \longleftarrow\quad \text{linear} \;\;\; \text{tree} \;\;\; \text{GAM} \;\;\; \text{forest} \;\;\; \text{boosting} \;\;\; \text{network} \quad\longrightarrow\quad \text{flexible}
+$$
+
+- **Left**: the model *is* its explanation. A coefficient, a branch. You can defend it in a room.
+- **Right**: the model is a function you can evaluate but not read. It is often more accurate, because reality is not linear.
+- The middle is not empty: a GAM — additive, one smooth curve per variable — bends without hiding
+
+::: {.callout-important title="The thesis of Module 2, from lecture 18"}
+Flexibility and interpretability are traded, not combined. Every model on the right of the line owes you an explanation it cannot give by itself. The tools of this lecture are how you extract one — approximately, and with care.
+:::
+
+## Two kinds of question
+
+- **Global**: *what does the model do, overall?* Which variables matter, and how does the prediction move with each?
+- **Local**: *why this prediction, for this customer?* What pushed her score above the threshold?
+
+They need different tools, and a good explanation to a board is global; to a customer, local.
+
+## [Section 2]{.section-kicker} Global tools {.section-slide background-color="#002f57"}
+
+## Variable importance
+
+For a forest: how much does the impurity fall, summed over every split that uses this variable? For any model: **permutation importance** — shuffle one column, remeasure test error, see how much it worsens.
+
+- Ranks variables. Says *that* `tenure` matters, not *how*
+- Correlated variables **share** importance — two near-copies each look half as important as the thing they measure
+- Permutation importance is model-agnostic. Use it to compare a forest and a network on the same footing.
+
+::: {.callout-note}
+Importance is the first thing a manager asks for and the last thing you should stop at. A variable can be important because the model uses it *badly*.
+:::
+
+## Partial dependence
+
+Fix one variable at a value $x$. Set it to $x$ for **every** row, predict, average. Repeat across $x$. Plot.
+
+$$
+\text{PD}_j(x) \;=\; \frac{1}{n}\sum_{i=1}^{n} \hat f(x,\; x_{i,-j})
+$$
+
+- The *average* effect of variable $j$, with everything else as it is in the data
+- Read it like a coefficient that is allowed to curve: churn rises steeply until 12 months of tenure, then flattens
+- Its blind spot: **interactions**. If the effect of `monthly_charge` reverses between contract types, the average shows nothing. ICE plots — one curve per row, not averaged — reveal that.
+
+## In R — global
+
+```{.r code-line-numbers="1-2|4-5|7-8|10"}
+library(iml); library(ranger)
+rf <- ranger(churn ~ ., data = churn[tr, ], num.trees = 300, probability = TRUE)
+
+pred <- Predictor$new(rf, data = churn[-tr, ], y = "churn", class = "yes")
+imp  <- FeatureImp$new(pred, loss = "logLoss"); plot(imp)        # permutation importance
+
+pdp  <- FeatureEffect$new(pred, feature = "tenure_months", method = "pdp+ice")
+plot(pdp)                                                        # average curve + one per customer
+
+FeatureEffect$new(pred, feature = c("monthly_charge", "contract"), method = "pdp") |> plot()
+```
+
+The last line: a two-way partial dependence. If the surface is not additive, the one-way plot was hiding something.
+
+## [Section 3]{.section-kicker} Local tools {.section-slide background-color="#002f57"}
+
+## Explaining one prediction
+
+**LIME**: around *this* customer, perturb the inputs, get the model's predictions, fit a small **linear model** to them. The local coefficients are the explanation.
+
+**Shapley values**: from game theory. Each variable's contribution to *this* prediction is its average marginal contribution over all orderings of the variables. They **sum exactly** to the difference between this prediction and the average prediction — an accounting identity, which is why regulators like them.
+
+| | LIME | Shapley (SHAP) |
+|---|---|---|
+| Idea | local linear surrogate | fair attribution |
+| Guarantee | none — depends on the neighbourhood | additive, consistent |
+| Cost | cheap | expensive; `TreeSHAP` fixes that for trees |
+| Use it for | a quick "what drove this" | the answer you put in the letter |
+
+## In R — local
+
+```{.r code-line-numbers="1|3-4|6-7"}
+one <- churn[-tr, ][17, ]                              # a customer the model flagged
+
+sh <- Shapley$new(pred, x.interest = one)
+plot(sh)                                               # contribution of each variable, this row
+
+lime <- LocalModel$new(pred, x.interest = one, k = 5)  # 5-variable local linear model
+plot(lime)
+```
+
+The Shapley plot reads: *average churn probability 27%; this customer 71%; month-to-month contract +18 points, three support calls +12, fibre +9, tenure of 40 months −6…* That is a sentence you can send.
+
+## What none of this gives you
+
+- **Causality.** *Tenure lowers churn* in the model does not mean *lengthening tenure would lower churn*. The model learned an association from customers who chose to stay.
+- **Stability.** Explanations of the same prediction can differ between two equally accurate models. There is no unique "why".
+- **Absolution.** An explained wrong decision is still a wrong decision.
+
+::: {.callout-important title="Attention"}
+The failure mode is *explanation theatre*: a SHAP plot next to a model nobody validated, to make an audience stop asking questions. The tools here are for finding out what the model does, not for making it look understood.
+:::
+
+## [Section 4]{.section-kicker} Deciding {.section-slide background-color="#002f57"}
+
+## Where to stand, case by case
+
+| Decision | Cost of a wrong prediction | Cost of no explanation | Stand |
+|---|---|---|---|
+| Which customers get the catalogue | low | none | far right: boosting, and move on |
+| Whom to call first for retention | medium | low | forest + importance |
+| Credit limit | high | high — regulated | left, or right with SHAP in every letter |
+| Readmission risk flag on a chart | high | very high — a clinician acts on it | GAM or tree; a network only with PDPs a doctor has signed off |
+
+The column that decides is the last one, not the first. Accuracy is cheap to measure and easy to overvalue.
+
+## Saying it to the board
+
+- Lead with the **decision**, not the model: *we will contact these 2 000 customers first*
+- One number for accuracy, with its baseline: *71% of churners caught, versus 27% by contacting at random*
+- One picture: importance, or a partial dependence with a story — *risk is highest in the first year and after a support call*
+- One sentence on the limit: *the model finds patterns, it does not know causes; the retention offer's effect we will measure with a test*
+
+Everything else is for the appendix, and for you.
+
+## A model you cannot explain is a decision you cannot defend. Choose how much accuracy that is worth to you.  {.statement}
+
+## Before Friday
+
+- Run importance and PDP on last week's forest. Which top-3 variable has a *non-monotone* PDP? What does that mean for the offer?
+- Shapley for three customers: one high-risk, one low, one at the threshold. Write each a two-line explanation.
+- Read the last slide again, then draft the four-line board summary for the churn model. Friday is about delivering it.
+
+## Reading
+
+- **Molnar**, *Interpretable Machine Learning* — chapters 8 (PDP, ICE, permutation importance) and 9 (LIME, Shapley). Free online, and the reference for everything today
+- **Provost & Fawcett** chapter 12, *Analytical thinking* — the section on model comprehensibility
+- Reference: the `iml` package vignette

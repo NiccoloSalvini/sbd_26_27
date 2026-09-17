@@ -1,0 +1,169 @@
+---
+title: "k-means and customer segmentation"
+subtitle: "Lecture 11 · room 204"
+author: "Prof. Niccolò Salvini"
+institute: "HEMA · Università Cattolica del Sacro Cuore, Rome"
+date: 2026-11-03
+date-format: "dddd D MMMM YYYY"
+---
+
+## Objectives
+
+- Run the k-means algorithm by hand once, so it is never a black box again
+- Understand what it minimises, and why that makes it fast and fallible
+- Choose $k$ with a method you can defend to a colleague
+- Turn clusters into **segments**: profiles a marketing team can use
+
+## Why a manager cares
+
+::: {.subtitle-frame}
+One offer for everyone, or one for each customer? Neither.
+:::
+
+- Mass marketing wastes budget on people who would never respond
+- One-to-one is a fantasy at 400 000 customers
+- **Segmentation** is the working compromise: a handful of groups, each with its own offer, message, and channel
+- Every CRM system you will ever use has a segmentation inside it — usually a k-means, usually run once in 2019 and never revisited
+
+By the end of today you can build one, and you know what is wrong with the one you inherit.
+
+## [Section 1]{.section-kicker} The algorithm {.section-slide background-color="#002f57"}
+
+## What k-means wants
+
+Given $n$ points and a number $k$ that **you** choose, find $k$ groups $C_1,\dots,C_k$ that minimise the **within-cluster sum of squares**:
+
+$$
+W(C) \;=\; \sum_{j=1}^{k} \;\sum_{i \in C_j} \lVert x_i - \bar{x}_j \rVert^2
+$$
+
+- $\bar x_j$ is the **centroid** of cluster $j$: the mean of its points
+- Small $W$: each point is close to its own centroid
+- This is exactly the total variance *inside* groups — the same quantity ANOVA puts in the denominator
+
+::: {.callout-note}
+Finding the true minimum over all partitions is impossible in practice: with $n = 100$ and $k = 3$ there are more partitions than atoms in the universe. k-means finds a *good* one, quickly.
+:::
+
+## Lloyd's algorithm, four lines
+
+1. Pick $k$ points at random as initial centroids
+2. **Assign** each point to the nearest centroid
+3. **Update** each centroid to the mean of its assigned points
+4. Repeat 2–3 until nothing moves
+
+Each step can only lower $W$, so it always stops. Usually within a dozen rounds.
+
+::: {.callout-important title="Attention"}
+It stops at *a* minimum, not *the* minimum. Different starting points give different answers. Always run it several times and keep the best: `nstart = 25`, never `nstart = 1`.
+:::
+
+## By hand: six customers, two variables
+
+::: {.subtitle-frame}
+Visits per month and average basket, already scaled
+:::
+
+| | A | B | C | D | E | F |
+|---|---|---|---|---|---|---|
+| visits | 1 | 2 | 1 | 8 | 9 | 8 |
+| basket | 1 | 1 | 2 | 8 | 8 | 9 |
+
+$k = 2$. Start with centroids at **A** and **D**.
+
+- **Assign**: B, C nearer A; E, F nearer D → $\{A,B,C\}$, $\{D,E,F\}$
+- **Update**: $\bar x_1 = (1.33, 1.33)$, $\bar x_2 = (8.33, 8.33)$
+- **Assign again**: nothing changes. Done in one round.
+
+$W = 2.67 + 2.67 = 5.3$. Any other split of these six gives a larger $W$ — try $\{A,B,C,D\}$ vs $\{E,F\}$ and see.
+
+## Two things that silently break it
+
+::: {.subtitle-frame}
+Both happen in every real dataset
+:::
+
+**Scale.** Income in euros and age in years: income dominates the distance entirely, age is noise. k-means sees only geometry. **Standardise first** — `scale()` — unless you have a reason not to.
+
+**Shape.** k-means draws straight boundaries between centroids. It finds round, similar-sized blobs. Give it two crescents, or one dense core inside a diffuse halo, and it will cut them wrongly and report a fine $W$.
+
+::: {.callout-note}
+Neither failure produces an error message. The output looks like any other segmentation. This is why you *look at the plot* before you trust the numbers.
+:::
+
+## [Section 2]{.section-kicker} Choosing k {.section-slide background-color="#002f57"}
+
+## $W$ always falls as $k$ grows
+
+- $k = 1$: $W$ is the total variance
+- $k = n$: $W = 0$, every point is its own cluster
+- In between, $W$ falls monotonically. It **cannot** choose $k$ for you — it always votes for more.
+
+Two honest tools:
+
+- **Elbow**: plot $W$ against $k$; take $k$ where the curve stops bending. Crude, quick, often enough.
+- **Silhouette**: for each point, *how much closer is it to its own cluster than to the next one?* Average it; pick the $k$ that maximises. Ranges $-1$ to $1$; above $0.5$ is a real structure, below $0.25$ is not.
+
+## In R
+
+```{.r code-line-numbers="1-2|4-5|7-8|10"}
+library(tidyverse); library(factoextra)
+X <- scale(USArrests)                      # always: same units for every column
+
+fviz_nbclust(X, kmeans, method = "wss")    # elbow
+fviz_nbclust(X, kmeans, method = "silhouette")
+
+set.seed(1)
+km <- kmeans(X, centers = 4, nstart = 25)  # 25 random starts, keep the best
+
+fviz_cluster(km, data = X)                 # the picture you show a colleague
+```
+
+::: {.callout-note}
+`set.seed()` makes the random starts reproducible. Without it, your colleague reruns your script and gets different segment numbers — the same segments, relabelled — and a meeting is lost to confusion.
+:::
+
+## [Section 3]{.section-kicker} From clusters to segments {.section-slide background-color="#002f57"}
+
+## A cluster is a set of rows. A segment is a story.
+
+The algorithm gives you `1, 2, 3, 4`. Nobody in marketing can act on `3`.
+
+**Profile** each cluster: the mean of every variable, per cluster, back in the original units.
+
+| Segment | Visits / month | Basket (€) | Tenure (yrs) | Share |
+|---|---|---|---|---|
+| 1 | 0.8 | 62 | 1.1 | 41% |
+| 2 | 6.4 | 28 | 4.8 | 22% |
+| 3 | 2.1 | 140 | 3.9 | 19% |
+| 4 | 4.0 | 55 | 0.4 | 18% |
+
+Then **name** them from the numbers — *occasional big-basket*, *frequent small-basket loyalists*, … — and only then hand them over.
+
+## What "act on it" looks like
+
+- **Segment 2** (frequent, small basket, long tenure): cross-sell, not discount — they already come; raise the basket
+- **Segment 4** (new, mid-frequency): the retention window is now; a churn model (week 5) will tell you *which* of them
+- **Segment 1** (rare, big basket): the campaign question is *reach*, not *offer*
+
+::: {.callout-important title="Attention"}
+The segmentation is only as good as the variables you fed it. Cluster on demographics and you get demographic segments, which rarely predict behaviour. Cluster on **behaviour** — recency, frequency, monetary value — and the segments are things a company can move.
+:::
+
+## k-means answers "how many groups?" with "as many as you asked for." {.statement}
+
+[The choice of $k$ is a decision, and it is yours.]{.muted}
+
+## Before the lab
+
+Friday is clustering end to end, on a real customer table. Come having run today's R block on `USArrests`, and with an answer to:
+
+- What is the elbow $k$? The silhouette $k$? Do they agree?
+- Rerun `kmeans` with `nstart = 1` three times. Do the clusters change?
+- Profile the clusters. Write one sentence naming each.
+
+## Reading
+
+- **ISLR** §12.4.1 — k-means clustering, with the algorithm and its figure
+- **Provost & Fawcett** chapter 6, *Clustering* — the business questions, and *"what does a cluster mean?"*
+- Reference: `?kmeans`, and the `factoextra` vignette for the plots

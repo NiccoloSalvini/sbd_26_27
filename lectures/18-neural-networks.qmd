@@ -1,0 +1,268 @@
+---
+title: "Neural networks"
+subtitle: "Lecture 18 · room 202"
+author: "Prof. Niccolò Salvini"
+institute: "HEMA · Università Cattolica del Sacro Cuore, Rome"
+date: 2026-11-30
+date-format: "dddd D MMMM YYYY"
+---
+
+## Objectives
+
+- See where neural networks come from, and what problem they were built to solve
+- Meet the **perceptron**, and train one by hand — four rows, two epochs, no software
+- Understand gradient descent, the engine under every network
+- Discover that a network with one neuron **is a GLM** — and what that buys you
+- Add a hidden layer, and see flexibility and overfitting arrive together
+
+## Why a manager cares
+
+::: {.subtitle-frame}
+The most over-sold and under-understood model in business
+:::
+
+- Every vendor deck says *AI*. Underneath, on a table of customers, it is usually a neural network — or a gradient-boosted tree pretending to be one
+- You will be asked to approve, fund, or trust one. You should know what it is: a regression that learned to bend
+- And you should know when it is the *wrong* tool — which, on tabular data, is most of the time. Friday is about that.
+
+## [Section 1]{.section-kicker} From linear to nonlinear {.section-slide background-color="#002f57"}
+
+## The motivation, in one picture
+
+Two classes of customer, two variables. You want a **decision boundary**.
+
+- A **linear** boundary — logistic regression — is a straight line. If the classes are separated by a curve, it cannot follow.
+- A **nonlinear** boundary bends where the data bend
+
+Neural networks exist to draw the second kind. That is the whole motivation. Everything else is machinery.
+
+::: {.callout-note}
+They were inspired by the brain, in the 1940s. The inspiration is real and the analogy is thin: *inputs* arrive like signals at dendrites, the *body* sums them, the *axon* fires or does not. Keep the picture; do not lean on it.
+:::
+
+## Two dialects, revisited
+
+From lecture 10 — now it matters:
+
+| Statistics | Machine learning |
+|---|---|
+| Coefficients | **Weights** $W$ |
+| Intercept | **Bias** $W_0$ |
+| Transformation, link | **Activation function** $g$ |
+| Fitting | **Training** |
+| Observations | **Training set** |
+
+::: {.callout-important title="The trade, stated once more"}
+You are about to gain flexibility and lose interpretability. A neural network learns *whatever* relationship is there. It does not tell you what it learned, and it gives you no standard errors. Choose it when prediction is the whole job.
+:::
+
+## [Section 2]{.section-kicker} The perceptron {.section-slide background-color="#002f57"}
+
+## McCulloch & Pitts, 1943
+
+Inputs $X_1, \dots, X_p$, weights $W_1, \dots, W_p$, a bias $W_0$, and a step:
+
+$$
+\hat y \;=\; \operatorname{sign}\!\Big(W_0 + \sum_{j=1}^{p} W_j X_j\Big), \qquad \operatorname{sign}(z) = \begin{cases} +1 & z \ge 0 \\ -1 & z < 0\end{cases}
+$$
+
+In general: $\hat y = g\big[\phi(X; W)\big]$ — a **linear combination** $\phi$, then an **activation** $g$.
+
+Now make both linear: $g(z) = z$. You have $\hat y = W_0 + \sum_j W_j X_j$. **That is linear regression.** The simplest possible neural network is the model you started the course with.
+
+## The difference that is not in the formula
+
+Same equation, two philosophies:
+
+- Linear regression has a **stochastic** part: $y = X\beta + \varepsilon$. The noise is in the model; that is where tests and intervals come from.
+- The network is a **deterministic** map from input to output. No $\varepsilon$, no distribution, no inference — just *find weights that predict well*.
+- Regression **imposes** the form of the relationship. The network **learns** it.
+
+::: {.callout-note}
+This is why a network can be more accurate and less useful at the same time. Both statements are about the same object.
+:::
+
+## Training: the perceptron rule
+
+Supervised: we have the true $y$. Start with random weights, then for each observation:
+
+$$
+W(t+1) \;=\; W(t) + \eta\,(y - \hat y)\,X
+$$
+
+- $\eta \in (0, 1]$: the **learning rate** — how big a step. Set by you, not learned. A *hyperparameter*.
+- $(y - \hat y)$: the error. Correct prediction → zero → no update.
+- Wrong with $y = +1$: weights move *up* along $X$. Wrong with $y = -1$: *down*.
+
+One pass over all observations is an **epoch**. Repeat until nothing changes, or you run out of patience.
+
+## By hand: the AND gate
+
+::: {.subtitle-frame}
+Two binary inputs, output 1 only when both are 1. $W_1 = 0.3$, $W_2 = -0.1$, no bias, $\eta = 0.1$, threshold $0.2$.
+:::
+
+| Obs | $X_1$ | $X_2$ | $y$ | $z$ | $\hat y$ | error | $W$ after |
+|---|---|---|---|---|---|---|---|
+| 1 | 0 | 0 | 0 | 0 | 0 | 0 | — |
+| 2 | 0 | 1 | 0 | −0.1 | 0 | 0 | — |
+| 3 | 1 | 0 | 0 | 0.3 | **1** | −1 | $(0.2,\,-0.1)$ |
+| 4 | 1 | 1 | 1 | 0.1 | **0** | +1 | $(0.3,\,0.0)$ |
+
+End of epoch 1: $W = (0.3, 0.0)$. Epoch 2 starts. It converges in a few more. Four rows, one rule, and the network has *learned* AND.
+
+## [Section 3]{.section-kicker} Gradient descent {.section-slide background-color="#002f57"}
+
+## The general engine
+
+The perceptron rule is a special case of something universal. Given a **loss** $L(W)$ — say mean squared error — move the weights *downhill*:
+
+$$
+W_j(t+1) \;=\; W_j(t) - \eta\,\frac{\partial L(W)}{\partial W_j}
+$$
+
+- Derivative positive: $L$ rises with $W_j$, so decrease it. Negative: increase it. The minus sign is the whole idea.
+- Repeat until the gradient is (near) zero: a minimum
+- For a network, computing $\partial L / \partial W$ layer by layer is called **backpropagation**. It is the chain rule, applied carefully, and nothing more.
+
+::: {.callout-important title="Attention"}
+With a convex loss — a bowl — you reach *the* minimum. A network's loss is not a bowl. Gradient descent finds *a* valley, which depends on where you started. Same lesson as k-means: run it more than once.
+:::
+
+## The learning rate, and what it does to you
+
+- $\eta$ **too small**: the loss creeps down; thousands of iterations; on a large dataset, days
+- $\eta$ **too large**: the loss oscillates, jumps the valley, may never settle
+- **Just right**: a smooth, decelerating descent — and you know it only by watching the curve
+
+Practical variants: shrink $\eta$ over time (*annealing*); add inertia so consistent gradients accelerate (*momentum*, $\mu \approx 0.9$). Each is one more hyperparameter.
+
+## Gradient descent on linear regression
+
+Apply the update to $\hat y = XW$ with squared loss: $W(t+1) = W(t) + \eta\, X^\top(y - XW)$.
+
+It converges to $\hat W = (X^\top X)^{-1} X^\top y$. **Exactly OLS.** The network, trained by gradient descent, arrives where the formula was already standing.
+
+| | OLS | NN, identity activation |
+|---|---|---|
+| Intercept | 1.01 | $W_0$ = 1.01 |
+| $X_1$ | −0.02 | $W_1$ = −0.02 |
+| $X_2$ | −0.35 | $W_2$ = −0.35 |
+| $X_3$ | −0.52 | $W_3$ = −0.52 |
+
+Identical coefficients, identical predictions. Nothing was gained — yet.
+
+## [Section 4]{.section-kicker} One neuron is a GLM {.section-slide background-color="#002f57"}
+
+## The bridge
+
+Train a network on the **negative log-likelihood** and gradient descent finds the **MLE**. More precisely: a single-neuron network with activation $g$ *is* a GLM whose link is $g^{-1}$.
+
+| Target | Regression | Link $h(\mu)$ | Activation $g(\lambda)$ |
+|---|---|---|---|
+| Continuous | Linear | identity | identity |
+| Binary | Logistic | $\log \frac{\mu}{1-\mu}$ | sigmoid $\;\frac{1}{1+e^{-\lambda}}$ |
+| Binary | Probit | $\Phi^{-1}(\mu)$ | $\Phi(\lambda)$ |
+| Counts | Poisson | $\log \mu$ | $e^{\lambda}$ |
+| Categorical | Multinomial | $\log \frac{\mu_k}{1-\mu_k}$ | softmax |
+
+::: {.callout-note}
+Take the link function, invert it, and you have the activation. Take the activation, invert it, and you have the link. You already know every model in this table from Module 1.
+:::
+
+## The sigmoid, since it is everywhere
+
+$$
+\sigma(\lambda) = \frac{1}{1 + e^{-\lambda}} \;\in\; (0, 1)
+$$
+
+- Input anything; output a probability. Threshold at $0.5$ to classify.
+- A network with one sigmoid neuron and binary cross-entropy loss **is logistic regression**, weights and all
+- Binary cross-entropy, $-\sum_i [y_i \log \hat y_i + (1-y_i)\log(1-\hat y_i)]$, is the negative log-likelihood of the Bernoulli. Same object, machine-learning name.
+
+## [Section 5]{.section-kicker} Hidden layers {.section-slide background-color="#002f57"}
+
+## Adding a layer
+
+So far: input → output. Two layers, and nothing a GLM cannot do.
+
+Now put $L$ **hidden neurons** between them. Each one is a little GLM of the inputs, and the output is a GLM of *them*:
+
+$$
+a_l = f\Big(W^{(1)}_{0l} + \sum_j W^{(1)}_{jl} X_j\Big), \qquad
+\hat y = g\Big(W^{(2)}_0 + \sum_l W^{(2)}_l\, a_l\Big)
+$$
+
+- **Hidden**: you never observe $a_l$. They are features the network invents.
+- Fully connected: every input feeds every hidden neuron. Weights: $(p+1)L + (L+1)$.
+- Two activations, $f$ and $g$, and they are usually different.
+
+## Why the activations must bend
+
+Set $f$ and $g$ both to the identity. Expand:
+
+$$
+\hat y = W^{(2)}_0 + \sum_l W^{(2)}_l \Big(W^{(1)}_{0l} + \sum_j W^{(1)}_{jl} X_j\Big) \;=\; \text{a linear function of } X
+$$
+
+- Three inputs, two hidden, one output: **11 weights** to express what **4** coefficients already did
+- Same model, more parameters, less interpretability, nothing gained
+
+::: {.callout-important title="Attention"}
+A hidden layer with linear activations is over-parameterised linear regression. The bend comes from $f$ — sigmoid, tanh, ReLU. Without it, there is no network, only a slower way to run `lm()`.
+:::
+
+## More flexibility, and what it costs
+
+::: {.subtitle-frame}
+Ten inputs, one hidden layer of five sigmoid neurons, 90/10 split
+:::
+
+Plot the error against training iterations. Two curves:
+
+- **Training MSE** falls, and keeps falling
+- **Test MSE** falls, reaches a minimum — the *optimum* — then **rises**
+
+Past that point the network is learning the noise in the training set. It fits the data it has seen better and better, and the data it has not seen worse and worse. **Overfitting**, drawn.
+
+## Three ways to stop it
+
+- **Early stopping**: watch a validation set; stop when its error turns up. Simple, empirical, no guarantee it is the true optimum
+- **Regularisation**: add a penalty $\lambda J(W)$ to the loss. $J = \sum W^2$ is **ridge** — *weight decay* in the ML dialect. $J = \sum |W|$ is **lasso**. Same idea as Module 1, same $\lambda$ to tune
+- **Fewer neurons**: the honest fix, and the one people resist
+
+::: {.callout-note}
+Everything from lecture 7 — ridge, lasso, cross-validation for $\lambda$ — applies unchanged. A network is a very flexible regression, and it overfits like one.
+:::
+
+## In R
+
+```{.r code-line-numbers="1-2|4-5|7-8|10|12"}
+library(tidyverse); library(nnet); library(ISLR2)
+d <- Default |> mutate(default = default == "Yes", balance = scale(balance), income = scale(income))
+
+set.seed(1); tr <- sample(nrow(d), 7000)
+
+fit <- nnet(default ~ balance + income + student, data = d[tr, ],
+            size = 5, decay = 0.01, maxit = 500, trace = FALSE)     # 5 hidden, weight decay
+
+p <- predict(fit, d[-tr, ])                                          # probabilities
+
+mean((p > 0.5) == d$default[-tr])                                    # held-out accuracy
+```
+
+`size` is $L$. `decay` is $\lambda$. Both are hyperparameters, and Friday's lab is about choosing them without lying to yourself.
+
+## A neural network is a regression that learned to bend. Whether it needed to is the question you must answer before you fit one.  {.statement}
+
+## Before the lab
+
+- Run the block. Change `size` to 1. Compare with `glm(family = binomial)` on the same rows: are the coefficients close? (They should be — why?)
+- `size = 20, decay = 0`. Training accuracy? Test accuracy? Draw the curve you saw on slide 17 in your head.
+- Reread lecture 14, last section: *autoencoders*. Friday we make the connection.
+
+## Reading
+
+- **ISLR** §10.1–10.2 — single-layer networks; the parameter-counting examples
+- **ISLR** §10.7 — fitting a neural network; skim for the vocabulary
+- **Provost & Fawcett** chapter 4, *Fitting a model to data* — the overfitting discussion, which applies here twice over

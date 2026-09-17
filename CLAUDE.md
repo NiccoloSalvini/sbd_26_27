@@ -173,6 +173,23 @@ visual option; a lecture file sets title, subtitle (`Lecture n · room`), author
 a one-line slide is `## Text {.statement}`. Math is KaTeX — MathJax dropped
 `\mathcal` glyphs. Rendered to `_site/lectures/`, so `make deploy` publishes it.
 
+**Module 2 is twelve decks, `lectures/10-*.qmd` to `21-*.qmd`, one per row of
+the schedule**, all in this format; Module 1 (Prof. Arbia) is PDFs in `slides/`.
+Start a new deck from `10-opening.qmd`. Every deck follows one shape, and a
+deck that skips a step should have a reason: Objectives → *Why a manager cares*
+→ sections (intuition, method, a worked example by hand, In R) → an *Attention*
+callout for the trap → one `.statement` slide → *Before the lab* → Reading
+(ISLR chapter, Provost & Fawcett chapter, package reference). Section slides
+carry `[Section n]{.section-kicker}`. Code blocks are display-only (`{.r}`),
+never executed at render, so the site builds without R.
+
+The three lab datasets — `materials/customers.csv` (L13), `brands.csv` (L15),
+`churn.csv` (L17) — are **generated**, not hand-edited: `Rscript
+materials/gen-data.R` rebuilds them byte for byte from fixed seeds and then
+runs each lab's own pipeline as an assertion (silhouette, seed stability,
+chi-square and inertia, churn rate and AUC). Change a lab's expectations there
+first, then regenerate. The schedule links each dataset next to its deck.
+
 Three things the theme fights, learnt by reading the rendered DOM and CSS:
 Quarto's title slide is `<section id="title-slide">` with no `.title-slide`
 class, so the theme styles `#title-slide` and sets `center-title-slide: false`

@@ -1,0 +1,158 @@
+---
+title: "Lab — neural networks, and when not to reach for them"
+subtitle: "Lecture 19 · room 204"
+author: "Prof. Niccolò Salvini"
+institute: "HEMA · Università Cattolica del Sacro Cuore, Rome"
+date: 2026-12-04
+date-format: "dddd D MMMM YYYY"
+---
+
+## Today
+
+1. Fit a network on Friday's churn table, properly — validation set, `size`, `decay`
+2. Put it in the table next to logistic regression, the forest and the boosting
+3. Watch it lose, and understand why
+4. See what *deep* learning is, in one slide, and where it wins instead
+5. Leave with a rule you can use on Monday
+
+## [Section 1]{.section-kicker} Fit one properly {.section-slide background-color="#002f57"}
+
+## Step 1 — the same rows as last week
+
+```{.r code-line-numbers="1-3|5-7|9"}
+library(tidyverse); library(nnet); library(ranger); library(xgboost); library(here)
+churn <- read_csv(here("data", "churn.csv")) |> select(-id) |>
+  mutate(across(where(is.character), factor), y = churn == "yes")
+
+set.seed(1)
+tr  <- sample(nrow(churn), 4900)          # 70%, as in lecture 17
+val <- sample(tr, 900)                    # carve a validation set out of training
+trn <- setdiff(tr, val)
+
+X <- model.matrix(y ~ . - churn - 1, churn) |> scale()   # dummies, then scale — networks need both
+```
+
+::: {.callout-important title="Attention"}
+Three sets, not two. **Training** fits the weights, **validation** chooses `size` and `decay`, **test** is touched once, at the end, to report. Choose hyperparameters on the test set and your reported accuracy is fiction.
+:::
+
+## Step 2 — a grid, and the validation curve
+
+```{.r code-line-numbers="1-2|4-9|11"}
+grid <- expand_grid(size = c(1, 3, 5, 10, 20), decay = c(0, 0.001, 0.01, 0.1))
+logloss <- function(p, y) -mean(y * log(p) + (1 - y) * log(1 - p))
+
+grid$val <- pmap_dbl(grid, function(size, decay) {
+  set.seed(7)
+  f <- nnet(X[trn, ], churn$y[trn], size = size, decay = decay, maxit = 300, trace = FALSE)
+  p <- pmin(pmax(predict(f, X[val, ]), 1e-6), 1 - 1e-6)
+  logloss(p, churn$y[val])
+})
+
+ggplot(grid, aes(size, val, colour = factor(decay))) + geom_line() + geom_point()
+```
+
+Read the plot before the next slide. Where is the minimum? What happens at `size = 20, decay = 0`? That is slide 17 of Monday, drawn by you.
+
+## Step 3 — refit on all of training, score the test once
+
+```{.r code-line-numbers="1|3-4|6"}
+best <- grid[which.min(grid$val), ]                    # typically size 3–5, decay 0.01
+
+set.seed(7)
+nn <- nnet(X[tr, ], churn$y[tr], size = best$size, decay = best$decay, maxit = 500, trace = FALSE)
+
+p_nn <- predict(nn, X[-tr, ])
+```
+
+Add logistic, forest and boosting **on the same `-tr` rows**, from last week's script. Then:
+
+| Model | Accuracy | AUC | Log-loss |
+|---|---|---|---|
+| Logistic | | | |
+| Pruned tree | | | |
+| Random forest | | | |
+| Gradient boosting | | | |
+| Neural network | | | |
+
+Fill it in. Then look at it for a while.
+
+## [Section 2]{.section-kicker} What you will see {.section-slide background-color="#002f57"}
+
+## The network loses. Here is why.
+
+On a table of a few thousand customers with twenty columns, the order is almost always: **boosting ≥ forest > network ≈ logistic > tree**.
+
+- Tabular data has *structure a tree can use*: thresholds, interactions between a few columns. Trees find them in one split. A network has to *discover* them through smooth functions of scaled dummies.
+- With 5 000 rows, a network cannot learn much that a forest does not already know. It **can** learn the noise, and it needs your validation set to stop it.
+- The network's advantage — arbitrary smooth nonlinearity — is not the shape of the signal here
+
+::: {.callout-note}
+This is not a defect of networks. It is a mismatch between the tool and the data. The same network on 50 000 images would win by a mile.
+:::
+
+## When the residuals tell you to reach for one
+
+From Monday: the network with identity activation *is* OLS. So when does the nonlinearity earn its place?
+
+- Fit the linear model. Plot predicted vs observed. **If the residuals curve**, the relationship is nonlinear.
+- Option 1: transform the response, refit the regression, keep interpretability
+- Option 2: assume the nonlinearity is real and complex → a network with nonlinear activations
+
+Try option 1 first. It costs a minute and, more often than not, the curve was a log.
+
+## [Section 3]{.section-kicker} Deep learning, in one slide {.section-slide background-color="#002f57"}
+
+## What "deep" means, and what it costs
+
+MNIST: 28 × 28 pixel images of handwritten digits, 10 classes. A network: 784 → 1024 → 1024 → 2048 → 10.
+
+$$
+784\!\times\!1024 + 1024\!\times\!1024 + 1024\!\times\!2048 + 2048\!\times\!10 \;\approx\; \mathbf{4\ million\ weights}
+$$
+
+- *Deep*: more than one hidden layer. That is the whole definition.
+- Four million weights, sixty thousand images: it **will** overfit without **dropout** — randomly switching off neurons during training, an ensemble of sub-networks — and weight decay
+- The two architectures you will hear named: **CNNs** for images (convolution: local, shared filters — a 3×3 edge detector reused across the whole picture) and **RNNs** for sequences (the same weights applied at every time step — an autoregressive model with a memory)
+
+::: {.callout-important title="Attention"}
+None of these apply to a customer table. They win where the data have *spatial or sequential structure* the architecture can exploit: images, text, audio, sensor streams. On rows and columns, use last week's tools.
+:::
+
+## The one connection worth keeping
+
+An **autoencoder** is a network trained to reproduce its own input through a narrow hidden layer: $p$ inputs → $q < p$ neurons → $p$ outputs, loss = reconstruction error.
+
+- With **linear** activations, it converges to **PCA**. Exactly. The $q$ hidden neurons span the first $q$ components.
+- With nonlinear activations it is a PCA that can bend — compression that follows curved structure
+
+Lecture 14's last slide, closed. Unsupervised learning and neural networks are the same subject seen from two sides.
+
+## [Section 4]{.section-kicker} The rule {.section-slide background-color="#002f57"}
+
+## Which model, on Monday morning
+
+| Your data are… | Start with | Consider a network when… |
+|---|---|---|
+| A table, < 100k rows | logistic → forest → boosting | never, unless residuals curve and transformations fail |
+| A table, millions of rows, hundreds of columns | boosting | a well-tuned MLP is competitive; test it |
+| Images, audio, free text, long sequences | a pretrained deep network | always — nothing else works |
+| Anything where you must **explain** the decision | tree, logistic, GAM | only with lecture 20's tools, and a lawyer |
+
+The honest version of every AI vendor pitch you will ever hear fits in this table.
+
+## Deliverable
+
+Ungraded, but bring it Wednesday:
+
+- The five-model table, filled, on the test rows
+- Your validation plot for the network, with the chosen `size` and `decay` marked
+- One paragraph: *which model would you deploy for this company, and what would you tell the CFO about the one you did not choose?*
+
+## The question is never "can a neural network do this?" It can. The question is whether anything simpler could — and it usually can.  {.statement}
+
+## Reading
+
+- **ISLR** §10.3–10.4 — CNNs and RNNs, for the vocabulary; §10.6, *when to use deep learning*, for the argument you heard today
+- **ISLR** §10.7 — the `nnet`-free R lab uses `keras`; read it to see what the real toolchain looks like, do not install it tonight
+- **Provost & Fawcett** chapter 7 — *Decision analytic thinking*: expected value, and why the most accurate model is not always the one to deploy

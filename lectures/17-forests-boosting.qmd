@@ -1,0 +1,156 @@
+---
+title: "Random forests and gradient boosting"
+subtitle: "Lecture 17 · room 204"
+author: "Prof. Niccolò Salvini"
+institute: "HEMA · Università Cattolica del Sacro Cuore, Rome"
+date: 2026-11-27
+date-format: "dddd D MMMM YYYY"
+---
+
+## Objectives
+
+- Understand why averaging many bad trees gives one good model — and the one trick that makes it work
+- Tell **bagging**, **random forests** and **boosting** apart in a sentence each
+- Fit both, tune the two or three settings that matter, and read variable importance
+- Lab: a churn model end to end, with a test error you would sign
+
+## Why a manager cares
+
+::: {.subtitle-frame}
+On a table of customers, this is the model that wins
+:::
+
+- Churn, default, readmission, fraud, response to an offer: in a decade of competitions and deployments, on tabular data, **gradient-boosted trees** win or tie almost every time
+- Random forests are a close second, and need almost no tuning
+- The price is the tree's one virtue: you can no longer read the model
+
+Today you learn to build the thing that wins. Week 7 is about living with what you cannot read.
+
+## [Section 1]{.section-kicker} Many trees {.section-slide background-color="#002f57"}
+
+## The variance problem, and averaging
+
+A single tree is unstable: high variance. Statistics has one universal remedy for variance — **average**.
+
+$$
+\operatorname{Var}\!\left(\tfrac{1}{B}\sum_{b=1}^{B} \hat f_b\right) \;=\; \frac{\sigma^2}{B} \qquad \text{if the } \hat f_b \text{ are independent}
+$$
+
+Fit $B$ trees, average their predictions (or vote), and the variance falls like $1/B$.
+
+Except you have **one** training set. Where do $B$ independent trees come from?
+
+## Bagging: bootstrap, then aggregate
+
+1. Draw a **bootstrap sample**: $n$ rows *with replacement* from the training data
+2. Grow a full, unpruned tree on it
+3. Repeat $B$ times — 500 is typical
+4. Predict by averaging (regression) or majority vote (classification)
+
+Each tree sees about **63%** of the rows; the other 37% are *out of bag* for that tree. Predict those with it, and you get a test error **for free, without a test set**: the **OOB error**.
+
+::: {.callout-note}
+The bootstrap samples are not independent — they share most of their rows. So the trees are correlated, and the variance does not fall all the way to $\sigma^2/B$. That gap is what the next idea closes.
+:::
+
+## Random forests: one more trick
+
+Bagging's trees look alike because they all grab the same strong variable at the top. Correlated trees average badly.
+
+**At every split, consider only a random subset of $m$ of the $p$ predictors.** Typically $m \approx \sqrt{p}$.
+
+- The strong variable is unavailable in most splits, so trees are forced to use others
+- They become **decorrelated**, and the average gets much better
+- That single line is the entire difference between bagging and a random forest
+
+::: {.callout-important title="Attention"}
+$m = p$ *is* bagging. `ranger` and `randomForest` default to $\sqrt{p}$. It is the one setting worth touching; try $p/3$ and $\sqrt p$ and keep the better OOB error.
+:::
+
+## [Section 2]{.section-kicker} Boosting {.section-slide background-color="#002f57"}
+
+## Boosting: learn from the mistakes, slowly
+
+Forests grow trees **in parallel**, each ignorant of the others. Boosting grows them **in sequence**, each one fitted to what the previous ones got wrong.
+
+1. Start with $\hat f = 0$, residuals $r = y$
+2. Fit a *small* tree $\hat f_b$ to the residuals $r$
+3. Update: $\hat f \leftarrow \hat f + \lambda \hat f_b$, and $r \leftarrow r - \lambda \hat f_b$
+4. Repeat $B$ times
+
+Three knobs: **$B$** trees, **$\lambda$** the learning rate (0.01–0.1: small steps), and **$d$** the depth of each tree (1–4: stumps and near-stumps).
+
+::: {.callout-note}
+"Gradient" boosting: step 2 fits the tree to the *gradient of the loss* — for squared error, exactly the residual; for classification, the gradient of the log-loss. `xgboost` is this, with every engineering shortcut ever found.
+:::
+
+## Forest vs boosting, in one table
+
+| | Random forest | Gradient boosting |
+|---|---|---|
+| Trees | deep, independent | shallow, sequential |
+| Learns by | averaging away variance | correcting bias, step by step |
+| Tuning | almost none — $m$, done | $B$, $\lambda$, $d$, and they interact |
+| Overfits? | hard to make it | easy: too many trees, too big a step |
+| Accuracy | very good | usually best |
+| First choice | when you have an afternoon | when you have a week |
+
+## In R — forest
+
+```{.r code-line-numbers="1-3|5|7-8|10"}
+library(tidyverse); library(ranger); library(ISLR2)
+d <- Default |> mutate(default = factor(default))
+set.seed(1); tr <- sample(nrow(d), 7000)
+
+rf <- ranger(default ~ ., data = d[tr, ], num.trees = 500, importance = "impurity", probability = TRUE)
+
+rf$prediction.error                                   # OOB error, no test set needed
+sort(rf$variable.importance, decreasing = TRUE)       # which variables did the work
+
+pred <- predict(rf, d[-tr, ])$predictions[, "Yes"]   # probability of default, held-out rows
+```
+
+## In R — boosting
+
+```{.r code-line-numbers="1|3-4|6-9|11"}
+library(xgboost)
+
+X  <- model.matrix(default ~ . - 1, d)               # numeric matrix, no intercept
+y  <- as.numeric(d$default == "Yes")
+
+xgb <- xgboost(data = X[tr, ], label = y[tr],
+               nrounds = 300, eta = 0.05, max_depth = 3,
+               objective = "binary:logistic", verbose = 0)
+
+p_xgb <- predict(xgb, X[-tr, ])
+```
+
+Then the comparison that matters: forest vs boosting vs Monday's pruned tree vs a plain logistic regression, **on the same held-out rows**, with the same metric.
+
+::: {.callout-important title="Attention"}
+`nrounds = 300` at `eta = 0.05` is a starting point, not an answer. Use `xgb.cv()` to pick `nrounds` by cross-validation; watch the test log-loss stop falling and start rising. That turning point is your model.
+:::
+
+## [Section 3]{.section-kicker} Lab {.section-slide background-color="#002f57"}
+
+## Churn, end to end
+
+`churn.csv` on Blackboard: 7 000 telecom customers, 19 columns, `churn` yes/no.
+
+1. Split 70/30, **stratified** on `churn` — it is 27% yes, and a random split can drift
+2. Logistic regression: the baseline nobody may skip
+3. Pruned tree — print it, read it
+4. Random forest, default $m$; then $m = p/3$
+5. `xgb.cv` to choose `nrounds`; then `xgboost`
+6. One table: model × {accuracy, AUC, log-loss} on the 30%
+7. `variable.importance` from the forest vs the top splits of the tree: do they agree?
+
+Deliverable: the table in step 6, and one paragraph on **which model you would deploy, and why the answer is not simply "the most accurate one"**.
+
+## Every tree in a forest is wrong. The forest is right because they are wrong in different ways.  {.statement}
+
+## Reading
+
+- **ISLR** §8.2 — bagging, random forests, boosting; then §8.2.5 for BART if curious
+- **Provost & Fawcett** chapter 8 — *Visualising model performance*: ROC and AUC, which the lab uses and Monday's tree lecture did not
+- Reference: `?ranger`, `?xgboost`, `?xgb.cv`

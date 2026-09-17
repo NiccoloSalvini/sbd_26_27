@@ -1,0 +1,146 @@
+---
+title: "Correspondence analysis"
+subtitle: "Lecture 15 · room 204"
+author: "Prof. Niccolò Salvini"
+institute: "HEMA · Università Cattolica del Sacro Cuore, Rome"
+date: 2026-11-17
+date-format: "dddd D MMMM YYYY"
+---
+
+## Objectives
+
+- Take a contingency table and turn it into a **map**
+- Understand what the map shows — and the one thing it does not
+- Build a brand perception map from survey data, and read it aloud
+- Lab: from a raw survey file to the map, in the second half
+
+## Why a manager cares
+
+::: {.subtitle-frame}
+"Where does our brand sit in the customer's head?"
+:::
+
+- Ask 1 200 people which attributes they associate with each of six brands: *reliable, cheap, innovative, premium, for young people, …*
+- You get a table: brands in rows, attributes in columns, counts in the cells
+- The question is not *which attribute is most common* — it is **which brands are close to which attributes, and to each other**
+
+Correspondence analysis draws that table as a picture. It is PCA for counts, and it is the standard tool of brand positioning.
+
+## [Section 1]{.section-kicker} From a table to distances {.section-slide background-color="#002f57"}
+
+## The table, and what "close" should mean
+
+| | Reliable | Cheap | Innovative | Premium |
+|---|---|---|---|---|
+| Brand A | 320 | 40 | 210 | 180 |
+| Brand B | 90 | 410 | 60 | 20 |
+| Brand C | 150 | 60 | 380 | 150 |
+| Brand D | 260 | 30 | 110 | 350 |
+
+Two brands are *similar* if their **row profiles** — the counts divided by the row total — are similar. Not the raw counts: B was mentioned more often than D, and that alone means nothing.
+
+A: (.43, .05, .28, .24). D: (.35, .04, .15, .47). Similar on *reliable*, apart on *premium*.
+
+## The chi-square distance
+
+Between two row profiles $r_i$ and $r_{i'}$:
+
+$$
+d^2(i, i') \;=\; \sum_{j} \frac{(r_{ij} - r_{i'j})^2}{c_j}
+$$
+
+where $c_j$ is the column's overall share.
+
+- Ordinary Euclidean distance between profiles, **weighted by $1/c_j$**: a difference on a *rare* attribute counts more than the same difference on a common one
+- Being associated with *innovative* when few brands are is informative. Being associated with *reliable* when every brand is, is not.
+
+::: {.callout-note}
+Total inertia — the table's whole spread — is $\chi^2 / n$ from the independence test. CA decomposes exactly the departure from independence.
+:::
+
+## Then PCA, on those distances
+
+- Rows placed in a space where distances are chi-square distances
+- Find the directions of greatest spread — the **axes**, as in PCA
+- Do the same for columns
+- Draw both on the first two axes: **the map**
+
+Rows near each other: similar profiles. Columns near each other: attributes that go together. That much is exact.
+
+## [Section 2]{.section-kicker} Reading the map {.section-slide background-color="#002f57"}
+
+## What the map shows
+
+- **Brand–brand distance**: real. Two brands close together are perceived alike.
+- **Attribute–attribute distance**: real. *Cheap* and *for students* near each other are associated in people's minds.
+- **Direction from the origin**: a brand out along the *premium* side is over-associated with premium relative to average.
+- **The origin** is the average profile — a brand at the centre is *undifferentiated*, which is usually the worst place to be.
+
+## What the map does not show
+
+::: {.subtitle-frame}
+The misreading in every third marketing deck
+:::
+
+- **Brand-to-attribute distance is not a distance.** Rows and columns live in different spaces, overlaid for convenience. Brand A "next to" *innovative* is suggestive, not measured.
+- The honest version: look at the *angle* from the origin. A brand and an attribute in the same direction are associated; at 90°, unrelated; opposite, anti-associated.
+- Two axes may explain 60% of inertia. The other 40% is not on the page.
+
+::: {.callout-important title="Attention"}
+Never present a CA map without the percentage of inertia on each axis. A map that explains 35% of the table is a sketch, and should be called one.
+:::
+
+## In R
+
+```{.r code-line-numbers="1|3-5|7|9|11"}
+library(FactoMineR); library(factoextra)
+
+tab <- as.table(rbind(A = c(320, 40, 210, 180), B = c(90, 410, 60, 20),
+                      C = c(150, 60, 380, 150), D = c(260, 30, 110, 350)))
+dimnames(tab)[[2]] <- c("Reliable", "Cheap", "Innovative", "Premium")
+
+chisq.test(tab)                    # is there anything to map at all?
+
+ca <- CA(tab, graph = FALSE)
+
+fviz_ca_biplot(ca, repel = TRUE)   # the perception map
+```
+
+`ca$eig` gives inertia per axis. Put the two percentages on the plot's axis labels before anyone sees it.
+
+## Reading our four brands
+
+- Axis 1 separates **Cheap** (B, alone) from everything else — the value/premium divide. It carries most of the inertia.
+- Axis 2 separates **Innovative** (C) from **Premium** (D) — the two ways of not being cheap
+- A sits between C and D and near *Reliable*: solid, differentiated on nothing in particular
+- B owns *cheap* and nothing else — which is a position, and a fragile one
+
+Those four sentences are the analysis. The map exists so a marketing director can check them in ten seconds.
+
+## [Section 3]{.section-kicker} Lab {.section-slide background-color="#002f57"}
+
+## From a survey file to the map
+
+`brands.csv` on Blackboard: one row per respondent, columns `brand` and `attribute` — each respondent named up to three.
+
+```{.r code-line-numbers="1-2|4|6|8-9"}
+library(tidyverse); library(FactoMineR); library(factoextra); library(here)
+resp <- read_csv(here("data", "brands.csv"))
+
+tab <- table(resp$brand, resp$attribute)       # the contingency table
+
+chisq.test(tab)$p.value                        # < 0.05 or stop here
+
+ca <- CA(tab, graph = FALSE); round(ca$eig[1:3, 2], 1)
+fviz_ca_biplot(ca, repel = TRUE) + labs(title = "Brand perception, 1 200 respondents")
+```
+
+Then, in pairs: write the four sentences for *this* map. Swap with the pair next to you. Where do you disagree, and is it the map or the reading?
+
+## A perception map does not tell you where to go. It tells you where you are, and who is standing next to you.  {.statement}
+
+## Reading
+
+- **ISLR** has no CA chapter. Read Greenacre, *Correspondence Analysis in Practice*, chapters 1–4 — on Blackboard, and the standard reference
+- **Provost & Fawcett** chapter 6 — positioning as a similarity problem
+- Reference: `?FactoMineR::CA`, `factoextra::fviz_ca_biplot`
