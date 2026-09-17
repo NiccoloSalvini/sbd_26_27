@@ -1,0 +1,35 @@
+# Every .qmd in lectures/ is a revealjs deck with the Cattolica theme.
+# A lecture file sets title, lecture number, author and date — nothing visual.
+format:
+  revealjs:
+    theme: [default, cattolica.scss]
+    width: 1280
+    height: 720
+    margin: 0.06
+    slide-number: c/t
+    footer: "Statistics & Big Data · HEMA, Università Cattolica del Sacro Cuore"
+    transition: fade
+    transition-speed: fast
+    controls: false
+    progress: false
+    hash: true
+    history: false
+    menu: false
+    code-line-numbers: true
+    highlight-style: github
+    html-math-method: katex          # MathJax dropped \mathcal glyphs; KaTeX is bundled and complete
+    embed-resources: false
+    toc: false
+    center: false
+    center-title-slide: false        # reveal would centre it with an inline top; we lay it out ourselves
+    include-in-header:
+      - text: |
+          <link rel="preconnect" href="https://fonts.googleapis.com">
+          <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+# Title slide: navy, logo top-right. reveal paints these itself — no CSS tricks.
+title-slide-attributes:
+  data-background-color: "#002f57"
+  data-background-image: "/images/cattolica-logo.png"
+  data-background-size: "5.5%"
+  data-background-position: "top 7% right 4%"

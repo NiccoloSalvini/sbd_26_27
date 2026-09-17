@@ -1,0 +1,173 @@
+/*-- scss:defaults --*/
+// Cattolica revealjs theme — the web sister of beamerthemeCattolica.sty.
+// Same palette as styles.scss and the Beamer theme, so a deck rendered here
+// and a PDF from LaTeX read as the same course.
+
+@import url('https://fonts.googleapis.com/css2?family=Libre+Franklin:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap');
+
+$navy:    #002f57;
+$ink:     #1c2226;
+$muted:   #5f6b75;
+$rule:    #e6e9ec;
+$paper:   #ffffff;
+$gold:    #b8860b;
+$codebg:  #f3f5f7;
+
+$font-family-sans-serif: "Libre Franklin", -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+$font-family-monospace:  "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace;
+$presentation-font-size-root: 30px;
+$presentation-line-height: 1.4;
+$presentation-heading-font: $font-family-sans-serif;
+$presentation-heading-color: $navy;
+$presentation-heading-font-weight: 700;
+$presentation-heading-line-height: 1.15;
+$presentation-h2-font-size: 1.55em;
+$presentation-h3-font-size: 1.1em;
+$body-bg: $paper;
+$body-color: $ink;
+$link-color: $navy;
+$link-color-hover: $gold;
+$selection-bg: rgba($navy, .18);
+$code-color: $ink;
+$code-block-bg: $codebg;
+$code-block-border-color: transparent;
+$code-block-font-size: 0.78em;
+$presentation-block-margin: 14px;
+
+/*-- scss:rules --*/
+
+// ---- Frame: top-aligned, generous side margins, hairline under the title ----
+.reveal .slides > section,
+.reveal .slides > section > section {
+  text-align: left;
+  padding: 0 0.6em;
+}
+
+.reveal h2 {
+  margin-bottom: 0.15em;
+  padding-bottom: 0.25em;
+  border-bottom: 1px solid $rule;
+  letter-spacing: -0.005em;
+}
+.reveal h2 + h3,
+.reveal .subtitle-frame {          // "One line, then a semester of consequences"
+  color: $muted;
+  font-weight: 400;
+  margin-top: -0.35em;
+  margin-bottom: 0.9em;
+}
+
+// ---- Title slide: full navy, logo top-right (reveal background), text bottom-left ----
+// Quarto renders it as <section id="title-slide" class="quarto-title-block">; there is
+// no .title-slide class. The id also wins over reveal's inline display:block.
+#title-slide {
+  display: flex !important;
+  flex-direction: column;
+  justify-content: flex-end;
+  height: 100%;
+  box-sizing: border-box;
+  padding: 0 1.4em 2.4em;
+  text-align: left;
+  color: #fff;
+}
+#title-slide .subtitle {            // "Lecture 3 · room 204" sits above the title, as in Beamer
+  order: -1;
+  color: rgba(255,255,255,.75);
+  font-size: 0.85em;
+  margin: 0 0 0.25em;
+}
+#title-slide h1.title {
+  color: #fff;
+  font-size: 2.1em;
+  border: 0;
+  margin: 0 0 0.7em;
+  padding: 0;
+}
+#title-slide .quarto-title-authors { display: block; margin: 0; }
+#title-slide .quarto-title-author { display: block; margin: 0; padding: 0; }
+#title-slide .quarto-title-author-name { color: #fff; font-size: 0.8em; margin: 0; }
+#title-slide .quarto-title-affiliation,
+#title-slide .date {
+  color: rgba(255,255,255,.8);
+  font-size: 0.66em;
+  margin: 0.1em 0 0;
+  text-align: left;
+}
+
+// ---- Section slides: navy band, small "Section n", big title ----
+.reveal section.section-slide,
+.reveal section[data-background-color="#002f57"] {
+  color: #fff;
+}
+.reveal .section-slide h2 {
+  color: #fff;
+  border: 0;
+  font-size: 2em;
+  margin-top: 2.6em;
+}
+.reveal .section-slide .section-kicker {
+  display: block;
+  color: rgba(255,255,255,.7);
+  font-size: 0.42em;
+  font-weight: 400;
+  margin-bottom: 0.3em;
+}
+
+// ---- Lists: square navy bullets, en-dash sub-bullets ----
+.reveal ul { list-style: none; margin-left: 0; }
+.reveal ul > li { position: relative; padding-left: 0.9em; margin-bottom: 0.25em; }
+.reveal ul > li::before {
+  content: "\25A0";
+  position: absolute; left: 0; top: 0.06em;
+  color: $navy; font-size: 0.55em;
+}
+.reveal ul ul > li::before { content: "\2013"; color: $muted; font-size: 0.9em; top: 0; }
+
+// ---- Callouts: the same three as the site and the Beamer theme ----
+// Quarto injects an inline <style> after every stylesheet that sets
+// border-left-color with !important and paints the title on
+// div.callout-x.callout-style-default .callout-title. Match that exactly.
+.reveal div.callout {
+  border-radius: 0;
+  border: 0;
+  border-left-width: 3px;
+  border-left-style: solid;
+  margin: 0.8em 0;
+  font-size: 0.82em;
+  box-shadow: none;
+}
+.reveal div.callout .callout-title,
+.reveal div.callout.callout-style-default .callout-title { font-weight: 700; padding: 0.35em 0.7em; }
+.reveal div.callout .callout-icon { display: none; }
+
+.reveal div.callout.callout-note { border-left-color: $navy !important; background: rgba($navy, .04); }
+.reveal div.callout.callout-note.callout-style-default .callout-title { background-color: rgba($navy, .08); color: $navy; }
+
+.reveal div.callout.callout-important { border-left-color: $gold !important; background: rgba($gold, .06); }
+.reveal div.callout.callout-important.callout-style-default .callout-title { background-color: rgba($gold, .14); color: darken($gold, 15%); }
+
+.reveal div.callout.callout-tip { border: 1px solid $navy; border-left-width: 3px; border-left-color: $navy !important; background: #fff; }
+.reveal div.callout.callout-tip.callout-style-default .callout-title { background-color: $navy; color: #fff; }
+
+// ---- Code: quiet background, no border, R keywords in navy ----
+.reveal pre { box-shadow: none; margin: 0.6em 0; }
+.reveal pre code { padding: 0.7em 0.9em; line-height: 1.45; }
+.reveal code span.kw, .reveal code span.cf { color: $navy; font-weight: 600; }
+.reveal code span.co { color: $muted; font-style: italic; }
+.reveal code span.st { color: $gold; }
+.reveal code span.fu { color: $navy; }
+
+// ---- The one-big-statement slide ----
+.reveal .slides > section.statement { text-align: center; }
+.reveal .statement h2 { border: 0; font-size: 1.9em; margin-top: 3.4em; padding: 0; }
+.reveal .statement p { font-size: 1em; margin-top: 0.3em; }
+
+// ---- Helpers, same names as the Beamer theme ----
+.navy  { color: $navy; }
+.muted { color: $muted; }
+.gold  { color: $gold; }
+
+// ---- Footer and slide number, muted and small ----
+.reveal .footer { color: $muted; font-size: 0.42em; left: 1.6em; bottom: 0.9em; }
+.reveal .slide-number { color: $muted; font-size: 0.42em; right: 1.6em; bottom: 0.9em; background: none; }
+.reveal .slide-logo { display: none; }   // the logo lives on the title slide only

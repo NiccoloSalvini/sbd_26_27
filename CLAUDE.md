@@ -164,6 +164,26 @@ environments are `remark`, `important`, `definition*`; the colour helpers
 
 Final PDFs go to `slides/` (served by the site); build artefacts are ignored.
 
+**The web sister: `lectures/`.** Any `.qmd` there renders as a revealjs deck
+with `lectures/cattolica.scss` — same navy, same callouts, same bullets, Libre
+Franklin and JetBrains Mono as web fonts. `lectures/_metadata.yml` carries every
+visual option; a lecture file sets title, subtitle (`Lecture n · room`), author,
+`date` (ISO, formatted by `date-format`) and content. Section slides are
+`## [Section n]{.section-kicker} Title {.section-slide background-color="#002f57"}`;
+a one-line slide is `## Text {.statement}`. Math is KaTeX — MathJax dropped
+`\mathcal` glyphs. Rendered to `_site/lectures/`, so `make deploy` publishes it.
+
+Three things the theme fights, learnt by reading the rendered DOM and CSS:
+Quarto's title slide is `<section id="title-slide">` with no `.title-slide`
+class, so the theme styles `#title-slide` and sets `center-title-slide: false`
+to stop reveal's inline centring; Quarto injects an inline `<style>` *after*
+every stylesheet that colours callouts with `!important` on
+`div.callout-x` and paints the header on `.callout-title` under
+`.callout-style-default`, so the theme matches those selectors exactly; and
+reveal sets `display:block` inline on the current slide, so flex layouts on a
+slide need `!important`. Do not "simplify" any of those away.
+
+
 **Git on this repo: add files by path.** `git add -A` scans `_site/` and
 `setup_files/` on iCloud and hangs for minutes. `git add index.qmd` is instant.
 

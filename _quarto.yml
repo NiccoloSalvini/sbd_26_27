@@ -3,6 +3,7 @@ project:
   output-dir: _site
   render:
     - "*.qmd"
+    - "lectures/*.qmd"
   resources:
     - slides/
     - materials/
