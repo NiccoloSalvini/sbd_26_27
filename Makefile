@@ -23,9 +23,9 @@ clean:
 	rm -rf _site .quarto
 
 ## render every manim scene at deck quality, remux moov-first, copy where the site serves them
-SCENES := Boundary Perceptron GradientDescent Sigmoid HiddenLayer Overfitting
+SCENES := Boundary PerceptronByHand Perceptron GradientDescent Sigmoid HiddenLayer Overfitting
 clips:
-	cd animations && uv run manim -qm --disable_caching scenes.py $(SCENES)
+	cd animations && .venv/bin/manim -qm --disable_caching scenes.py $(SCENES)
 	mkdir -p lectures/media
 	for s in $(SCENES); do \
 	  ffmpeg -v error -y -i $(HOME)/.cache/sbd-manim-media/videos/scenes/720p30/$$s.mp4 -c copy -movflags +faststart lectures/media/$$s.mp4; \
@@ -33,4 +33,4 @@ clips:
 
 ## quick, low-quality render of every scene: for checking frames, not for the deck
 clips-preview:
-	cd animations && uv run manim -ql --disable_caching scenes.py $(SCENES)
+	cd animations && .venv/bin/manim -ql --disable_caching scenes.py $(SCENES)

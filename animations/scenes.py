@@ -6,7 +6,7 @@ Render all:      make clips   (from the repo root; remuxes and copies to lecture
 The look is the one maths reels use: a dark stage, one object, one
 transformation at a time, formulas set in real LaTeX. The stage is the
 course navy rather than black, so a clip on a white slide reads as ours.
-Each clip is one idea in six to twelve seconds; the sentence next to it on
+Each clip is one idea, paced to be spoken over: the sentence next to it on
 the slide does the rest.
 """
 from manim import *
@@ -33,8 +33,22 @@ def label(s, size=28, color=CREAM):
 
 
 class Stage(Scene):
+    """Every clip is spoken over, so it must breathe. The older scenes were timed
+    for a reel; WAIT_SCALE/PLAY_SCALE stretch them from here without retiming
+    each line. Scenes written with speech in mind set both to 1.0."""
+    WAIT_SCALE = 2.0
+    PLAY_SCALE = 1.4
+
     def setup(self):
         self.camera.background_color = NAVY
+
+    def wait(self, duration=1.0, **kw):
+        return super().wait(duration * self.WAIT_SCALE, **kw)
+
+    def play(self, *anims, **kw):
+        if "run_time" in kw:
+            kw["run_time"] = kw["run_time"] * self.PLAY_SCALE
+        return super().play(*anims, **kw)
 
 
 # ---------------------------------------------------------------- 1. motivation
@@ -69,52 +83,225 @@ class Boundary(Stage):
 
 
 # ---------------------------------------------------------------- 2. perceptron
-class Perceptron(Stage):
-    """The AND gate, learnt: one weight update per mistake, the boundary turns."""
+# The AND gate, the one worked example of the deck. Arithmetic is done in
+# hundredths as integers so 0.3 - 0.1 + 0.1 prints as 0.3 and never as
+# 0.30000000000000004, and so "z >= theta" is an exact comparison.
+AND_DATA = [((0, 0), 0), ((0, 1), 0), ((1, 0), 0), ((1, 1), 1)]
+W0, THETA, ETA = (30, -10), 25, 10
+
+
+def num(v):
+    """hundredths -> tex: 30 -> 0.3, -10 -> -0.1, 25 -> 0.25, 0 -> 0.0"""
+    t = f"{v / 100:.2f}".rstrip("0")
+    return t + "0" if t.endswith(".") else t
+
+
+def par(v):
+    """a negative factor in a product gets brackets: (-0.1)·0"""
+    return f"({num(v)})" if v < 0 else num(v)
+
+
+def perceptron_run(w=W0, theta=THETA, eta=ETA, max_epochs=10):
+    """One dict per row visited, in order, until an epoch has no mistake."""
+    w = list(w)
+    for epoch in range(1, max_epochs + 1):
+        mistakes = 0
+        for i, ((x1, x2), y) in enumerate(AND_DATA):
+            z = w[0] * x1 + w[1] * x2
+            yhat = 1 if z >= theta else 0
+            err = y - yhat
+            before = tuple(w)
+            if err:
+                mistakes += 1
+                w[0] += eta * err * x1
+                w[1] += eta * err * x2
+            yield dict(epoch=epoch, i=i, x=(x1, x2), y=y, z=z, yhat=yhat, err=err,
+                       before=before, after=tuple(w), last=(i == 3), mistakes=mistakes)
+        if mistakes == 0:
+            return
+
+
+def and_axes(size=4.6):
+    return Axes(x_range=[-0.5, 1.6, 1], y_range=[-0.5, 1.6, 1], x_length=size, y_length=size,
+                axis_config={"color": MUTED, "include_tip": False, "stroke_width": 1.5})
+
+
+def and_dots(ax):
+    return VGroup(*[Dot(ax.c2p(*p), radius=0.11, color=GOLD if y else SKY) for p, y in AND_DATA])
+
+
+def and_legend(dots):
+    """'y = 1' straight above (1,1): every boundary of the run passes to its side, never through."""
+    return VGroup(label("y = 1", 22, GOLD).next_to(dots[3], UP, buff=0.12),
+                  label("y = 0", 22, SKY).next_to(dots[0], DL, buff=0.08))
+
+
+def and_boundary(ax, w, theta=THETA, lo=-0.5, hi=1.6):
+    """The line W1 x + W2 y = theta clipped to the plot box, as a Line (so Transform stays a Line)."""
+    w1, w2 = w
+    pts = []
+    for x in (lo, hi):
+        if w2:
+            y = (theta - w1 * x) / w2
+            if lo <= y <= hi:
+                pts.append((x, y))
+    for y in (lo, hi):
+        if w1:
+            x = (theta - w2 * y) / w1
+            if lo <= x <= hi:
+                pts.append((x, y))
+    uniq = []
+    for q in pts:
+        if all(abs(q[0] - u[0]) + abs(q[1] - u[1]) > 1e-9 for u in uniq):
+            uniq.append(q)
+    if len(uniq) < 2:
+        return Line(ax.c2p(lo, lo), ax.c2p(lo, lo), color=CREAM, stroke_width=3)
+    a, b = max(((p, q) for p in uniq for q in uniq),
+               key=lambda pq: np.hypot(pq[0][0] - pq[1][0], pq[0][1] - pq[1][1]))
+    return Line(ax.c2p(*a), ax.c2p(*b), color=CREAM, stroke_width=3)
+
+
+def w_tex(w, size=34, color=CREAM):
+    return MathTex(rf"W = ({num(w[0])},\ {num(w[1])})", color=color, font_size=size)
+
+
+class PerceptronByHand(Stage):
+    """The AND table, every row and every number. Epoch 1 at speaking pace, the
+    rest a little quicker; W moves only on the rows marked wrong. About 160 s."""
+    WAIT_SCALE = 1.0
+    PLAY_SCALE = 1.0
 
     def construct(self):
-        ax = Axes(x_range=[-0.5, 1.6, 1], y_range=[-0.5, 1.6, 1], x_length=4.6, y_length=4.6,
-                  axis_config={"color": MUTED, "include_tip": False, "stroke_width": 1.5}).to_edge(LEFT, buff=0.7)
-        self.add(ax)
-        data = [((0, 0), 0), ((0, 1), 0), ((1, 0), 0), ((1, 1), 1)]
-        dots = VGroup(*[Dot(ax.c2p(*p), radius=0.11, color=GOLD if y else SKY) for p, y in data])
-        self.add(dots)
-        self.add(label("y = 1", 22, GOLD).next_to(dots[3], UR, buff=0.08),
-                 label("y = 0", 22, SKY).next_to(dots[0], DL, buff=0.08))
-        # the rule, on the right
-        rule = MathTex(r"\hat y = \operatorname{sign}\!\big(W_1 X_1 + W_2 X_2 - \theta\big)",
-                       color=CREAM, font_size=36).to_edge(RIGHT, buff=0.6).shift(UP * 2.2)
-        upd = MathTex(r"W \leftarrow W + \eta\,(y - \hat y)\,X", color=GOLD, font_size=36).next_to(rule, DOWN, buff=0.35)
+        ax = and_axes(4.4).to_edge(LEFT, buff=0.55).shift(DOWN * 0.35)
+        dots = and_dots(ax)
+        self.add(ax, dots, and_legend(dots))
+        # the three rules stay up, small and muted, while the numbers change under them
+        rules = VGroup(
+            MathTex(r"z = W_1 X_1 + W_2 X_2", color=MUTED, font_size=28),
+            MathTex(r"\hat y = 1 \text{ if } z \ge \theta,\ \text{else } 0", color=MUTED, font_size=28),
+            MathTex(r"W \leftarrow W + \eta\,(y - \hat y)\,X", color=MUTED, font_size=28),
+            MathTex(rf"\theta = {num(THETA)},\quad \eta = {num(ETA)}", color=MUTED, font_size=28),
+        ).arrange(DOWN, aligned_edge=LEFT, buff=0.14).to_corner(UR, buff=0.45)
+        self.play(FadeIn(rules), run_time=1.0)
+        self.wait(2.0)
+        w = W0
+        wlab = w_tex(w).next_to(ax, DOWN, buff=0.25)
+        bnd = and_boundary(ax, w)
+        self.play(Create(bnd), Write(wlab), run_time=1.2)
+        self.wait(2.5)
+
+        epoch_lab = label("epoch 1", 30, GOLD).next_to(ax, UP, buff=0.25).align_to(ax, LEFT)
+        self.play(FadeIn(epoch_lab), run_time=0.6)
+        panel_corner = np.array([ax.get_right()[0] + 0.7, rules.get_bottom()[1] - 0.55, 0])
+
+        for r in perceptron_run():
+            pace = 1.0 if r["epoch"] == 1 else 0.7
+            x1, x2 = r["x"]
+            y, z, yhat, err = r["y"], r["z"], r["yhat"], r["err"]
+            wb, wa = r["before"], r["after"]
+            wrong = err != 0
+            ring = Circle(radius=0.22, color=GOLD if wrong else CREAM, stroke_width=3).move_to(dots[r["i"]])
+
+            hdr = VGroup(label(f"obs {r['i'] + 1}", 28, CREAM),
+                         MathTex(rf"X = ({x1},\,{x2}),\quad y = {y}", color=CREAM, font_size=34)).arrange(RIGHT, buff=0.35)
+            zl = MathTex(rf"z = {num(wb[0])} \cdot {x1} \;+\; {par(wb[1])} \cdot {x2} \;=\; {num(z)}", color=CREAM, font_size=34)
+            rel = r"\ge" if z >= THETA else "<"
+            cl = MathTex(rf"{num(z)} {rel} {num(THETA)} \;\Rightarrow\; \hat y = {yhat}", color=CREAM, font_size=34)
+            if wrong:
+                el = VGroup(MathTex(rf"y - \hat y = {y} - {yhat} = {err:+d}", color=GOLD, font_size=34),
+                            label("wrong", 26, GOLD)).arrange(RIGHT, buff=0.4)
+                ul = MathTex(rf"W \leftarrow ({num(wb[0])},\ {num(wb[1])}) + {num(ETA)} \cdot ({err:+d}) \cdot ({x1},\,{x2})"
+                             rf" = ({num(wa[0])},\ {num(wa[1])})", color=GOLD, font_size=34)
+                lines = VGroup(hdr, zl, cl, el, ul)
+            else:
+                el = VGroup(MathTex(rf"y - \hat y = {y} - {yhat} = 0", color=MUTED, font_size=34),
+                            label("right, nothing changes", 26, MUTED)).arrange(RIGHT, buff=0.4)
+                lines = VGroup(hdr, zl, cl, el)
+            lines.arrange(DOWN, aligned_edge=LEFT, buff=0.32).move_to(panel_corner, aligned_edge=UL)
+
+            self.play(Create(ring), FadeIn(hdr), run_time=0.6 * pace)
+            self.wait(1.2 * pace)
+            self.play(Write(zl), run_time=1.0 * pace)
+            self.wait(1.6 * pace)
+            self.play(Write(cl), run_time=0.8 * pace)
+            self.wait(1.4 * pace)
+            self.play(Write(el), run_time=0.8 * pace)
+            self.wait(1.2 * pace)
+            if wrong:
+                self.play(Write(ul), run_time=1.2 * pace)
+                self.wait(1.4 * pace)
+                new_w = w_tex(wa).next_to(ax, DOWN, buff=0.25)
+                self.play(Transform(bnd, and_boundary(ax, wa)), Transform(wlab, new_w), run_time=1.4)
+                self.wait(1.8 * pace)
+            self.play(FadeOut(lines), FadeOut(ring), run_time=0.4)
+
+            if r["last"]:
+                m = r["mistakes"]
+                tally = label(f"epoch {r['epoch']}: {m} mistake{'s' if m != 1 else ''}", 30, GOLD if m else SKY)
+                tally.move_to(panel_corner, aligned_edge=UL)
+                self.play(FadeIn(tally), run_time=0.5)
+                self.wait(2.0)
+                if m == 0:
+                    done = VGroup(label("a whole epoch with no mistake:", 28, CREAM),
+                                  label("nothing will ever change again. Converged.", 28, CREAM)
+                                  ).arrange(DOWN, aligned_edge=LEFT, buff=0.15).next_to(tally, DOWN, aligned_edge=LEFT, buff=0.5)
+                    self.play(FadeIn(done), run_time=0.8)
+                    self.wait(4.0)
+                else:
+                    nxt = label(f"epoch {r['epoch'] + 1}", 30, GOLD).move_to(epoch_lab, aligned_edge=LEFT)
+                    self.play(FadeOut(tally), Transform(epoch_lab, nxt), run_time=0.6)
+                    self.wait(0.8)
+
+
+class Perceptron(Stage):
+    """The same run as geometry only: every row gets a ring on the point and a
+    status line under the plot, the boundary turns on each mistake, an epoch
+    with no mistake ends it. ~55 s."""
+    WAIT_SCALE = 1.0
+    PLAY_SCALE = 1.0
+
+    def construct(self):
+        ax = and_axes(5.6).to_edge(LEFT, buff=0.8).shift(DOWN * 0.2)
+        dots = and_dots(ax)
+        self.add(ax, dots, and_legend(dots))
+        rule = MathTex(r"\hat y = 1 \text{ if } W_1 X_1 + W_2 X_2 \ge \theta", color=CREAM, font_size=34)
+        upd = MathTex(r"W \leftarrow W + \eta\,(y - \hat y)\,X", color=GOLD, font_size=34)
+        right = VGroup(rule, upd).arrange(DOWN, aligned_edge=LEFT, buff=0.35).to_edge(RIGHT, buff=0.7).shift(UP * 2.0)
         self.play(Write(rule), run_time=1.0)
         self.play(Write(upd), run_time=0.8)
-        w = np.array([0.3, -0.1]); theta, eta = 0.2, 0.1
-
-        def boundary(w):
-            # W1 x + W2 y = theta  ->  y = (theta - W1 x) / W2 ; handle W2 ~ 0
-            if abs(w[1]) < 1e-6:
-                x0 = theta / w[0]
-                return Line(ax.c2p(x0, -0.5), ax.c2p(x0, 1.6), color=CREAM, stroke_width=3)
-            return ax.plot(lambda x: (theta - w[0] * x) / w[1], x_range=[-0.5, 1.6], color=CREAM, stroke_width=3)
-
-        wlab = always_redraw(lambda: MathTex(rf"W = ({w[0]:.1f},\ {w[1]:.1f})", color=CREAM, font_size=34)
-                             .next_to(upd, DOWN, buff=0.6))
-        bnd = boundary(w)
-        self.play(Create(bnd), FadeIn(wlab), run_time=0.8)
-        # two epochs, only the rows that change something get a beat
-        for epoch in (1, 2):
-            for (x1, x2), y in data:
-                z = w[0] * x1 + w[1] * x2 - theta
-                yhat = 1 if z >= 0 else 0
-                if yhat == y:
-                    continue
-                d = dots[data.index(((x1, x2), y))]
-                self.play(Indicate(d, color=CREAM, scale_factor=1.6), run_time=0.5)
-                w = w + eta * (y - yhat) * np.array([x1, x2])
-                new = boundary(w)
-                self.play(Transform(bnd, new), run_time=0.9)
-        ok = label("every row correct — it stops", 26, GOLD).to_edge(DOWN, buff=0.4)
-        self.play(FadeIn(ok), run_time=0.6)
-        self.wait(1.2)
+        self.wait(1.5)
+        w = W0
+        wlab = w_tex(w, 36).next_to(right, DOWN, aligned_edge=LEFT, buff=0.7)
+        epoch_lab = label("epoch 1", 30, GOLD).next_to(wlab, DOWN, aligned_edge=LEFT, buff=0.5)
+        count = label("mistakes so far: 0", 26, MUTED).next_to(epoch_lab, DOWN, aligned_edge=LEFT, buff=0.3)
+        bnd = and_boundary(ax, w)
+        self.play(Create(bnd), FadeIn(wlab), FadeIn(epoch_lab), FadeIn(count), run_time=1.0)
+        self.wait(2.0)
+        total = 0
+        for r in perceptron_run():
+            wrong = r["err"] != 0
+            d = dots[r["i"]]
+            ring = Circle(radius=0.24, color=GOLD if wrong else CREAM, stroke_width=3).move_to(d)
+            tag = label(f"obs {r['i'] + 1}: {'wrong' if wrong else 'right'}", 26, GOLD if wrong else MUTED).next_to(ax, DOWN, buff=0.3)
+            self.play(Create(ring), FadeIn(tag), run_time=0.5)
+            self.wait(0.9)
+            if wrong:
+                total += 1
+                self.play(Transform(bnd, and_boundary(ax, r["after"])),
+                          Transform(wlab, w_tex(r["after"], 36).move_to(wlab, aligned_edge=LEFT)),
+                          Transform(count, label(f"mistakes so far: {total}", 26, MUTED).move_to(count, aligned_edge=LEFT)),
+                          run_time=1.3)
+                self.wait(1.4)
+            self.play(FadeOut(ring), FadeOut(tag), run_time=0.3)
+            if r["last"]:
+                m = r["mistakes"]
+                if m == 0:
+                    ok = label("an epoch with no mistake — it stops", 28, GOLD).to_edge(DOWN, buff=0.4)
+                    self.play(FadeIn(ok), run_time=0.6)
+                    self.wait(3.5)
+                else:
+                    self.play(Transform(epoch_lab, label(f"epoch {r['epoch'] + 1}", 30, GOLD).move_to(epoch_lab, aligned_edge=LEFT)), run_time=0.5)
+                    self.wait(0.8)
 
 
 # ---------------------------------------------------------------- 3. gradient descent
@@ -249,4 +436,4 @@ class Overfitting(Stage):
         self.wait(0.8)
 
 
-SCENES = ["Boundary", "Perceptron", "GradientDescent", "Sigmoid", "HiddenLayer", "Overfitting"]
+SCENES = ["Boundary", "PerceptronByHand", "Perceptron", "GradientDescent", "Sigmoid", "HiddenLayer", "Overfitting"]

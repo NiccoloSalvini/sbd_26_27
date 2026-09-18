@@ -96,7 +96,7 @@ One pass over all observations is an **epoch**. Repeat until nothing changes, or
 ## By hand: the AND gate
 
 ::: {.subtitle-frame}
-Two binary inputs, output 1 only when both are 1. $W_1 = 0.3$, $W_2 = -0.1$, no bias, $\eta = 0.1$, threshold $0.2$.
+Two binary inputs, output 1 only when both are 1. $W_1 = 0.3$, $W_2 = -0.1$, no bias, $\eta = 0.1$, threshold $\theta = 0.25$.
 :::
 
 | Obs | $X_1$ | $X_2$ | $y$ | $z$ | $\hat y$ | error | $W$ after |
@@ -106,13 +106,19 @@ Two binary inputs, output 1 only when both are 1. $W_1 = 0.3$, $W_2 = -0.1$, no 
 | 3 | 1 | 0 | 0 | 0.3 | **1** | −1 | $(0.2,\,-0.1)$ |
 | 4 | 1 | 1 | 1 | 0.1 | **0** | +1 | $(0.3,\,0.0)$ |
 
-End of epoch 1: $W = (0.3, 0.0)$. Epoch 2 starts. It converges in a few more. Four rows, one rule, and the network has *learned* AND.
+End of epoch 1: $W = (0.3, 0.0)$, two mistakes. Epoch 2: two more. Epoch 3: one. Epoch 4: none, $W = (0.2, 0.1)$, and it stops. Four rows, one rule, and the network has *learned* AND.
 
-## The same thing, watched
+## By hand, watched
+
+{{< video media/PerceptronByHand.mp4 width="1000" height="562" >}}
+
+Every row, every number. $W$ moves only on the rows marked *wrong*, and only along that row's $X$.
+
+## The same thing, as geometry
 
 {{< video media/Perceptron.mp4 width="1000" height="562" >}}
 
-Each mistake turns the boundary. When every row is on the right side, nothing changes any more — that *is* convergence.
+Each mistake turns the boundary toward the point it got wrong. An epoch with no mistake means nothing will ever change again — that *is* convergence.
 
 ## [Section 3]{.section-kicker} Gradient descent {.section-slide background-color="#002f57"}
 

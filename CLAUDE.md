@@ -204,6 +204,17 @@ slide need `!important`. Do not "simplify" any of those away.
 **Git on this repo: add files by path.** `git add -A` scans `_site/` and
 `setup_files/` on iCloud and hangs for minutes. `git add index.qmd` is instant.
 
+**Clips: `animations/scenes.py`.** manim scenes on the course navy, formulas in
+`MathTex`, words in Libre Franklin via `manimpango.register_font`. `make clips-preview`
+(`-ql`) to check frames, `make clips` (`-qm`, then an ffmpeg `+faststart` remux into
+`lectures/media/`) for the deck; embed with `{{< video media/Name.mp4 width="1000" height="562" >}}`.
+Every clip is spoken over: `Stage.WAIT_SCALE`/`PLAY_SCALE` stretch the older scenes,
+new scenes set both to 1.0 and are timed for speech. The AND-gate scenes do their
+arithmetic in integer hundredths so the LaTeX never shows `0.30000000000000004`.
+Two traps: `manim.cfg` is read by configparser, which keeps an inline `# comment` as
+part of the value (a `#` in `media_dir` makes latex fail "without a log file"); and
+the media dir must stay outside `~/Desktop` (iCloud), see `manim.cfg`.
+
 ## Overleaf MCP
 
 `.mcp.json` also loads `~/dev/overleaf-mcp` (`NiccoloSalvini/overleaf-mcp`), so
