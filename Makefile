@@ -22,11 +22,15 @@ deploy: build
 clean:
 	rm -rf _site .quarto
 
-## render every manim scene at deck quality and copy the clips where the site serves them
+## render every manim scene at deck quality, remux moov-first, copy where the site serves them
+SCENES := Boundary Perceptron GradientDescent Sigmoid HiddenLayer Overfitting
 clips:
-	cd animations && uv run manim -qm --disable_caching scenes.py LearningRate Overfitting
+	cd animations && uv run manim -qm --disable_caching scenes.py $(SCENES)
 	mkdir -p lectures/media
-	# +faststart puts the moov atom first, so a browser can start playing before
-	# the file is fully fetched, and plays from servers without range support.
-	ffmpeg -v error -y -i animations/media/videos/scenes/720p30/LearningRate.mp4 -c copy -movflags +faststart lectures/media/gd-learning-rate.mp4
-	ffmpeg -v error -y -i animations/media/videos/scenes/720p30/Overfitting.mp4  -c copy -movflags +faststart lectures/media/overfitting.mp4
+	for s in $(SCENES); do \
+	  ffmpeg -v error -y -i $(HOME)/.cache/sbd-manim-media/videos/scenes/720p30/$$s.mp4 -c copy -movflags +faststart lectures/media/$$s.mp4; \
+	done
+
+## quick, low-quality render of every scene: for checking frames, not for the deck
+clips-preview:
+	cd animations && uv run manim -ql --disable_caching scenes.py $(SCENES)

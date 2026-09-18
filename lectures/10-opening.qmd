@@ -120,7 +120,92 @@ All three are *descriptive*. They organise data; they do not predict anything. T
 
 [What counts as "similar" is decided by you, not by the data.]{.muted}
 
-## [Section 4]{.section-kicker} Setup check {.section-slide background-color="#002f57"}
+## [Section 4]{.section-kicker} Finding your way around {.section-slide background-color="#002f57"}
+
+## R is the language. RStudio is the room you use it in.
+
+- **R** is a programming language: a set of rules for writing instructions a computer runs. It comes with a bare console — a prompt, `>`, and nothing else.
+- **RStudio** is an *IDE*, an integrated development environment: a window that puts the console, your files, your plots and your variables in one place. It starts R for you and talks to it.
+- You will always open RStudio. You will never open R.
+
+::: {.callout-note}
+The same distinction exists everywhere: Python is a language, VS Code or Jupyter are rooms. Learn the room once; the language is what carries over.
+:::
+
+## The four panes
+
+<div class="viz">
+<svg viewBox="0 0 640 400" xmlns="http://www.w3.org/2000/svg" font-family="Libre Franklin, sans-serif" font-size="14">
+  <rect x="10" y="10" width="620" height="380" rx="6" fill="#fff" stroke="#e6e9ec" stroke-width="2"/>
+  <rect x="20" y="20" width="300" height="200" rx="3" fill="#002f57" opacity=".92"/>
+  <text x="34" y="44" fill="#fff" font-weight="700">1 · Source</text>
+  <text x="34" y="66" fill="#fff" opacity=".85">your script, saved as a .R file</text>
+  <text x="34" y="86" fill="#fff" opacity=".85">what you keep</text>
+  <rect x="20" y="230" width="300" height="150" rx="3" fill="#002f57" opacity=".62"/>
+  <text x="34" y="254" fill="#fff" font-weight="700">2 · Console</text>
+  <text x="34" y="276" fill="#fff" opacity=".9">where R actually runs</text>
+  <text x="34" y="296" fill="#fff" opacity=".9">type, Enter, answer — then gone</text>
+  <rect x="330" y="20" width="290" height="200" rx="3" fill="#e6e9ec"/>
+  <text x="344" y="44" fill="#002f57" font-weight="700">3 · Environment</text>
+  <text x="344" y="66" fill="#1c2226">every object that exists right now</text>
+  <text x="344" y="86" fill="#1c2226">data frames, vectors, fitted models</text>
+  <rect x="330" y="230" width="290" height="150" rx="3" fill="#e6e9ec"/>
+  <text x="344" y="254" fill="#002f57" font-weight="700">4 · Files · Plots · Packages · Help</text>
+  <text x="344" y="276" fill="#1c2226">your project folder, the last plot,</text>
+  <text x="344" y="296" fill="#1c2226">and ?function when you are lost</text>
+</svg>
+</div>
+
+You will spend the semester in **1** and read the results in **2**. Panes 3 and 4 are for checking.
+
+## Script or console?
+
+| Console | Script |
+|---|---|
+| type a line, Enter, see the answer | write lines in a file, run them when you choose |
+| gone when you close RStudio | saved, rerunnable, shareable |
+| for *trying* something | for *keeping* something |
+
+Habit to build this week: **everything that matters goes in the script**. The console is a scratchpad. `Cmd/Ctrl + Enter` runs the line your cursor is on; `Cmd/Ctrl + Shift + Enter` runs the whole script.
+
+## Notebook or script?
+
+You will meet both.
+
+- A **script** (`.R`) is code, top to bottom. What we use in class, in labs, and in the exam.
+- A **notebook** (`.qmd`, `.Rmd`, Jupyter) mixes text and code cells with their output, in one document. Good for a report; the course site's slides are one.
+- Same language inside. The notebook adds prose and layout around the code; it does not change what the code does.
+
+Start with scripts. The notebook is a second thing to learn once the first is comfortable.
+
+## Reading an error without panic
+
+```{.r}
+> library(tidyvers)
+Error in library(tidyvers) : there is no package called 'tidyvers'
+```
+
+- **Read the last line first.** It names the problem: *no package called `tidyvers`*.
+- **Find your typo, or your missing step.** Here: a letter. Often: you loaded before installing, or the file is not where you think.
+- **Copy the exact message** into a search — or, this year, into an assistant. Then check the answer against what you know.
+
+::: {.callout-important title="Attention"}
+Red text in the console is R talking to you, not R breaking. A *warning* lets the code run and tells you something odd happened. An *error* stops it. Learn which one you got before you do anything.
+:::
+
+## Five words you will hear all semester
+
+| Word | What it is | You will see it as |
+|---|---|---|
+| **object** | anything with a name: a number, a table, a model | `fit`, `cust`, `X` |
+| **function** | a verb: takes inputs, returns an output | `kmeans(X, 4)` |
+| **argument** | an input to a function | `centers = 4` |
+| **package** | someone else's functions, installed once, loaded per session | `library(tidyverse)` |
+| **data frame** | a table: rows are cases, columns are variables | `cust` from `read_csv()` |
+
+Everything on this slide you will use on Tuesday. Nothing else about programming is required before then.
+
+## [Section 5]{.section-kicker} Setup check {.section-slide background-color="#002f57"}
 
 ## Ten minutes, now, on your own machine
 

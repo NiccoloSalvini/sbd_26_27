@@ -175,7 +175,8 @@ $presentation-block-margin: 14px;
 // ---- Visual intuition: two SVGs side by side, driven by reveal fragments ----
 .reveal .viz { display: flex; gap: 1.2em; align-items: flex-start; margin-top: 0.2em; }
 .reveal .viz svg { flex: 1 1 0; height: auto; max-height: 460px; }
-.reveal .viz svg:last-child { flex: 0 0 36%; }
+.reveal .viz svg:last-child:not(:only-child) { flex: 0 0 36%; }
+.reveal .viz svg:only-child { flex: 0 0 100%; max-width: 880px; margin: 0 auto; }
 .reveal .viz .fragment { opacity: 0; transition: opacity .25s; }
 .reveal .viz .fragment.visible { opacity: 1; }
 .reveal .viz g.fragment[opacity] { opacity: 0 !important; }

@@ -29,12 +29,9 @@ The most over-sold and under-understood model in business
 
 ## The motivation, in one picture
 
-Two classes of customer, two variables. You want a **decision boundary**.
+{{< video media/Boundary.mp4 width="1000" height="562" >}}
 
-- A **linear** boundary — logistic regression — is a straight line. If the classes are separated by a curve, it cannot follow.
-- A **nonlinear** boundary bends where the data bend
-
-Neural networks exist to draw the second kind. That is the whole motivation. Everything else is machinery.
+A **linear** boundary — logistic regression — cannot follow a curve. Neural networks exist to draw the second kind. That is the whole motivation; everything else is machinery.
 
 ::: {.callout-note}
 They were inspired by the brain, in the 1940s. The inspiration is real and the analogy is thin: *inputs* arrive like signals at dendrites, the *body* sums them, the *axon* fires or does not. Keep the picture; do not lean on it.
@@ -111,6 +108,12 @@ Two binary inputs, output 1 only when both are 1. $W_1 = 0.3$, $W_2 = -0.1$, no 
 
 End of epoch 1: $W = (0.3, 0.0)$. Epoch 2 starts. It converges in a few more. Four rows, one rule, and the network has *learned* AND.
 
+## The same thing, watched
+
+{{< video media/Perceptron.mp4 width="1000" height="562" >}}
+
+Each mistake turns the boundary. When every row is on the right side, nothing changes any more — that *is* convergence.
+
 ## [Section 3]{.section-kicker} Gradient descent {.section-slide background-color="#002f57"}
 
 ## The general engine
@@ -131,7 +134,7 @@ A convex loss is a bowl: you reach *the* minimum. A network's loss is not. You f
 
 ## The learning rate, and what it does to you
 
-{{< video media/gd-learning-rate.mp4 width="1000" height="562" >}}
+{{< video media/GradientDescent.mp4 width="1000" height="562" >}}
 
 **Too small**: it creeps — thousands of steps. **Too large**: it overshoots the valley and oscillates. **Right**: a smooth, decelerating descent. Practical variants: shrink $\eta$ over time (*annealing*), or add inertia (*momentum*, $\mu \approx 0.9$) — each one more hyperparameter.
 
@@ -170,13 +173,9 @@ Take the link function, invert it, and you have the activation. Take the activat
 
 ## The sigmoid, since it is everywhere
 
-$$
-\sigma(\lambda) = \frac{1}{1 + e^{-\lambda}} \;\in\; (0, 1)
-$$
+{{< video media/Sigmoid.mp4 width="1000" height="562" >}}
 
-- Input anything; output a probability. Threshold at $0.5$ to classify.
-- A network with one sigmoid neuron and binary cross-entropy loss **is logistic regression**, weights and all
-- Binary cross-entropy, $-\sum_i [y_i \log \hat y_i + (1-y_i)\log(1-\hat y_i)]$, is the negative log-likelihood of the Bernoulli. Same object, machine-learning name.
+Soften the step into $\sigma(\lambda) = 1/(1+e^{-\lambda})$ and the output is a probability. One sigmoid neuron with cross-entropy loss **is logistic regression**, weights and all: cross-entropy is the Bernoulli negative log-likelihood under another name.
 
 ## [Section 5]{.section-kicker} Hidden layers {.section-slide background-color="#002f57"}
 
@@ -194,6 +193,12 @@ $$
 - **Hidden**: you never observe $a_l$. They are features the network invents.
 - Fully connected: every input feeds every hidden neuron. Weights: $(p+1)L + (L+1)$.
 - Two activations, $f$ and $g$, and they are usually different.
+
+## What a hidden layer buys
+
+{{< video media/HiddenLayer.mp4 width="1000" height="562" >}}
+
+One hidden neuron: still a line. Two: one bend. Five: the boundary follows the data. Each neuron is a line; the output layer blends them.
 
 ## Why the activations must bend
 
@@ -216,7 +221,7 @@ A hidden layer with linear activations is over-parameterised linear regression. 
 Ten inputs, one hidden layer of five sigmoid neurons, 90/10 split
 :::
 
-{{< video media/overfitting.mp4 width="1000" height="562" >}}
+{{< video media/Overfitting.mp4 width="1000" height="562" >}}
 
 **Training error** keeps falling. **Test error** falls, reaches a minimum, then **rises**: past that point the network is learning the noise of the training set. Overfitting, drawn.
 
