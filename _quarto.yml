@@ -4,10 +4,10 @@ project:
   render:
     - "*.qmd"
     - "lectures/*.qmd"
+    - "homework/*.qmd"
   resources:
     - slides/
     - materials/
-    - homework/
     - lectures/media/
 
 website:

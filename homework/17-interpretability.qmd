@@ -1,0 +1,52 @@
+---
+title: "Set 17 — interpretability"
+subtitle: "After lecture 20 · 9 December · about 40 minutes"
+---
+
+Data: [`churn.csv`](../materials/churn.csv) and your boosting model from Set 15.
+
+## 1 · Partial dependence, and what it assumes
+
+Compute the partial dependence of churn probability on `tenure_months`.
+
+The curve is produced by averaging over the other columns *as if* they were
+independent of tenure. Find one column in this dataset where that assumption is
+plainly false, and say what it does to the shape you plotted.
+
+## 2 · One customer, one explanation
+
+Pick the held-out customer with the highest predicted churn probability.
+Compute SHAP values for that single prediction.
+
+Write the two-sentence explanation you would put in a retention agent's screen.
+No jargon: the agent has ninety seconds before the call.
+
+## 3 · Global and local disagree
+
+Compare the global importance ranking with the SHAP values for your chosen
+customer.
+
+They will not match. Explain why that is expected rather than a bug, and what
+each one is actually a statement about.
+
+## 4 · The counterfactual question
+
+The manager asks: *"if we gave this customer a discount of 10 euro a month,
+would they stay?"*
+
+Use the model to answer, then write the caveat. The model was fitted on
+observational data; say precisely what would have to be true for the number to
+be a prediction of the intervention rather than an artefact of the fit.
+
+## 5 · The model card
+
+Produce a half-page summary of your deployed model: what it predicts, on what
+population, its test performance, the three variables that drive it, two
+situations where it should not be trusted, and the date it should be refitted.
+
+Someone must be able to read it without opening R.
+
+---
+
+*This set checks: that every explanation method answers a specific question, and
+that the gap between prediction and intervention is where careers end.*

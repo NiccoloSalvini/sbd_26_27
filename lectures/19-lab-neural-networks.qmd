@@ -9,63 +9,162 @@ date-format: "dddd D MMMM YYYY"
 
 ## Today
 
-1. Fit a network on Friday's churn table, properly — validation set, `size`, `decay`
+1. Fit a network on Friday's churn table, properly — three splits, `size`, `decay`
 2. Put it in the table next to logistic regression, the forest and the boosting
 3. Watch it lose, and understand why
 4. See what *deep* learning is, in one slide, and where it wins instead
 5. Leave with a rule you can use on Monday
 
+## Today we switch to Python
+
+::: {.subtitle-frame}
+The one lab of this course that is not in R — on purpose
+:::
+
+- Everything you have fitted so far has an R implementation that practitioners actually use. **Neural networks do not.** `nnet` is a 1990s single-hidden-layer fitter kept alive for teaching; nobody deploys it
+- The real toolchain is Python: `scikit-learn` for a multilayer perceptron, PyTorch or Keras past that. The day a colleague hands you a model, it will be a `.py` file
+- **The exam's coding part is still R.** What you are examined on here is the reasoning — three splits, the validation curve, the comparison — not the syntax
+
+Setup: [the Python section of the setup page](../setup.qmd#python). `uv run jupyter lab`, and you are in.
+
 ## [Section 1]{.section-kicker} Fit one properly {.section-slide background-color="#002f57"}
+
+## Three sets, not two
+
+{{< video media/DataSplit.mp4 width="1000" height="562" >}}
+
+**Training** fits the weights. **Validation** chooses `size` and `decay`. **Test** is touched once, at the end, to report a number you can defend.
+
+::: {.callout-important title="Attention"}
+Choose hyperparameters on the test set and your reported accuracy is fiction — you have fitted the test set through the back door, with your own hands instead of gradient descent. This is the single most common mistake in applied machine learning, and it is invisible in the output.
+:::
 
 ## Step 1 — the same rows as last week
 
-```{.r code-line-numbers="1-3|5-7|9"}
-library(tidyverse); library(nnet); library(ranger); library(xgboost); library(here)
-churn <- read_csv(here("data", "churn.csv")) |> select(-id) |>
-  mutate(across(where(is.character), factor), y = churn == "yes")
+```{.python code-line-numbers="1-4|6-9|11-14|16-18"}
+import pandas as pd, numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
 
-set.seed(1)
-tr  <- sample(nrow(churn), 4900)          # 70%, as in lecture 17
-val <- sample(tr, 900)                    # carve a validation set out of training
-trn <- setdiff(tr, val)
+churn = pd.read_csv("materials/churn.csv").drop(columns="id")
+y = (churn.pop("churn") == "yes").to_numpy()
+num = churn.select_dtypes("number").columns
+cat = churn.columns.difference(num)
 
-X <- model.matrix(y ~ . - churn - 1, churn) |> scale()   # dummies, then scale — networks need both
+# 70 / 15 / 15, stratified so every split has the same churn rate
+X_tr, X_tmp, y_tr, y_tmp = train_test_split(churn, y, test_size=0.30,
+                                            stratify=y, random_state=1)
+X_val, X_te, y_val, y_te = train_test_split(X_tmp, y_tmp, test_size=0.50,
+                                            stratify=y_tmp, random_state=1)
+
+prep = ColumnTransformer([("num", StandardScaler(), num),
+                          ("cat", OneHotEncoder(drop="first"), cat)])
 ```
 
-::: {.callout-important title="Attention"}
-Three sets, not two. **Training** fits the weights, **validation** chooses `size` and `decay`, **test** is touched once, at the end, to report. Choose hyperparameters on the test set and your reported accuracy is fiction.
+Networks need **both** steps: dummies because they only eat numbers, scaling because a column measured in thousands would dominate the gradient.
+
+## Why the scaler goes inside the pipeline
+
+::: {.subtitle-frame}
+The mistake that inflates every result, and never announces itself
 :::
+
+- Scale the whole table first, then split, and the training set has seen the mean and standard deviation of the test set. The leak is small, silent, and always in your favour
+- A `Pipeline` fits the scaler on **training rows only**, then applies it to the others. Same for the encoder
+- This is not Python pedantry. The same trap exists in R with `scale()` before `sample()` — you have probably done it
+
+```{.python}
+from sklearn.pipeline import Pipeline
+from sklearn.neural_network import MLPClassifier
+
+net = Pipeline([("prep", prep),
+                ("mlp", MLPClassifier(hidden_layer_sizes=(5,), alpha=0.01,
+                                      max_iter=600, random_state=7))])
+net.fit(X_tr, y_tr)          # the scaler learns from X_tr, and only from X_tr
+```
+
+`hidden_layer_sizes=(5,)` is `size = 5` in `nnet`. `alpha` is `decay` — the same $\lambda$ from ridge, third time this course.
 
 ## Step 2 — a grid, and the validation curve
 
-```{.r code-line-numbers="1-2|4-9|11"}
-grid <- expand_grid(size = c(1, 3, 5, 10, 20), decay = c(0, 0.001, 0.01, 0.1))
-logloss <- function(p, y) -mean(y * log(p) + (1 - y) * log(1 - p))
+{{< video media/ValidationCurve.mp4 width="1000" height="562" >}}
 
-grid$val <- pmap_dbl(grid, function(size, decay) {
-  set.seed(7)
-  f <- nnet(X[trn, ], churn$y[trn], size = size, decay = decay, maxit = 300, trace = FALSE)
-  p <- pmin(pmax(predict(f, X[val, ]), 1e-6), 1 - 1e-6)
-  logloss(p, churn$y[val])
-})
+```{.python code-line-numbers="1-3|5-12|14"}
+from sklearn.metrics import log_loss
+sizes  = [1, 3, 5, 10, 20, 50]
+alphas = [0.0, 0.001, 0.01, 0.1, 1.0]
 
-ggplot(grid, aes(size, val, colour = factor(decay))) + geom_line() + geom_point()
+rows = []
+for s in sizes:
+    for a in alphas:
+        m = Pipeline([("prep", prep),
+                      ("mlp", MLPClassifier((s,), alpha=a, max_iter=600, random_state=7))])
+        m.fit(X_tr, y_tr)
+        rows.append((s, a, log_loss(y_val, m.predict_proba(X_val)[:, 1])))
+
+grid = pd.DataFrame(rows, columns=["size", "alpha", "val_logloss"])
 ```
 
-Read the plot before the next slide. Where is the minimum? What happens at `size = 20, decay = 0`? That is slide 17 of Monday, drawn by you.
+Thirty fits, about a minute. Plot it before the next slide: one line per `alpha`, `size` on the x-axis.
 
-## Step 3 — refit on all of training, score the test once
+## Read the plot before I show you mine
 
-```{.r code-line-numbers="1|3-4|6"}
-best <- grid[which.min(grid$val), ]                    # typically size 3–5, decay 0.01
+::: {.subtitle-frame}
+Three questions to answer from your own figure
+:::
 
-set.seed(7)
-nn <- nnet(X[tr, ], churn$y[tr], size = best$size, decay = best$decay, maxit = 500, trace = FALSE)
+- Where is the minimum? Is it at a small `size` — probably 3 to 10 — or at 50?
+- What does `alpha = 0` do as `size` grows? That rising line is slide 17 of Monday, drawn by your own laptop
+- What does `alpha = 1.0` do everywhere? Why is it flat and mediocre?
 
-p_nn <- predict(nn, X[-tr, ])
+```{.python}
+import matplotlib.pyplot as plt
+for a, g in grid.groupby("alpha"):
+    plt.plot(g["size"], g["val_logloss"], marker="o", label=f"alpha={a}")
+plt.xscale("log"); plt.xlabel("hidden neurons"); plt.ylabel("validation log-loss"); plt.legend()
 ```
 
-Add logistic, forest and boosting **on the same `-tr` rows**, from last week's script:
+::: {.callout-note}
+A flat penalised curve is not a failure. It says the signal in this table is nearly linear, so extra capacity has nothing to find. That is the lab's conclusion arriving early.
+:::
+
+## Step 3 — refit, then touch the test set once
+
+```{.python code-line-numbers="1-2|4-8|10-12"}
+best = grid.loc[grid["val_logloss"].idxmin()]
+X_full = pd.concat([X_tr, X_val]); y_full = np.concatenate([y_tr, y_val])
+
+final = Pipeline([("prep", prep),
+                  ("mlp", MLPClassifier((int(best["size"]),), alpha=best["alpha"],
+                                        max_iter=800, random_state=7))])
+final.fit(X_full, y_full)
+p_nn = final.predict_proba(X_te)[:, 1]
+```
+
+Hyperparameters chosen on validation, weights refitted on training **plus** validation, score reported on test. Every number below comes from the same `X_te` rows.
+
+## The four rivals, same rows
+
+```{.python code-line-numbers="1-4|6-11|13-17"}
+from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier, HistGradientBoostingClassifier
+from sklearn.metrics import roc_auc_score, accuracy_score, log_loss
+from sklearn.tree import DecisionTreeClassifier
+
+models = {
+    "Logistic":          LogisticRegression(max_iter=1000),
+    "Pruned tree":       DecisionTreeClassifier(max_depth=4, random_state=7),
+    "Random forest":     RandomForestClassifier(n_estimators=500, random_state=7),
+    "Gradient boosting": HistGradientBoostingClassifier(random_state=7),
+}
+
+for name, m in models.items():
+    pipe = Pipeline([("prep", prep), ("model", m)]).fit(X_full, y_full)
+    p = pipe.predict_proba(X_te)[:, 1]
+    print(f"{name:18} acc {accuracy_score(y_te, p > .5):.3f}  "
+          f"AUC {roc_auc_score(y_te, p):.3f}  logloss {log_loss(y_te, p):.3f}")
+```
 
 | Model | Accuracy | AUC | Log-loss |
 |---|---|---|---|
@@ -79,23 +178,25 @@ Add logistic, forest and boosting **on the same `-tr` rows**, from last week's s
 
 ## The network loses. Here is why.
 
+{{< video media/ModelRace.mp4 width="1000" height="562" >}}
+
 On a table of a few thousand customers with twenty columns, the order is almost always: **boosting ≥ forest > network ≈ logistic > tree**.
 
-- Tabular data has *structure a tree can use*: thresholds, interactions between a few columns. Trees find them in one split. A network has to *discover* them through smooth functions of scaled dummies.
-- With 5 000 rows, a network cannot learn much that a forest does not already know. It **can** learn the noise, and it needs your validation set to stop it.
-- The network's advantage — arbitrary smooth nonlinearity — is not the shape of the signal here
+- Tabular data has *structure a tree can use*: thresholds, interactions between a few columns. A tree finds `tenure < 6 AND contract = month-to-month` in two splits. A network has to build it out of smooth functions of scaled dummies
+- With 5 000 rows a network cannot learn much a forest does not already know. It **can** learn the noise, which is what your validation set was for
+- Its real advantage — arbitrary smooth nonlinearity — is not the shape of the signal here
 
 ::: {.callout-note}
-This is not a defect of networks. It is a mismatch between the tool and the data. The same network on 50 000 images would win by a mile.
+This is not a defect of networks. It is a mismatch between tool and data. The same network on 50 000 images would win by a mile.
 :::
 
 ## When the residuals tell you to reach for one
 
 From Monday: the network with identity activation *is* OLS. So when does the nonlinearity earn its place?
 
-- Fit the linear model. Plot predicted vs observed. **If the residuals curve**, the relationship is nonlinear.
-- Option 1: transform the response, refit the regression, keep interpretability
-- Option 2: assume the nonlinearity is real and complex → a network with nonlinear activations
+- Fit the linear model. Plot predicted against observed. **If the residuals curve**, the relationship is nonlinear
+- Option 1: transform the response or the predictor, refit the regression, keep interpretability
+- Option 2: assume the nonlinearity is real and complicated → a network with nonlinear activations
 
 Try option 1 first. It costs a minute and, more often than not, the curve was a log.
 
@@ -103,15 +204,13 @@ Try option 1 first. It costs a minute and, more often than not, the curve was a 
 
 ## What "deep" means, and what it costs
 
-MNIST: 28 × 28 pixel images of handwritten digits, 10 classes. A network: 784 → 1024 → 1024 → 2048 → 10.
+{{< video media/DeepScale.mp4 width="1000" height="562" >}}
 
-$$
-784\!\times\!1024 + 1024\!\times\!1024 + 1024\!\times\!2048 + 2048\!\times\!10 \;\approx\; \mathbf{4\ million\ weights}
-$$
+MNIST: 28 × 28 pixel images of handwritten digits, 10 classes. A network 784 → 1024 → 1024 → 2048 → 10 carries **about four million weights** for sixty thousand images.
 
-- *Deep*: more than one hidden layer. That is the whole definition.
-- Four million weights, sixty thousand images: it **will** overfit without **dropout** — neurons switched off at random during training, an implicit ensemble — and weight decay
-- The two architectures you will hear named: **CNNs** for images (convolution: local, shared filters — a 3×3 edge detector reused across the whole picture) and **RNNs** for sequences (the same weights applied at every time step — an autoregressive model with a memory)
+- *Deep* means more than one hidden layer. That is the whole definition
+- Four million weights on sixty thousand images **will** overfit without **dropout** — neurons switched off at random during training, an implicit ensemble — and weight decay
+- **CNNs** for images: convolution is a small filter, reused across the whole picture, so an edge detector is learned once instead of per pixel. **RNNs** for sequences: the same weights at every time step — an autoregressive model with a memory
 
 ::: {.callout-important title="Attention"}
 None of this applies to a customer table. They win on *spatial or sequential* data — images, text, audio, sensors. On rows and columns, use last week's tools.
@@ -119,9 +218,11 @@ None of this applies to a customer table. They win on *spatial or sequential* da
 
 ## The one connection worth keeping
 
+{{< video media/AutoencoderPCA.mp4 width="1000" height="562" >}}
+
 An **autoencoder** is a network trained to reproduce its own input through a narrow hidden layer: $p$ inputs → $q < p$ neurons → $p$ outputs, loss = reconstruction error.
 
-- With **linear** activations, it converges to **PCA**. Exactly. The $q$ hidden neurons span the first $q$ components.
+- With **linear** activations it converges to **PCA**. Exactly: the $q$ hidden neurons span the first $q$ components
 - With nonlinear activations it is a PCA that can bend — compression that follows curved structure
 
 Lecture 14's last slide, closed. Unsupervised learning and neural networks are the same subject seen from two sides.
@@ -144,7 +245,7 @@ The honest version of every AI vendor pitch you will ever hear fits in this tabl
 Ungraded, but bring it Wednesday:
 
 - The five-model table, filled, on the test rows
-- Your validation plot for the network, with the chosen `size` and `decay` marked
+- Your validation figure, with the chosen `size` and `alpha` marked
 - One paragraph: *which model would you deploy for this company, and what would you tell the CFO about the one you did not choose?*
 
 ## The question is never "can a neural network do this?" It can. The question is whether anything simpler could — and it usually can.  {.statement}
@@ -152,5 +253,5 @@ Ungraded, but bring it Wednesday:
 ## Reading
 
 - **ISLR** §10.3–10.4 — CNNs and RNNs, for the vocabulary; §10.6, *when to use deep learning*, for the argument you heard today
-- **ISLR** §10.7 — the `nnet`-free R lab uses `keras`; read it to see what the real toolchain looks like, do not install it tonight
+- **scikit-learn** user guide, §1.17 *Neural network models* — read the "Tips on Practical Use" box; it is four paragraphs and it is all true
 - **Provost & Fawcett** chapter 7 — *Decision analytic thinking*: expected value, and why the most accurate model is not always the one to deploy

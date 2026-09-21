@@ -58,7 +58,16 @@ Several links in one cell:
 Then `make deploy`. Files in `slides/`, `materials/` and `homework/` are copied to
 the site verbatim — they are listed under `resources:` in `_quarto.yml`.
 
-`homework.qmd` works the same way, against the `homework/` folder.
+**Practice sets are rendered pages, not attachments.** `homework/NN-topic.qmd`
+is rendered by Quarto (it is in `project: render:`) and linked from the table in
+`homework.qmd`; the folder is deliberately *not* in `resources:`, or the `.qmd`
+sources would be copied next to the HTML. Numbering follows the **set** (10–18
+for Module 2), not the lecture, because Module 1's sets are 1–9.
+
+A set is 30 to 45 minutes, one dataset, four to six questions, and most
+questions end in a sentence the student has to write rather than a number they
+have to get — the exam asks for a justified choice, and that is the part that
+cannot be improvised. Datasets come from `materials/`, which is in `resources:`.
 
 ## Files
 
@@ -208,8 +217,22 @@ slide need `!important`. Do not "simplify" any of those away.
 `MathTex`, words in Libre Franklin via `manimpango.register_font`. `make clips-preview`
 (`-ql`) to check frames, `make clips` (`-qm`, then an ffmpeg `+faststart` remux into
 `lectures/media/`) for the deck; embed with `{{< video media/Name.mp4 width="1000" height="562" >}}`.
-Every clip is spoken over: `Stage.WAIT_SCALE`/`PLAY_SCALE` stretch the older scenes,
-new scenes set both to 1.0 and are timed for speech. The AND-gate scenes do their
+Every clip is spoken over, and that sets the length. **A clip runs 40 to 90
+seconds.** Under 30 it is a gif: it shows the finished object and is over before
+a sentence about it has been said. The first five clips of lecture 18 were 7 to
+12 seconds and were rewritten for exactly this reason. Length comes from
+*content*, not from padding: the count of misclassified points updating as a
+line rotates, each gradient-descent step written out with its own numbers, every
+squared distance in a by-hand example. If a clip needs stretching to reach 40
+seconds it is missing a step that should be on screen.
+
+New scenes set `WAIT_SCALE`/`PLAY_SCALE` to 1.0 and time their own waits; the
+two scales exist only to stretch the older ones. `make clips-preview` then
+`ffprobe` the result is how you check a duration — read the number, do not guess
+from the code.
+
+The Makefile groups scenes per lecture (`SCENES_11`, `SCENES_18`, `SCENES_19`)
+and `SCENES` concatenates them; add a lecture's group when its clips exist. The AND-gate scenes do their
 arithmetic in integer hundredths so the LaTeX never shows `0.30000000000000004`.
 Two traps: `manim.cfg` is read by configparser, which keeps an inline `# comment` as
 part of the value (a `#` in `media_dir` makes latex fail "without a log file"); and

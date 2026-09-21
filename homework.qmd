@@ -11,7 +11,11 @@ The syllabus states it plainly: **no individual or group assignments are require
 
 Each set goes live after the lecture it belongs to. A set is small on purpose — 30 to 45 minutes, one dataset, a handful of questions. Solutions are posted one week later.
 
-Work in R unless a set says otherwise — see [Setup](setup.qmd) if your machine is not ready. Bring what breaks to [office hours](office-hours.qmd) — a broken script is a better question than a vague one.
+Work in R unless a set says otherwise — set 16 is in Python, like the lab it follows. See [Setup](setup.qmd) if your machine is not ready. Bring what breaks to [office hours](office-hours.qmd) — a broken script is a better question than a vague one.
+
+::: {.callout-note appearance="simple"}
+Most questions end in a sentence you have to write, not a number you have to get. That is deliberate: the exam asks you to justify a choice, and the justification is the part that is hard to improvise.
+:::
 
 ## Module 1 · Prof. Arbia
 
@@ -33,15 +37,15 @@ Work in R unless a set says otherwise — see [Setup](setup.qmd) if your machine
 
 | Set | After lecture | Topic | Exercises | Solutions |
 |---|---|---|---|---|
-| 10 | 3 Nov | k-means and customer segmentation | — | — |
-| 11 | 9 Nov | Hierarchical clustering | — | — |
-| 12 | 16 Nov | Principal components | — | — |
-| 13 | 17 Nov | Correspondence analysis | — | — |
-| 14 | 23 Nov | Decision trees | — | — |
-| 15 | 27 Nov | Random forests and gradient boosting | — | — |
-| 16 | 30 Nov | Neural networks | — | — |
-| 17 | 9 Dec | Interpretability | — | — |
-| 18 | 11 Dec | Dashboards and communication | — | — |
+| 10 | 3 Nov | k-means and customer segmentation | [set](homework/10-kmeans.qmd) | — |
+| 11 | 9 Nov | Hierarchical clustering | [set](homework/11-hierarchical.qmd) | — |
+| 12 | 16 Nov | Principal components | [set](homework/12-pca.qmd) | — |
+| 13 | 17 Nov | Correspondence analysis | [set](homework/13-correspondence.qmd) | — |
+| 14 | 23 Nov | Decision trees | [set](homework/14-trees.qmd) | — |
+| 15 | 27 Nov | Random forests and gradient boosting | [set](homework/15-forests-boosting.qmd) | — |
+| 16 | 30 Nov | Neural networks · *Python* | [set](homework/16-neural-networks.qmd) | — |
+| 17 | 9 Dec | Interpretability | [set](homework/17-interpretability.qmd) | — |
+| 18 | 11 Dec | Dashboards and communication | [set](homework/18-communication.qmd) | — |
 
 : {tbl-colwidths="[6,14,44,18,18]"}
 

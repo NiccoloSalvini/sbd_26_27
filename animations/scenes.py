@@ -51,41 +51,10 @@ class Stage(Scene):
         return super().play(*anims, **kw)
 
 
-# ---------------------------------------------------------------- 1. motivation
-class Boundary(Stage):
-    """Two classes. A line tries and fails; a curve bends where the data bend."""
 
-    def construct(self):
-        rng = np.random.default_rng(3)
-        ax = Axes(x_range=[-3, 3, 1], y_range=[-2.2, 2.2, 1], x_length=8, y_length=4.8,
-                  axis_config={"color": MUTED, "include_tip": False, "stroke_width": 1.5})
-        self.add(ax)
-        # class A: inside a band around a sine; class B: outside
-        pts, cols = [], []
-        for _ in range(60):
-            x, y = rng.uniform(-2.8, 2.8), rng.uniform(-2, 2)
-            inside = abs(y - 0.9 * np.sin(1.3 * x)) < 0.8
-            pts.append(Dot(ax.c2p(x, y), radius=0.06, color=GOLD if inside else SKY))
-        dots = VGroup(*pts)
-        self.play(FadeIn(dots, lag_ratio=0.02), run_time=1.2)
-        line = ax.plot(lambda x: 0.0 * x, color=CREAM, stroke_width=3)
-        tl = label("a line", 26, CREAM).next_to(ax, UP, buff=0.15)
-        self.play(Create(line), FadeIn(tl), run_time=1.0)
-        self.wait(0.6)
-        # it rotates looking for a fit and never finds one
-        self.play(Rotate(line, angle=0.35, about_point=ax.c2p(0, 0)), run_time=0.7)
-        self.play(Rotate(line, angle=-0.7, about_point=ax.c2p(0, 0)), run_time=0.9)
-        self.play(Rotate(line, angle=0.35, about_point=ax.c2p(0, 0)), run_time=0.6)
-        curve = ax.plot(lambda x: 0.9 * np.sin(1.3 * x), color=GOLD, stroke_width=4)
-        tc = label("a curve", 26, GOLD).next_to(ax, UP, buff=0.15)
-        self.play(Transform(line, curve), FadeTransform(tl, tc), run_time=1.4)
-        self.wait(1.0)
 
 
 # ---------------------------------------------------------------- 2. perceptron
-# The AND gate, the one worked example of the deck. Arithmetic is done in
-# hundredths as integers so 0.3 - 0.1 + 0.1 prints as 0.3 and never as
-# 0.30000000000000004, and so "z >= theta" is an exact comparison.
 AND_DATA = [((0, 0), 0), ((0, 1), 0), ((1, 0), 0), ((1, 1), 1)]
 W0, THETA, ETA = (30, -10), 25, 10
 
@@ -304,136 +273,954 @@ class Perceptron(Stage):
                     self.wait(0.8)
 
 
-# ---------------------------------------------------------------- 3. gradient descent
-class GradientDescent(Stage):
-    """The same bowl, three learning rates: creep, converge, overshoot."""
+# ---------------------------------------------------------------- 1. motivation
+class Boundary(Stage):
+    """Why a curve at all. A line is tried, its mistakes are counted, it is
+    rotated and counted again; no angle gets below twelve. Then the curve, then
+    the fact that the curve is three lines blended — which is Section 5."""
+
+    WAIT_SCALE = 1.0
+    PLAY_SCALE = 1.0
 
     def construct(self):
-        panels = VGroup()
-        specs = [(r"\eta\ \text{too small}", 0.05, 9), (r"\eta\ \text{right}", 0.3, 7), (r"\eta\ \text{too large}", 1.05, 6)]
-        for ttl, eta, steps in specs:
-            ax = Axes(x_range=[-1, 5, 1], y_range=[0, 9, 3], x_length=3.7, y_length=2.8,
-                      axis_config={"color": MUTED, "include_tip": False, "stroke_width": 1.5})
-            curve = ax.plot(lambda w: (w - 2) ** 2, color=SKY, stroke_width=4)
-            t = MathTex(ttl, color=CREAM, font_size=30).next_to(ax, UP, buff=0.15)
-            panels.add(VGroup(ax, curve, t))
-        panels.arrange(RIGHT, buff=0.35).shift(UP * 0.3)
-        self.add(panels)
-        rule = MathTex(r"W_{t+1} = W_t - \eta\,\frac{\partial L}{\partial W}", color=CREAM, font_size=36).to_edge(DOWN, buff=0.35)
-        self.play(Write(rule), run_time=0.9)
-        f = lambda w: (w - 2) ** 2
-        for (ttl, eta, steps), panel in zip(specs, panels):
-            ax = panel[0]
-            w = 4.6
-            dot = Dot(ax.c2p(w, f(w)), color=GOLD, radius=0.09)
-            self.add(dot)
-            for _ in range(steps):
-                wn = max(-0.9, min(4.9, w - eta * 2 * (w - 2)))
-                seg = Line(ax.c2p(w, f(w)), ax.c2p(wn, f(wn)), color=GOLD, stroke_width=2.5, stroke_opacity=0.75)
-                self.play(Create(seg), dot.animate.move_to(ax.c2p(wn, f(wn))), run_time=0.26)
+        rng = np.random.default_rng(3)
+        ax = Axes(x_range=[-3, 3, 1], y_range=[-2.2, 2.2, 1], x_length=8.4, y_length=4.6,
+                  axis_config={"color": MUTED, "include_tip": False, "stroke_width": 1.5}).shift(UP * 0.25)
+        self.play(Create(ax), run_time=1.0)
+
+        truth = lambda x: 0.9 * np.sin(1.3 * x)
+        data = []
+        for _ in range(60):
+            x, y = rng.uniform(-2.8, 2.8), rng.uniform(-2, 2)
+            data.append((x, y, y > truth(x)))
+        dots = VGroup(*[Dot(ax.c2p(x, y), radius=0.062, color=(GOLD if above else SKY)) for x, y, above in data])
+        self.play(FadeIn(dots, lag_ratio=0.03), run_time=1.6)
+        self.wait(1.4)
+
+        # a counter that means something: how many points the rule gets wrong
+        def miscount(fn):
+            return sum(1 for x, y, above in data if (y > fn(x)) != above)
+
+        tally = VGroup(label("wrong", 24, MUTED), Integer(0, color=GOLD, font_size=46)).arrange(RIGHT, buff=0.3)
+        tally.to_corner(UR, buff=0.5)
+
+        slopes = [0.0, 0.55, -0.5, 0.22]
+        first = lambda x: 0.0 * x
+        line = ax.plot(first, color=CREAM, stroke_width=4)
+        cap = label("one straight line", 26, CREAM).next_to(ax, DOWN, buff=0.3)
+        tally[1].set_value(miscount(first))
+        self.play(Create(line), FadeIn(cap), FadeIn(tally), run_time=1.2)
+        self.wait(3.0)
+
+        # rotate it and let the count speak for itself
+        for s in slopes[1:]:
+            fn = lambda x, s=s: s * x
+            new = ax.plot(fn, color=CREAM, stroke_width=4)
+            self.play(Transform(line, new),
+                      ChangeDecimalToValue(tally[1], miscount(fn)), run_time=1.8)
+            self.wait(2.2)
+
+        verdict = label("no straight line gets below twelve", 26, CREAM).next_to(ax, DOWN, buff=0.3)
+        self.play(FadeTransform(cap, verdict), run_time=1.0)
+        self.wait(3.4)
+
+        curve = ax.plot(truth, color=GOLD, stroke_width=5)
+        cap2 = label("one curve", 26, GOLD).next_to(ax, DOWN, buff=0.3)
+        self.play(Transform(line, curve), FadeTransform(verdict, cap2),
+                  ChangeDecimalToValue(tally[1], miscount(truth)), run_time=2.6)
+        self.wait(3.6)
+
+        # where the curve comes from — three bends, blended. Section 5, foreshadowed.
+        pieces = VGroup(
+            ax.plot(lambda x: 1.15 * np.tanh(2.2 * (x + 1.7)) - 0.35, color=SKY, stroke_width=2.5, stroke_opacity=0.9),
+            ax.plot(lambda x: -1.3 * np.tanh(2.0 * x), color=SKY, stroke_width=2.5, stroke_opacity=0.9),
+            ax.plot(lambda x: 1.15 * np.tanh(2.2 * (x - 1.7)) + 0.35, color=SKY, stroke_width=2.5, stroke_opacity=0.9),
+        )
+        cap3 = label("three simple bends, added together", 26, SKY).next_to(ax, DOWN, buff=0.3)
+        self.play(FadeTransform(cap2, cap3), run_time=0.8)
+        for pc in pieces:
+            self.play(Create(pc), run_time=1.1)
+            self.wait(1.2)
+        self.wait(2.6)
+        self.play(FadeOut(pieces), run_time=1.0)
+        self.wait(2.0)
+
+
+# ---------------------------------------------------------------- 3. gradient descent
+class GradientDescent(Stage):
+    """One bowl, three learning rates, and the arithmetic of every step on
+    screen. The point is not that a dot rolls downhill; it is that each step is
+    the old weight minus eta times a slope you can read."""
+
+    WAIT_SCALE = 1.0
+    PLAY_SCALE = 1.0
+
+    F = staticmethod(lambda w: (w - 2.0) ** 2)
+    G = staticmethod(lambda w: 2.0 * (w - 2.0))     # dL/dW
+
+    def construct(self):
+        ax = Axes(x_range=[-1.2, 5.4, 1], y_range=[0, 9, 3], x_length=7.4, y_length=4.4,
+                  axis_config={"color": MUTED, "include_tip": False, "stroke_width": 1.5}).to_edge(LEFT, buff=0.7).shift(DOWN * 0.2)
+        curve = ax.plot(self.F, color=SKY, stroke_width=4)
+        self.play(Create(ax), Create(curve), run_time=1.4)
+        self.play(FadeIn(MathTex(r"L(W) = (W-2)^2", color=SKY, font_size=32).next_to(ax, UP, buff=0.2)), run_time=0.8)
+
+        rule = MathTex(r"W_{t+1} = W_t - \eta\,\frac{\partial L}{\partial W}", color=CREAM, font_size=38)
+        rule.to_corner(UR, buff=0.7).shift(LEFT * 0.2)
+        self.play(Write(rule), run_time=1.4)
+        self.wait(1.8)
+
+        def run(eta, steps, colour, title, show_arithmetic):
+            head = MathTex(title, color=colour, font_size=34).next_to(rule, DOWN, buff=0.5).align_to(rule, LEFT)
+            self.play(FadeIn(head), run_time=0.7)
+            w = 4.8
+            dot = Dot(ax.c2p(w, self.F(w)), color=colour, radius=0.1)
+            self.play(FadeIn(dot, scale=1.6), run_time=0.6)
+            self.wait(0.8)
+            trail, lines = VGroup(), []
+            for k in range(steps):
+                g = self.G(w)
+                wn = w - eta * g
+                if show_arithmetic and k < 3:
+                    # the step, written out with the numbers of this step
+                    expr = MathTex(rf"{w:.2f} - {eta}\times({g:.2f}) = {wn:.2f}", color=colour, font_size=30)
+                    expr.next_to(head, DOWN, buff=0.35 + 0.45 * k).align_to(head, LEFT)
+                    self.play(FadeIn(expr, shift=RIGHT * 0.2), run_time=0.8)
+                    lines.append(expr)
+                    self.wait(1.0)
+                wn_c = max(-1.15, min(5.35, wn))
+                seg = Line(ax.c2p(w, self.F(w)), ax.c2p(wn_c, self.F(wn_c)),
+                           color=colour, stroke_width=2.5, stroke_opacity=0.8)
+                trail.add(seg)
+                self.play(Create(seg), dot.animate.move_to(ax.c2p(wn_c, self.F(wn_c))),
+                          run_time=0.45 if k < 3 else 0.28)
                 w = wn
-        self.wait(0.8)
+            self.wait(1.4)
+            self.play(FadeOut(VGroup(head, dot, trail, *lines)), run_time=0.8)
+
+        run(0.3, 8, GOLD, r"\eta = 0.3\ \ \text{(right)}", True)
+        self.wait(0.6)
+        run(0.03, 26, SKY, r"\eta = 0.03\ \ \text{(too small: 26 steps, still short)}", True)
+        self.wait(0.6)
+        run(1.05, 7, "#e2725b", r"\eta = 1.05\ \ \text{(too large: it climbs the far wall)}", True)
+
+        closing = label("the minus sign is the whole idea", 28, CREAM).next_to(ax, DOWN, buff=0.35)
+        self.play(FadeIn(closing), run_time=1.0)
+        self.wait(2.2)
 
 
 # ---------------------------------------------------------------- 4. one neuron = GLM
 class Sigmoid(Stage):
-    """From the perceptron's step to the sigmoid: a probability, and a GLM."""
+    """Why the step had to go: its derivative is zero everywhere, so there is
+    nothing for gradient descent to descend. The sigmoid fixes exactly that, and
+    hands back a probability while it is at it."""
+
+    WAIT_SCALE = 1.0
+    PLAY_SCALE = 1.0
 
     def construct(self):
-        ax = Axes(x_range=[-6, 6, 2], y_range=[-0.2, 1.2, 0.5], x_length=8, y_length=4,
-                  axis_config={"color": MUTED, "include_tip": False, "stroke_width": 1.5}).shift(DOWN * 0.3)
-        self.add(ax)
-        self.add(MathTex(r"\lambda = W_0 + \textstyle\sum_j W_j X_j", color=MUTED, font_size=28).next_to(ax, DOWN, buff=0.2))
-        step = VGroup(ax.plot(lambda x: 0, x_range=[-6, 0], color=SKY, stroke_width=4),
-                      ax.plot(lambda x: 1, x_range=[0, 6], color=SKY, stroke_width=4))
-        ts = MathTex(r"g(\lambda) = \operatorname{sign}(\lambda)", color=SKY, font_size=36).to_edge(UP, buff=0.4)
-        self.play(Create(step), Write(ts), run_time=1.0)
-        self.wait(0.5)
+        ax = Axes(x_range=[-6, 6, 2], y_range=[-0.15, 1.15, 0.5], x_length=8.6, y_length=3.4,
+                  axis_config={"color": MUTED, "include_tip": False, "stroke_width": 1.5}).shift(UP * 1.15)
+        dax = Axes(x_range=[-6, 6, 2], y_range=[0, 0.3, 0.1], x_length=8.6, y_length=1.5,
+                   axis_config={"color": MUTED, "include_tip": False, "stroke_width": 1.2}).shift(DOWN * 1.9)
+        self.play(Create(ax), run_time=0.9)
+        self.play(FadeIn(MathTex(r"\lambda = W_0 + \textstyle\sum_j W_j X_j", color=MUTED, font_size=26)
+                         .next_to(dax, DOWN, buff=0.25)), run_time=0.7)
+
+        step = VGroup(ax.plot(lambda x: 0, x_range=[-6, -0.02], color=SKY, stroke_width=4),
+                      ax.plot(lambda x: 1, x_range=[0.02, 6], color=SKY, stroke_width=4),
+                      DashedLine(ax.c2p(0, 0), ax.c2p(0, 1), color=SKY, stroke_width=2))
+        ts = MathTex(r"g(\lambda) = \operatorname{sign}(\lambda)", color=SKY, font_size=34).to_edge(UP, buff=0.35)
+        self.play(Create(step), Write(ts), run_time=1.4)
+        self.wait(3.0)
+
+        # the derivative panel is the argument
+        self.play(Create(dax), FadeIn(label("slope", 22, MUTED).next_to(dax, LEFT, buff=0.2)), run_time=0.9)
+        flat = dax.plot(lambda x: 0.0, color=SKY, stroke_width=4)
+        self.play(Create(flat), run_time=1.0)
+        why = label("slope zero everywhere: nothing to descend", 26, SKY).next_to(ax, DOWN, buff=0.35)
+        self.play(FadeIn(why), run_time=0.9)
+        self.wait(4.2)
+
         sig = ax.plot(lambda x: 1 / (1 + np.exp(-x)), color=GOLD, stroke_width=4)
-        tg = MathTex(r"g(\lambda) = \sigma(\lambda) = \frac{1}{1 + e^{-\lambda}}", color=GOLD, font_size=36).to_edge(UP, buff=0.4)
-        self.play(Transform(step, sig), FadeTransform(ts, tg), run_time=1.6)
-        # a probability: read one value off the curve
-        x0 = 1.4
-        p0 = 1 / (1 + np.exp(-x0))
-        v = DashedLine(ax.c2p(x0, 0), ax.c2p(x0, p0), color=CREAM, stroke_width=2)
-        h = DashedLine(ax.c2p(x0, p0), ax.c2p(-6, p0), color=CREAM, stroke_width=2)
-        pl = MathTex(rf"\hat\pi = {p0:.2f}", color=CREAM, font_size=32).next_to(ax.c2p(-6, p0), LEFT, buff=0.15)
-        self.play(Create(v), Create(h), FadeIn(pl), run_time=1.0)
-        bridge = MathTex(r"\text{link } h = g^{-1}:\quad \log\frac{\pi}{1-\pi} = \lambda\ \ \Rightarrow\ \ \text{logistic regression}",
-                         color=CREAM, font_size=30).to_edge(DOWN, buff=0.35)
-        self.play(Write(bridge), run_time=1.2)
-        self.wait(1.2)
+        tg = MathTex(r"g(\lambda) = \sigma(\lambda) = \frac{1}{1 + e^{-\lambda}}", color=GOLD, font_size=34).to_edge(UP, buff=0.35)
+        dsig = dax.plot(lambda x: np.exp(-x) / (1 + np.exp(-x)) ** 2, color=GOLD, stroke_width=4)
+        why2 = label("a slope you can follow", 26, GOLD).next_to(ax, DOWN, buff=0.35)
+        self.play(Transform(step, sig), FadeTransform(ts, tg), Transform(flat, dsig),
+                  FadeTransform(why, why2), run_time=2.4)
+        self.wait(2.0)
+        self.play(FadeIn(MathTex(r"\sigma'(\lambda) = \sigma(\lambda)\,[1-\sigma(\lambda)]",
+                                 color=GOLD, font_size=28).next_to(dax, RIGHT, buff=-2.4).shift(UP * 0.55)), run_time=1.0)
+        self.wait(3.2)
+
+        # read two values off the curve: it is a probability, not a verdict
+        self.play(FadeOut(why2), run_time=0.5)
+        for x0, colour in ((1.4, CREAM), (-0.6, CREAM), (3.2, CREAM)):
+            p0 = 1 / (1 + np.exp(-x0))
+            v = DashedLine(ax.c2p(x0, 0), ax.c2p(x0, p0), color=colour, stroke_width=2)
+            h = DashedLine(ax.c2p(x0, p0), ax.c2p(-6, p0), color=colour, stroke_width=2)
+            pl = MathTex(rf"\lambda = {x0} \Rightarrow \hat\pi = {p0:.2f}", color=colour, font_size=28)
+            pl.next_to(ax.c2p(-6, p0), RIGHT, buff=0.25).shift(UP * 0.28)
+            self.play(Create(v), Create(h), FadeIn(pl), run_time=1.1)
+            self.wait(2.8)
+            self.play(FadeOut(VGroup(v, h, pl)), run_time=0.6)
+
+        bridge = MathTex(r"\text{one sigmoid neuron} + \text{cross-entropy} \;=\; \text{logistic regression}",
+                         color=CREAM, font_size=30).next_to(ax, DOWN, buff=0.35)
+        self.play(Write(bridge), run_time=1.6)
+        self.wait(3.6)
 
 
 # ---------------------------------------------------------------- 5. hidden layer
 class HiddenLayer(Stage):
-    """Add hidden neurons and the boundary bends: 1, then 2, then 5."""
+    """What a hidden neuron actually contributes. Each one is a single bend;
+    the output layer adds them with weights. Shown one neuron at a time, with
+    the pieces visible before the sum."""
+
+    WAIT_SCALE = 1.0
+    PLAY_SCALE = 1.0
 
     def construct(self):
         rng = np.random.default_rng(7)
-        ax = Axes(x_range=[-3, 3, 1], y_range=[-2.2, 2.2, 1], x_length=7.2, y_length=4.4,
-                  axis_config={"color": MUTED, "include_tip": False, "stroke_width": 1.5}).to_edge(LEFT, buff=0.5)
-        self.add(ax)
+        ax = Axes(x_range=[-3, 3, 1], y_range=[-2.4, 2.4, 1], x_length=7.0, y_length=4.4,
+                  axis_config={"color": MUTED, "include_tip": False, "stroke_width": 1.5}).to_edge(LEFT, buff=0.45).shift(DOWN * 0.15)
         truth = lambda x: 0.9 * np.sin(1.3 * x)
         pts = VGroup()
         for _ in range(60):
             x, y = rng.uniform(-2.8, 2.8), rng.uniform(-2, 2)
             pts.add(Dot(ax.c2p(x, y), radius=0.055, color=GOLD if y > truth(x) else SKY))
-        self.add(pts)
-        # the network diagram on the right: nodes rebuilt per L, one label transformed
+        self.play(Create(ax), FadeIn(pts, lag_ratio=0.02), run_time=1.6)
+
         def net(L):
             g = VGroup()
-            xs = VGroup(*[Dot(radius=0.13, color=MUTED) for _ in range(2)]).arrange(DOWN, buff=0.7)
-            hs = VGroup(*[Dot(radius=0.13, color=GOLD) for _ in range(L)]).arrange(DOWN, buff=0.34)
-            out = Dot(radius=0.15, color=CREAM)
-            cols = VGroup(xs, hs, out).arrange(RIGHT, buff=1.1)
+            xs = VGroup(*[Dot(radius=0.12, color=MUTED) for _ in range(2)]).arrange(DOWN, buff=0.65)
+            hs = VGroup(*[Dot(radius=0.12, color=GOLD) for _ in range(L)]).arrange(DOWN, buff=0.32)
+            out = Dot(radius=0.14, color=CREAM)
+            cols = VGroup(xs, hs, out).arrange(RIGHT, buff=1.0)
             for a in xs:
                 for b in hs:
-                    g.add(Line(a.get_center(), b.get_center(), stroke_width=1.2, color=MUTED, stroke_opacity=0.6))
+                    g.add(Line(a.get_center(), b.get_center(), stroke_width=1.1, color=MUTED, stroke_opacity=0.55))
             for b in hs:
-                g.add(Line(b.get_center(), out.get_center(), stroke_width=1.2, color=MUTED, stroke_opacity=0.6))
+                g.add(Line(b.get_center(), out.get_center(), stroke_width=1.1, color=MUTED, stroke_opacity=0.55))
             g.add(cols)
-            return g.to_edge(RIGHT, buff=0.6)
+            return g.scale(0.9).to_edge(RIGHT, buff=0.5).shift(UP * 0.35)
 
-        fits = {
-            1: lambda x: 0.25 * x,
-            2: lambda x: 0.9 * np.tanh(1.2 * x) * (1 - 0.15 * x),
-            5: truth,
-        }
-        cur_b, cur_n, cur_l = None, None, None
-        for L in (1, 2, 5):
-            b = ax.plot(fits[L], color=CREAM, stroke_width=4)
-            n = net(L)
-            l = MathTex(rf"L = {L}", color=CREAM, font_size=40).next_to(n, UP, buff=0.4)
-            if cur_b is None:
-                self.play(Create(b), FadeIn(n), FadeIn(l), run_time=1.1)
-                cur_b, cur_n, cur_l = b, n, l
-            else:
-                self.play(Transform(cur_b, b), FadeTransform(cur_n, n), Transform(cur_l, l), run_time=1.4)
-                cur_n = n
-            self.wait(0.7)
-        wl = MathTex(r"\text{weights} = (p+1)L + (L+1)", color=MUTED, font_size=30).to_edge(DOWN, buff=0.3)
-        self.play(FadeIn(wl), run_time=0.5)
-        self.wait(1.0)
+        # each hidden neuron is one tanh bend; the output layer weights them
+        bends = [
+            (1.05, 2.0, 0.0),
+            (-1.30, 1.9, 1.75),
+            (1.25, 1.9, -1.75),
+            (0.55, 1.6, 0.9),
+            (-0.5, 1.7, -0.9),
+        ]
+
+        def blend(k):
+            def f(x):
+                return sum(a * np.tanh(b * (x - c)) for a, b, c in bends[:k]) / max(1, (k + 1) / 2.0)
+            return f
+
+        cur_net = net(1)
+        cur_lab = MathTex(r"L = 1", color=CREAM, font_size=38).next_to(cur_net, UP, buff=0.35)
+        cur_w = MathTex(r"\text{weights} = 3\cdot 1 + 2 = 5", color=MUTED, font_size=26).next_to(cur_net, DOWN, buff=0.45)
+        self.play(FadeIn(cur_net), FadeIn(cur_lab), FadeIn(cur_w), run_time=1.2)
+
+        piece = ax.plot(lambda x: bends[0][0] * np.tanh(bends[0][1] * (x - bends[0][2])), color=SKY,
+                        stroke_width=2.5, stroke_opacity=0.85)
+        boundary = ax.plot(blend(1), color=CREAM, stroke_width=4.5)
+        cap = label("one neuron: one bend", 26, CREAM).next_to(ax, DOWN, buff=0.3)
+        self.play(Create(piece), run_time=1.2)
+        self.play(Create(boundary), FadeIn(cap), run_time=1.2)
+        self.wait(4.0)
+
+        shown = VGroup(piece)
+        for L in (2, 3, 5):
+            new_pieces = VGroup(*[
+                ax.plot(lambda x, a=a, b=b, c=c: a * np.tanh(b * (x - c)), color=SKY,
+                        stroke_width=2.2, stroke_opacity=0.75)
+                for a, b, c in bends[len(shown):L]
+            ])
+            n, w = net(L), (3 * L + L + 1)
+            nl = MathTex(rf"L = {L}", color=CREAM, font_size=38).next_to(n, UP, buff=0.35)
+            wl = MathTex(rf"\text{{weights}} = 3\cdot {L} + {L+1} = {w}", color=MUTED, font_size=26).next_to(n, DOWN, buff=0.45)
+            cap2 = label(f"{L} neurons: {L} bends, then the sum", 26, CREAM).next_to(ax, DOWN, buff=0.3)
+
+            self.play(FadeTransform(cur_net, n), Transform(cur_lab, nl), Transform(cur_w, wl),
+                      FadeTransform(cap, cap2), run_time=1.2)
+            cur_net, cap = n, cap2
+            for pc in new_pieces:
+                self.play(Create(pc), run_time=0.9)
+                self.wait(0.5)
+            shown.add(*new_pieces)
+            self.wait(1.4)
+            self.play(Transform(boundary, ax.plot(blend(L), color=CREAM, stroke_width=4.5)), run_time=1.8)
+            self.wait(3.0)
+
+        self.play(FadeOut(shown), run_time=1.2)
+        closing = label("every neuron is a line; the output layer blends them", 26, GOLD).next_to(ax, DOWN, buff=0.3)
+        self.play(FadeTransform(cap, closing), run_time=1.0)
+        self.wait(3.4)
 
 
 # ---------------------------------------------------------------- 6. overfitting
 class Overfitting(Stage):
-    """Train keeps falling; test turns up. Stop where it turns."""
+    """The two curves, and — the part that was missing — the boundary that
+    produces them. Training error falls because the boundary contorts to reach
+    individual points; the test set is what notices."""
+
+    WAIT_SCALE = 1.0
+    PLAY_SCALE = 1.0
 
     def construct(self):
-        ax = Axes(x_range=[0, 10, 2], y_range=[0, 4, 1], x_length=8, y_length=4.2,
-                  axis_config={"color": MUTED, "include_tip": False, "stroke_width": 1.5})
-        self.add(ax, label("training iterations", 22, MUTED).next_to(ax.x_axis, DOWN, buff=0.2),
-                 label("error", 22, MUTED).next_to(ax.y_axis, LEFT, buff=0.2).rotate(PI / 2))
-        train = ax.plot(lambda x: 3.4 * np.exp(-0.45 * x) + 0.15, color=SKY, stroke_width=4)
-        test = ax.plot(lambda x: 3.4 * np.exp(-0.45 * x) + 0.15 + 0.06 * (x - 3.2) ** 2 * (x > 3.2), color=GOLD, stroke_width=4)
-        self.play(Create(train), Create(test), run_time=3.2, rate_func=linear)
-        self.play(FadeIn(label("train", 22, SKY).next_to(ax.c2p(10, train.underlying_function(10)), RIGHT, buff=0.15)),
-                  FadeIn(label("test", 22, GOLD).next_to(ax.c2p(10, test.underlying_function(10)), RIGHT, buff=0.15)), run_time=0.4)
-        opt = DashedLine(ax.c2p(3.2, 0), ax.c2p(3.2, 3.6), color=CREAM, stroke_width=2)
-        self.play(Create(opt), FadeIn(label("stop here", 24, CREAM).next_to(opt, UP, buff=0.1)), run_time=0.6)
-        self.wait(0.8)
+        rng = np.random.default_rng(11)
+        ax = Axes(x_range=[-3, 3, 1], y_range=[-2.3, 2.3, 1], x_length=5.6, y_length=3.6,
+                  axis_config={"color": MUTED, "include_tip": False, "stroke_width": 1.4}).to_edge(LEFT, buff=0.55).shift(DOWN * 0.2)
+        ex = Axes(x_range=[0, 10, 2], y_range=[0, 4, 1], x_length=5.6, y_length=3.6,
+                  axis_config={"color": MUTED, "include_tip": False, "stroke_width": 1.4}).to_edge(RIGHT, buff=0.55).shift(DOWN * 0.2)
+        self.play(Create(ax), Create(ex), run_time=1.2)
+        self.play(FadeIn(label("the boundary", 24, MUTED).next_to(ax, UP, buff=0.2)),
+                  FadeIn(label("error", 24, MUTED).next_to(ex, UP, buff=0.2)),
+                  FadeIn(label("training iterations", 20, MUTED).next_to(ex, DOWN, buff=0.25)), run_time=0.8)
+
+        truth = lambda x: 0.85 * np.sin(1.25 * x)
+        train, test = VGroup(), VGroup()
+        for _ in range(42):
+            x, y = rng.uniform(-2.8, 2.8), rng.uniform(-2.1, 2.1)
+            train.add(Dot(ax.c2p(x, y), radius=0.05, color=GOLD if y > truth(x) else SKY))
+        for _ in range(22):
+            x, y = rng.uniform(-2.8, 2.8), rng.uniform(-2.1, 2.1)
+            d = Dot(ax.c2p(x, y), radius=0.055, color=GOLD if y > truth(x) else SKY,
+                    fill_opacity=0.0, stroke_width=1.8)
+            d.set_stroke(color=GOLD if y > truth(x) else SKY)
+            test.add(d)
+        self.play(FadeIn(train, lag_ratio=0.03), run_time=1.2)
+        self.play(FadeIn(test, lag_ratio=0.05), run_time=1.0)
+        self.play(FadeIn(VGroup(label("filled: training", 20, MUTED), label("hollow: test", 20, MUTED))
+                         .arrange(DOWN, buff=0.12, aligned_edge=LEFT).next_to(ax, DOWN, buff=0.3)), run_time=0.8)
+        self.wait(3.2)
+
+        f_train = lambda t: 3.3 * np.exp(-0.45 * t) + 0.18
+        f_test = lambda t: 3.3 * np.exp(-0.45 * t) + 0.18 + 0.075 * max(0.0, t - 3.4) ** 2
+
+        # the boundary at three moments, and the two curves growing with it
+        stages = [
+            (2.2, lambda x: 0.30 * x, "underfit: too straight"),
+            (3.4, truth, "the minimum: it follows the signal"),
+            (9.4, lambda x: truth(x) + 0.42 * np.sin(6.5 * x) + 0.22 * np.sin(11.0 * x), "overfit: it chases single points"),
+        ]
+        boundary = ax.plot(stages[0][1], color=CREAM, stroke_width=4)
+        cap = label(stages[0][2], 22, CREAM).next_to(ax, DOWN, buff=1.05)
+        self.play(Create(boundary), FadeIn(cap), run_time=1.4)
+
+        drawn_to = 0.0
+        tr_curve = VGroup()
+        te_curve = VGroup()
+        for upto, fn, text in stages:
+            seg_tr = ex.plot(f_train, x_range=[drawn_to, upto], color=SKY, stroke_width=4)
+            seg_te = ex.plot(f_test, x_range=[drawn_to, upto], color=GOLD, stroke_width=4)
+            new_b = ax.plot(fn, color=CREAM, stroke_width=4)
+            new_c = label(text, 22, CREAM).next_to(ax, DOWN, buff=1.05)
+            self.play(Create(seg_tr), Create(seg_te), Transform(boundary, new_b),
+                      FadeTransform(cap, new_c), run_time=2.4, rate_func=linear)
+            tr_curve.add(seg_tr); te_curve.add(seg_te); cap = new_c
+            drawn_to = upto
+            self.wait(3.6)
+
+        self.play(FadeIn(label("train", 22, SKY).next_to(ex.c2p(10, f_train(10)), RIGHT, buff=0.1)),
+                  FadeIn(label("test", 22, GOLD).next_to(ex.c2p(10, f_test(10)), RIGHT, buff=0.1)), run_time=0.8)
+        opt = DashedLine(ex.c2p(3.4, 0), ex.c2p(3.4, 3.9), color=CREAM, stroke_width=2)
+        self.play(Create(opt), FadeIn(label("stop here", 22, CREAM).next_to(opt, UP, buff=0.08)), run_time=1.0)
+        self.wait(3.8)
+
+        closing = label("past the turn, it is learning the noise", 26, GOLD).next_to(ex, DOWN, buff=0.75)
+        self.play(FadeIn(closing), run_time=1.0)
+        self.wait(3.2)
 
 
-SCENES = ["Boundary", "PerceptronByHand", "Perceptron", "GradientDescent", "Sigmoid", "HiddenLayer", "Overfitting"]
+# ================================================================ lecture 19 — the lab
+# ---------------------------------------------------------------- 1. three splits
+class DataSplit(Stage):
+    """Why three sets and not two, shown as the rows themselves. The last beat is
+    the mistake: choosing a hyperparameter on the test set, and the honest number
+    quietly becoming a dishonest one."""
+
+    WAIT_SCALE = 1.0
+    PLAY_SCALE = 1.0
+
+    def construct(self):
+        title = label("7 000 customers", 30, CREAM).to_edge(UP, buff=0.6)
+        bar = Rectangle(width=11.0, height=0.9, color=MUTED, stroke_width=2, fill_opacity=0.12)
+        bar.shift(UP * 1.4)
+        self.play(FadeIn(title), Create(bar), run_time=1.3)
+        self.wait(2.9)
+
+        widths = [(0.70, "training", GOLD, "fits the weights"),
+                  (0.15, "validation", SKY, "chooses size and decay"),
+                  (0.15, "test", CREAM, "touched once, at the end")]
+        left = bar.get_left()[0]
+        blocks, notes = VGroup(), VGroup()
+        for frac, name, colour, job in widths:
+            w = 11.0 * frac
+            r = Rectangle(width=w, height=0.9, color=colour, stroke_width=2,
+                          fill_color=colour, fill_opacity=0.28)
+            r.move_to([left + w / 2, bar.get_center()[1], 0])
+            n = VGroup(label(name, 24, colour), label(f"{int(frac*7000)} rows", 20, MUTED)).arrange(DOWN, buff=0.1)
+            n.next_to(r, DOWN, buff=0.35)
+            blocks.add(r); notes.add(n)
+            left += w
+        for r, n in zip(blocks, notes):
+            self.play(FadeIn(r), FadeIn(n), run_time=0.9)
+            self.wait(1.9)
+        self.wait(2.0)
+
+        jobs = VGroup(*[label(j, 24, c) for _, _, c, j in widths]).arrange(DOWN, buff=0.45, aligned_edge=LEFT)
+        jobs.next_to(notes, DOWN, buff=0.9)
+        for j in jobs:
+            self.play(FadeIn(j, shift=RIGHT * 0.25), run_time=0.8)
+            self.wait(2.3)
+        self.wait(2.3)
+
+        # the mistake
+        warn = label("choose the hyperparameter on the test set …", 26, "#e2725b").next_to(jobs, DOWN, buff=0.7)
+        self.play(FadeIn(warn), blocks[2].animate.set_fill("#e2725b", 0.45).set_stroke("#e2725b"), run_time=1.2)
+        self.wait(3.8)
+        warn2 = label("… and the number you report is fiction", 26, "#e2725b").next_to(jobs, DOWN, buff=0.7)
+        self.play(FadeTransform(warn, warn2), run_time=1.0)
+        self.wait(4.6)
+
+
+# ---------------------------------------------------------------- 2. validation curve
+class ValidationCurve(Stage):
+    """Thirty fits, one figure. The unpenalised line turns up as capacity grows;
+    the heavily penalised one never learns anything. The minimum sits between."""
+
+    WAIT_SCALE = 1.0
+    PLAY_SCALE = 1.0
+
+    def construct(self):
+        ax = Axes(x_range=[0, 4.4, 1], y_range=[0.40, 0.62, 0.05], x_length=8.6, y_length=4.6,
+                  axis_config={"color": MUTED, "include_tip": False, "stroke_width": 1.5},
+                  y_axis_config={"decimal_number_config": {"num_decimal_places": 2}}).shift(DOWN * 0.25)
+        self.play(Create(ax), run_time=1.2)
+        xl = label("hidden neurons", 22, MUTED).next_to(ax, DOWN, buff=0.3)
+        yl = label("validation log-loss", 22, MUTED).next_to(ax, LEFT, buff=0.25).rotate(PI / 2)
+        ticks = VGroup(*[label(t, 20, MUTED).next_to(ax.c2p(i, 0.40), DOWN, buff=0.18)
+                         for i, t in enumerate(["1", "3", "5", "10", "20"])])
+        self.play(FadeIn(xl), FadeIn(yl), FadeIn(ticks), run_time=0.9)
+        self.wait(2.6)
+
+        # alpha = 0 overfits as capacity grows; alpha = 1 is flat and mediocre
+        series = [
+            (0.0,   [0.545, 0.492, 0.487, 0.512, 0.578], "#e2725b", r"\alpha = 0"),
+            (0.01,  [0.540, 0.472, 0.468, 0.474, 0.486], GOLD,      r"\alpha = 0.01"),
+            (1.0,   [0.556, 0.551, 0.550, 0.551, 0.553], SKY,       r"\alpha = 1.0"),
+        ]
+        for a, ys, colour, tex in series:
+            pts = [ax.c2p(i, v) for i, v in enumerate(ys)]
+            line = VMobject(color=colour, stroke_width=4).set_points_as_corners(pts)
+            dots = VGroup(*[Dot(p, radius=0.07, color=colour) for p in pts])
+            lab_ = MathTex(tex, color=colour, font_size=30).next_to(pts[-1], RIGHT, buff=0.2)
+            self.play(Create(line), run_time=1.6)
+            self.play(FadeIn(dots, lag_ratio=0.15), FadeIn(lab_), run_time=0.9)
+            self.wait(3.8)
+
+        best = ax.c2p(2, 0.468)
+        ring = Circle(radius=0.22, color=CREAM, stroke_width=3).move_to(best)
+        cap = label("5 neurons, decay 0.01", 26, CREAM).next_to(ring, UP, buff=0.35)
+        self.play(Create(ring), FadeIn(cap), run_time=1.2)
+        self.wait(4.3)
+        closing = label("the rising orange line is Monday's overfitting slide, drawn by your laptop",
+                        24, "#e2725b").next_to(ax, DOWN, buff=0.85)
+        self.play(FadeIn(closing), run_time=1.0)
+        self.wait(4.9)
+
+
+# ---------------------------------------------------------------- 3. why the tree wins
+class ModelRace(Stage):
+    """The scoreboard, then the reason behind it: the signal in a customer table
+    is a threshold, which a tree states in one split and a network can only
+    approach with smooth functions."""
+
+    WAIT_SCALE = 1.0
+    PLAY_SCALE = 1.0
+
+    def construct(self):
+        rows = [("Gradient boosting", 0.847, GOLD), ("Random forest", 0.839, GOLD),
+                ("Neural network", 0.821, SKY), ("Logistic", 0.818, SKY),
+                ("Pruned tree", 0.776, MUTED)]
+        head = label("AUC on the test rows", 28, CREAM).to_edge(UP, buff=0.6)
+        self.play(FadeIn(head), run_time=0.8)
+
+        x0, scale = -3.4, 9.0
+        group = VGroup()
+        for k, (name, auc, colour) in enumerate(rows):
+            y = 1.9 - k * 0.85
+            nm = label(name, 24, CREAM).move_to([x0 - 1.9, y, 0], aligned_edge=RIGHT)
+            bar = Rectangle(width=0.01, height=0.42, color=colour, fill_color=colour,
+                            fill_opacity=0.75, stroke_width=0).move_to([x0, y, 0], aligned_edge=LEFT)
+            val = DecimalNumber(0.0, num_decimal_places=3, color=colour, font_size=28)
+            val.next_to(bar, RIGHT, buff=0.25)
+            group.add(nm, bar, val)
+            self.play(FadeIn(nm), run_time=0.4)
+            self.play(bar.animate.stretch_to_fit_width((auc - 0.70) * scale).move_to([x0, y, 0], aligned_edge=LEFT),
+                      ChangeDecimalToValue(val, auc),
+                      UpdateFromFunc(val, lambda m, b=bar: m.next_to(b, RIGHT, buff=0.25)),
+                      run_time=1.3)
+            self.wait(1.4)
+        self.wait(3.5)
+        self.play(FadeOut(group), FadeOut(head), run_time=1.0)
+
+        # the reason, in one picture
+        ax = Axes(x_range=[0, 24, 6], y_range=[0, 1.05, 0.5], x_length=8.6, y_length=3.6,
+                  axis_config={"color": MUTED, "include_tip": False, "stroke_width": 1.5}).shift(DOWN * 0.3)
+        self.play(Create(ax), run_time=0.9)
+        self.play(FadeIn(label("months as a customer", 22, MUTED).next_to(ax, DOWN, buff=0.25)),
+                  FadeIn(label("P(churn)", 22, MUTED).next_to(ax, LEFT, buff=0.2)), run_time=0.7)
+
+        truth = VGroup(ax.plot(lambda x: 0.82, x_range=[0, 6], color=CREAM, stroke_width=4),
+                       ax.plot(lambda x: 0.19, x_range=[6, 24], color=CREAM, stroke_width=4),
+                       DashedLine(ax.c2p(6, 0.19), ax.c2p(6, 0.82), color=CREAM, stroke_width=2))
+        self.play(Create(truth), run_time=1.4)
+        self.play(FadeIn(label("the real signal: a threshold at six months", 24, CREAM).next_to(ax, UP, buff=0.3)),
+                  run_time=0.9)
+        self.wait(4.1)
+
+        t1 = label("a tree: one split, exactly right", 24, GOLD).next_to(ax, DOWN, buff=0.85)
+        self.play(FadeIn(t1), Flash(ax.c2p(6, 0.5), color=GOLD, line_length=0.35, num_lines=14), run_time=1.2)
+        self.wait(3.8)
+
+        smooth = ax.plot(lambda x: 0.19 + 0.63 / (1 + np.exp(1.1 * (x - 6))), color=SKY, stroke_width=4)
+        t2 = label("a network: a smooth function leaning on it", 24, SKY).next_to(ax, DOWN, buff=0.85)
+        self.play(Create(smooth), FadeTransform(t1, t2), run_time=1.8)
+        self.wait(4.6)
+        closing = label("on rows and columns, the tree is speaking the data's own language",
+                        24, GOLD).next_to(ax, DOWN, buff=1.5)
+        self.play(FadeIn(closing), run_time=1.0)
+        self.wait(4.6)
+
+
+# ---------------------------------------------------------------- 4. the scale of deep
+class DeepScale(Stage):
+    """Four million weights, sixty thousand images. The arithmetic done in front
+    of them, because the ratio is the entire argument for dropout."""
+
+    WAIT_SCALE = 1.0
+    PLAY_SCALE = 1.0
+
+    def construct(self):
+        layers = [("input", 784), ("hidden", 1024), ("hidden", 1024), ("hidden", 2048), ("output", 10)]
+        cols = VGroup()
+        for name, n in layers:
+            h = np.clip(0.0022 * n, 0.35, 4.3)
+            r = Rectangle(width=0.62, height=h, color=SKY, fill_color=SKY, fill_opacity=0.22, stroke_width=2)
+            lab_ = VGroup(label(str(n), 24, CREAM), label(name, 18, MUTED)).arrange(DOWN, buff=0.08)
+            cols.add(VGroup(r, lab_))
+        cols.arrange(RIGHT, buff=1.25).shift(UP * 0.45)
+        for col in cols:
+            col[1].next_to(col[0], DOWN, buff=0.28)
+
+        self.play(FadeIn(cols[0]), run_time=0.8)
+        for k in range(1, len(cols)):
+            links = VGroup(*[Line(cols[k - 1][0].get_right(), cols[k][0].get_left(),
+                                  stroke_width=1.0, color=MUTED, stroke_opacity=0.5).shift(UP * dy)
+                             for dy in np.linspace(-0.25, 0.25, 5)])
+            self.play(FadeIn(cols[k]), Create(links), run_time=0.9)
+            self.wait(0.9)
+        self.wait(2.3)
+
+        terms = [(784, 1024), (1024, 1024), (1024, 2048), (2048, 10)]
+        running = 0
+        shown = VGroup()
+        for a, b in terms:
+            running += a * b
+            t = MathTex(rf"{a}\times{b}", color=GOLD, font_size=30)
+            shown.add(t)
+            shown.arrange(RIGHT, buff=0.55).to_edge(DOWN, buff=1.5)
+            self.play(FadeIn(t, shift=UP * 0.15), run_time=0.8)
+            self.wait(1.3)
+        total = MathTex(r"\approx 4\ \text{million weights}", color=GOLD, font_size=42).to_edge(DOWN, buff=0.6)
+        self.play(Write(total), run_time=1.4)
+        self.wait(3.8)
+
+        # the ratio that matters
+        self.play(FadeOut(cols), FadeOut(shown), total.animate.to_edge(UP, buff=0.8), run_time=1.2)
+        w = Rectangle(width=10.0, height=0.7, color=GOLD, fill_color=GOLD, fill_opacity=0.3, stroke_width=0)
+        i = Rectangle(width=10.0 * 60000 / 4_000_000, height=0.7, color=SKY, fill_color=SKY, fill_opacity=0.45, stroke_width=0)
+        VGroup(w, i).arrange(DOWN, buff=0.9, aligned_edge=LEFT).shift(DOWN * 0.3)
+        self.play(FadeIn(w), FadeIn(label("4 000 000 weights", 24, GOLD).next_to(w, UP, buff=0.18, aligned_edge=LEFT)), run_time=1.0)
+        self.play(FadeIn(i), FadeIn(label("60 000 training images", 24, SKY).next_to(i, DOWN, buff=0.22, aligned_edge=LEFT)), run_time=1.0)
+        self.wait(4.3)
+        closing = label("sixty-six parameters per image: it will memorise unless you stop it",
+                        26, CREAM).to_edge(DOWN, buff=0.7)
+        self.play(FadeIn(closing), run_time=1.0)
+        self.wait(4.9)
+
+
+# ---------------------------------------------------------------- 5. autoencoder = PCA
+class AutoencoderPCA(Stage):
+    """Squeeze the data through one linear neuron and what comes back out is the
+    first principal component. Lecture 14, arrived at from the other side."""
+
+    WAIT_SCALE = 1.0
+    PLAY_SCALE = 1.0
+
+    def construct(self):
+        rng = np.random.default_rng(5)
+        ax = Axes(x_range=[-3.2, 3.2, 1], y_range=[-2.4, 2.4, 1], x_length=6.6, y_length=4.4,
+                  axis_config={"color": MUTED, "include_tip": False, "stroke_width": 1.4}).to_edge(LEFT, buff=0.6)
+        self.play(Create(ax), run_time=1.0)
+
+        ang, pts = 0.52, []
+        for _ in range(55):
+            t, n = rng.normal(0, 1.35), rng.normal(0, 0.42)
+            x = t * np.cos(ang) - n * np.sin(ang)
+            y = t * np.sin(ang) + n * np.cos(ang)
+            pts.append((x, y))
+        dots = VGroup(*[Dot(ax.c2p(x, y), radius=0.055, color=SKY) for x, y in pts])
+        self.play(FadeIn(dots, lag_ratio=0.03), run_time=1.4)
+        self.wait(3.6)
+
+        # the network: 2 -> 1 -> 2
+        def node(c, col):
+            return Dot(c, radius=0.14, color=col)
+        xs = VGroup(node(ORIGIN, MUTED), node(ORIGIN, MUTED)).arrange(DOWN, buff=0.9)
+        hs = VGroup(node(ORIGIN, GOLD))
+        os_ = VGroup(node(ORIGIN, CREAM), node(ORIGIN, CREAM)).arrange(DOWN, buff=0.9)
+        net = VGroup(xs, hs, os_).arrange(RIGHT, buff=1.5).to_edge(RIGHT, buff=1.0).shift(UP * 0.5)
+        wires = VGroup()
+        for a in xs:
+            wires.add(Line(a.get_center(), hs[0].get_center(), stroke_width=1.3, color=MUTED, stroke_opacity=0.6))
+        for b in os_:
+            wires.add(Line(hs[0].get_center(), b.get_center(), stroke_width=1.3, color=MUTED, stroke_opacity=0.6))
+        cap = MathTex(r"2 \rightarrow 1 \rightarrow 2", color=CREAM, font_size=34).next_to(net, UP, buff=0.5)
+        loss = label("loss = reproduce your own input", 22, MUTED).next_to(net, DOWN, buff=0.6)
+        self.play(FadeIn(net), Create(wires), FadeIn(cap), run_time=1.4)
+        self.play(FadeIn(loss), run_time=0.8)
+        self.wait(5.7)
+
+        # the bottleneck forces a direction: the one that loses least
+        axis = ax.plot(lambda x: np.tan(ang) * x, x_range=[-2.6, 2.6], color=GOLD, stroke_width=4)
+        self.play(Create(axis), run_time=1.6)
+        self.play(FadeIn(label("the direction the single neuron keeps", 22, GOLD).next_to(ax, DOWN, buff=0.3)), run_time=0.9)
+        self.wait(4.9)
+
+        proj = VGroup()
+        for x, y in pts[:26]:
+            t = x * np.cos(ang) + y * np.sin(ang)
+            proj.add(Line(ax.c2p(x, y), ax.c2p(t * np.cos(ang), t * np.sin(ang)),
+                          color=CREAM, stroke_width=1.4, stroke_opacity=0.55))
+        self.play(Create(proj, lag_ratio=0.05), run_time=2.0)
+        self.wait(5.3)
+
+        verdict = MathTex(r"\text{linear autoencoder} \;=\; \text{PCA}", color=GOLD, font_size=40)
+        verdict.next_to(net, DOWN, buff=1.4)
+        self.play(FadeOut(loss), Write(verdict), run_time=1.6)
+        self.wait(6.9)
+
+
+
+
+# ================================================================ lecture 11 — k-means
+# The six customers of the by-hand slide, in the deck's own order and numbers.
+KM_PTS = {"A": (1, 1), "B": (2, 1), "C": (1, 2), "D": (8, 8), "E": (9, 8), "F": (8, 9)}
+
+
+def km_axes(x=(0, 10, 2), y=(0, 10, 2), xl=6.0, yl=5.0):
+    return Axes(x_range=list(x), y_range=list(y), x_length=xl, y_length=yl,
+                axis_config={"color": MUTED, "include_tip": False, "stroke_width": 1.4})
+
+
+class Lloyd(Stage):
+    """Assign, update, repeat — with W falling at every half-step, because the
+    fact that it can only fall is why the algorithm is guaranteed to stop."""
+
+    WAIT_SCALE = 1.0
+    PLAY_SCALE = 1.0
+
+    def construct(self):
+        rng = np.random.default_rng(4)
+        ax = km_axes(x=(-1, 11, 3), y=(-1, 11, 3), xl=7.4, yl=5.4).to_edge(LEFT, buff=0.7)
+        self.play(Create(ax), run_time=1.0)
+
+        centres = np.array([[2.5, 2.5], [8.0, 3.0], [5.5, 8.5]])
+        pts = np.vstack([c + rng.normal(0, 1.05, size=(22, 2)) for c in centres])
+        dots = VGroup(*[Dot(ax.c2p(*p), radius=0.06, color=MUTED) for p in pts])
+        self.play(FadeIn(dots, lag_ratio=0.02), run_time=1.4)
+        self.wait(1.8)
+
+        cols = [GOLD, SKY, "#c98bb9"]
+        # a deliberately poor start, so the first update is visibly large
+        cent = np.array([[1.5, 9.5], [3.0, 8.0], [7.0, 1.5]])
+        marks = VGroup(*[Star(n=5, outer_radius=0.17, color=c, fill_opacity=1).move_to(ax.c2p(*m))
+                         for m, c in zip(cent, cols)])
+        self.play(FadeIn(marks, scale=1.5), run_time=1.0)
+        self.play(FadeIn(label("start: three centroids, chosen badly on purpose", 24, CREAM)
+                         .next_to(ax, DOWN, buff=0.3)), run_time=0.9)
+        self.wait(2.2)
+
+        wbox = VGroup(MathTex(r"W =", color=CREAM, font_size=40),
+                      DecimalNumber(0, num_decimal_places=0, color=GOLD, font_size=44)).arrange(RIGHT, buff=0.25)
+        wbox.to_edge(RIGHT, buff=1.3).shift(UP * 1.8)
+        step = label("", 26, MUTED).next_to(wbox, DOWN, buff=0.7)
+
+        def assign(c):
+            d = ((pts[:, None, :] - c[None, :, :]) ** 2).sum(-1)
+            return d.argmin(1), d.min(1).sum()
+
+        lab_, W = assign(cent)
+        wbox[1].set_value(W)
+        self.play(FadeIn(wbox), run_time=0.8)
+        self.wait(1.4)
+
+        for it in range(4):
+            # assign
+            lab_, W = assign(cent)
+            s1 = label(f"round {it + 1} · assign", 26, CREAM).next_to(wbox, DOWN, buff=0.7)
+            self.play(FadeTransform(step, s1), run_time=0.5); step = s1
+            self.play(*[d.animate.set_color(cols[l]) for d, l in zip(dots, lab_)],
+                      ChangeDecimalToValue(wbox[1], W), run_time=1.3)
+            self.wait(1.8)
+            # update
+            new = np.array([pts[lab_ == j].mean(0) if (lab_ == j).any() else cent[j] for j in range(3)])
+            _, W2 = assign(new)
+            s2 = label(f"round {it + 1} · update", 26, CREAM).next_to(wbox, DOWN, buff=0.7)
+            self.play(FadeTransform(step, s2), run_time=0.5); step = s2
+            moved = float(np.abs(new - cent).max())
+            self.play(*[m.animate.move_to(ax.c2p(*n)) for m, n in zip(marks, new)],
+                      ChangeDecimalToValue(wbox[1], W2), run_time=1.5)
+            cent = new
+            self.wait(1.6)
+            if moved < 0.06:
+                break
+
+        done = label("nothing moved: that is convergence", 26, GOLD).next_to(ax, DOWN, buff=0.3)
+        self.play(FadeIn(done), run_time=1.0)
+        self.wait(2.2)
+        note = label("W fell at every half-step — which is why it must stop", 24, MUTED)
+        note.next_to(wbox, DOWN, buff=2.2)
+        self.play(FadeIn(note), run_time=1.0)
+        self.wait(3.0)
+
+
+class KmeansByHand(Stage):
+    """The six customers of the slide, with the distances written out. The deck
+    asserts W = 5.3; here it is computed in front of them."""
+
+    WAIT_SCALE = 1.0
+    PLAY_SCALE = 1.0
+
+    def construct(self):
+        ax = km_axes(x=(0, 10, 2), y=(0, 10, 2), xl=5.6, yl=4.8).to_edge(LEFT, buff=0.8).shift(DOWN * 0.3)
+        self.play(Create(ax), run_time=0.9)
+        self.play(FadeIn(label("visits", 22, MUTED).next_to(ax, DOWN, buff=0.25)),
+                  FadeIn(label("basket", 22, MUTED).next_to(ax, LEFT, buff=0.2).rotate(PI / 2)), run_time=0.7)
+
+        dots, names = {}, VGroup()
+        for n, (x, y) in KM_PTS.items():
+            d = Dot(ax.c2p(x, y), radius=0.085, color=MUTED)
+            t = label(n, 22, CREAM).next_to(d, UR, buff=0.06)
+            dots[n] = d; names.add(t)
+            self.add(d)
+        self.play(FadeIn(VGroup(*dots.values()), lag_ratio=0.1), FadeIn(names, lag_ratio=0.1), run_time=1.4)
+        self.wait(2.8)
+
+        # start: A and D are the centroids
+        cA = Star(n=5, outer_radius=0.16, color=GOLD, fill_opacity=1).move_to(ax.c2p(1, 1))
+        cD = Star(n=5, outer_radius=0.16, color=SKY, fill_opacity=1).move_to(ax.c2p(8, 8))
+        self.play(FadeIn(cA, scale=1.6), FadeIn(cD, scale=1.6), run_time=1.0)
+        self.play(FadeIn(label("centroids start at A and D", 24, CREAM).next_to(ax, UP, buff=0.3)), run_time=0.8)
+        self.wait(2.8)
+
+        rows = VGroup().to_edge(RIGHT, buff=0.9).shift(UP * 1.9)
+        head = MathTex(r"\text{point} \quad d^2(\cdot,A) \quad d^2(\cdot,D)", color=MUTED, font_size=28)
+        head.to_edge(RIGHT, buff=0.7).shift(UP * 2.4)
+        self.play(FadeIn(head), run_time=0.7)
+
+        prev = head
+        for n in ("B", "C", "E", "F"):
+            x, y = KM_PTS[n]
+            dA = (x - 1) ** 2 + (y - 1) ** 2
+            dD = (x - 8) ** 2 + (y - 8) ** 2
+            winner = GOLD if dA < dD else SKY
+            line = MathTex(rf"{n} \quad\; {dA} \quad\; {dD}", color=CREAM, font_size=30)
+            line.next_to(prev, DOWN, buff=0.38).align_to(head, LEFT)
+            self.play(FadeIn(line, shift=RIGHT * 0.15), run_time=0.7)
+            self.play(dots[n].animate.set_color(winner), line.animate.set_color(winner), run_time=0.7)
+            self.wait(2.1)
+            prev = line
+        self.play(dots["A"].animate.set_color(GOLD), dots["D"].animate.set_color(SKY), run_time=0.6)
+        self.wait(2.2)
+
+        # update the centroids to the group means, with the arithmetic
+        m1 = MathTex(r"\bar x_1 = \tfrac{1+2+1}{3},\ \tfrac{1+1+2}{3} = (1.33,\ 1.33)", color=GOLD, font_size=28)
+        m2 = MathTex(r"\bar x_2 = \tfrac{8+9+8}{3},\ \tfrac{8+8+9}{3} = (8.33,\ 8.33)", color=SKY, font_size=28)
+        VGroup(m1, m2).arrange(DOWN, buff=0.3, aligned_edge=LEFT).next_to(prev, DOWN, buff=0.6).align_to(head, LEFT)
+        self.play(FadeIn(m1), cA.animate.move_to(ax.c2p(1.333, 1.333)), run_time=1.3)
+        self.wait(2.0)
+        self.play(FadeIn(m2), cD.animate.move_to(ax.c2p(8.333, 8.333)), run_time=1.3)
+        self.wait(2.8)
+
+        again = label("assign again: nothing changes", 24, CREAM).next_to(ax, UP, buff=0.3)
+        self.play(FadeIn(again), run_time=0.9)
+        self.wait(2.8)
+
+        w = MathTex(r"W = 2.67 + 2.67 = 5.33", color=GOLD, font_size=36)
+        w.next_to(m2, DOWN, buff=0.7).align_to(head, LEFT)
+        self.play(Write(w), run_time=1.4)
+        self.wait(4.5)
+
+
+class ScaleBreaks(Stage):
+    """Income in euros against age in years: the distance is income, and the
+    clusters are income bands. Then the same points, standardised."""
+
+    WAIT_SCALE = 1.0
+    PLAY_SCALE = 1.0
+
+    def construct(self):
+        rng = np.random.default_rng(9)
+        # two genuine groups: young-and-rich, old-and-poor — invisible to raw distance
+        g1 = np.column_stack([rng.normal(30, 4, 30), rng.normal(52000, 7000, 30)])
+        g2 = np.column_stack([rng.normal(58, 4, 30), rng.normal(46000, 7000, 30)])
+        P = np.vstack([g1, g2])
+
+        ax = Axes(x_range=[18, 72, 10], y_range=[25000, 75000, 10000], x_length=5.6, y_length=4.4,
+                  axis_config={"color": MUTED, "include_tip": False, "stroke_width": 1.4},
+                  y_axis_config={"decimal_number_config": {"num_decimal_places": 0, "group_with_commas": False}})
+        ax.to_edge(LEFT, buff=0.75).shift(DOWN * 0.25)
+        self.play(Create(ax), run_time=1.0)
+        self.play(FadeIn(label("age (years)", 20, MUTED).next_to(ax, DOWN, buff=0.28)),
+                  FadeIn(label("income (euro)", 20, MUTED).next_to(ax, LEFT, buff=0.15).rotate(PI / 2)), run_time=0.7)
+        dots = VGroup(*[Dot(ax.c2p(a, i), radius=0.055, color=MUTED) for a, i in P])
+        self.play(FadeIn(dots, lag_ratio=0.02), run_time=1.3)
+        self.wait(2.5)
+
+        d2 = MathTex(r"d^2 = (\Delta\text{age})^2 + (\Delta\text{income})^2", color=CREAM, font_size=30)
+        d2.to_edge(RIGHT, buff=1.0).shift(UP * 2.0)
+        ex = MathTex(r"= 28^2 + 6000^2", color=CREAM, font_size=30).next_to(d2, DOWN, buff=0.4)
+        ex2 = MathTex(r"= 784 + 36{,}000{,}000", color=GOLD, font_size=30).next_to(ex, DOWN, buff=0.35)
+        self.play(FadeIn(d2), run_time=0.9); self.wait(2.0)
+        self.play(FadeIn(ex), run_time=0.9); self.wait(2.2)
+        self.play(FadeIn(ex2), run_time=0.9)
+        self.wait(3.4)
+        verdict = label("age contributes nothing", 26, GOLD).next_to(ex2, DOWN, buff=0.55)
+        self.play(FadeIn(verdict), run_time=0.9)
+        self.wait(3.1)
+
+        # k-means on raw units: a horizontal cut, i.e. income bands
+        cut = DashedLine(ax.c2p(18, 49500), ax.c2p(72, 49500), color=CREAM, stroke_width=3)
+        self.play(Create(cut), run_time=1.2)
+        self.play(*[d.animate.set_color(GOLD if P[i, 1] > 49500 else SKY) for i, d in enumerate(dots)], run_time=1.2)
+        self.play(FadeIn(label("clusters = income bands, nothing more", 24, CREAM).next_to(ax, UP, buff=0.3)), run_time=0.9)
+        self.wait(4.2)
+
+        # standardised: the real groups appear
+        Z = (P - P.mean(0)) / P.std(0)
+        az = Axes(x_range=[-3, 3, 1], y_range=[-3, 3, 1], x_length=5.6, y_length=4.4,
+                  axis_config={"color": MUTED, "include_tip": False, "stroke_width": 1.4})
+        az.move_to(ax)
+        self.play(FadeOut(cut), FadeOut(VGroup(d2, ex, ex2, verdict)), run_time=0.8)
+        self.play(Transform(ax, az),
+                  *[d.animate.move_to(az.c2p(*z)).set_color(GOLD if i < 30 else SKY) for i, (d, z) in enumerate(zip(dots, Z))],
+                  run_time=2.4)
+        self.play(FadeIn(label("scale() first, and the real groups are there", 26, GOLD).next_to(az, UP, buff=0.3)), run_time=1.0)
+        self.wait(4.5)
+
+
+class ShapeBreaks(Stage):
+    """Two crescents. k-means cuts them straight down the middle and reports a
+    perfectly respectable W — the failure that never raises an error."""
+
+    WAIT_SCALE = 1.0
+    PLAY_SCALE = 1.0
+
+    def construct(self):
+        rng = np.random.default_rng(2)
+        t1 = rng.uniform(0, np.pi, 70)
+        c1 = np.column_stack([np.cos(t1) * 2.4, np.sin(t1) * 1.5]) + rng.normal(0, 0.12, (70, 2))
+        t2 = rng.uniform(0, np.pi, 70)
+        c2 = np.column_stack([np.cos(t2) * 2.4 + 1.6, -np.sin(t2) * 1.5 + 0.6]) + rng.normal(0, 0.12, (70, 2))
+
+        ax = km_axes(x=(-4, 5, 2), y=(-2.6, 2.6, 1), xl=8.4, yl=4.6).shift(UP * 0.2)
+        self.play(Create(ax), run_time=0.9)
+        d1 = VGroup(*[Dot(ax.c2p(*p), radius=0.05, color=MUTED) for p in c1])
+        d2 = VGroup(*[Dot(ax.c2p(*p), radius=0.05, color=MUTED) for p in c2])
+        self.play(FadeIn(d1, lag_ratio=0.02), FadeIn(d2, lag_ratio=0.02), run_time=1.6)
+        self.play(FadeIn(label("two crescents — any eye sees them", 26, CREAM).next_to(ax, DOWN, buff=0.35)), run_time=0.9)
+        self.wait(5.8)
+
+        # what k-means does: a straight boundary between two centroids
+        allp = np.vstack([c1, c2])
+        cent = np.array([[-1.4, 0.35], [2.4, 0.35]])
+        marks = VGroup(*[Star(n=5, outer_radius=0.16, color=c, fill_opacity=1).move_to(ax.c2p(*m))
+                         for m, c in zip(cent, (GOLD, SKY))])
+        self.play(FadeIn(marks, scale=1.4), run_time=0.9)
+        lab_ = (((allp[:, None, :] - cent[None, :, :]) ** 2).sum(-1)).argmin(1)
+        alld = VGroup(*d1, *d2)
+        self.play(*[d.animate.set_color((GOLD, SKY)[l]) for d, l in zip(alld, lab_)], run_time=1.6)
+        cut = DashedLine(ax.c2p(0.5, -2.6), ax.c2p(0.5, 2.6), color=CREAM, stroke_width=3)
+        self.play(Create(cut), run_time=1.2)
+        self.wait(5.4)
+
+        verdict = label("k-means draws straight boundaries. It cut both crescents in half.",
+                        25, GOLD).next_to(ax, DOWN, buff=0.35)
+        self.play(FadeIn(verdict), run_time=1.0)
+        self.wait(6.2)
+        w = label("and W = 96.4, which looks entirely fine in the output", 24, MUTED).next_to(verdict, DOWN, buff=0.35)
+        self.play(FadeIn(w), run_time=1.0)
+        self.wait(7.2)
+
+
+class ElbowLie(Stage):
+    """W falls for every k, all the way to zero. The curve cannot choose k; at
+    best it hints, and on real data the hint is often unreadable."""
+
+    WAIT_SCALE = 1.0
+    PLAY_SCALE = 1.0
+
+    def construct(self):
+        ax = Axes(x_range=[0, 11, 2], y_range=[0, 100, 25], x_length=8.0, y_length=4.4,
+                  axis_config={"color": MUTED, "include_tip": False, "stroke_width": 1.4}).shift(DOWN * 0.2)
+        self.play(Create(ax), run_time=1.0)
+        self.play(FadeIn(label("k", 24, MUTED).next_to(ax, DOWN, buff=0.28)),
+                  FadeIn(MathTex("W", color=MUTED, font_size=30).next_to(ax, LEFT, buff=0.22)), run_time=0.7)
+
+        ks = np.arange(1, 11)
+        W = np.array([92, 44, 22, 18.5, 16, 14, 12.2, 10.6, 9.2, 8.0])
+        pts = [ax.c2p(k, w) for k, w in zip(ks, W)]
+        curve = VMobject(color=GOLD, stroke_width=4).set_points_as_corners(pts)
+        dots = VGroup(*[Dot(p, radius=0.07, color=GOLD) for p in pts])
+        self.play(Create(curve), run_time=2.4)
+        self.play(FadeIn(dots, lag_ratio=0.1), run_time=1.0)
+        self.wait(2.8)
+
+        n1 = label("k = 1: W is the total variance", 24, CREAM).next_to(ax.c2p(1, 92), RIGHT, buff=0.4)
+        self.play(FadeIn(n1), Flash(pts[0], color=CREAM, line_length=0.3, num_lines=12), run_time=1.1)
+        self.wait(3.1)
+        n2 = label("k = n: W = 0, every point its own cluster", 24, CREAM).next_to(ax.c2p(10, 8), UR, buff=0.25)
+        self.play(FadeTransform(n1, n2), run_time=1.0)
+        self.wait(3.4)
+
+        clear = label("it falls for every k. It always votes for more.", 26, GOLD).next_to(ax, DOWN, buff=0.75)
+        self.play(FadeTransform(n2, clear), run_time=1.0)
+        self.wait(3.6)
+
+        # the elbow you are told to find — and the one you actually get
+        el = Circle(radius=0.28, color=CREAM, stroke_width=3).move_to(pts[2])
+        self.play(Create(el), FadeIn(label("the elbow, when you are lucky", 24, CREAM)
+                                     .next_to(el, UP, buff=0.3)), run_time=1.2)
+        self.wait(3.4)
+
+        smooth = np.array([92, 61, 47, 39, 33, 29, 25.5, 23, 21, 19.5])
+        pts2 = [ax.c2p(k, w) for k, w in zip(ks, smooth)]
+        curve2 = VMobject(color=SKY, stroke_width=4).set_points_as_corners(pts2)
+        self.play(FadeOut(el), FadeOut(dots), Transform(curve, curve2), run_time=2.0)
+        self.play(FadeIn(label("and this is most real data: no elbow at all", 26, SKY)
+                         .next_to(ax, DOWN, buff=1.25)), run_time=1.0)
+        self.wait(4.8)
+
+
+L11 = ["Lloyd", "KmeansByHand", "ScaleBreaks", "ShapeBreaks", "ElbowLie"]
+L18 = ["Boundary", "PerceptronByHand", "Perceptron", "GradientDescent", "Sigmoid", "HiddenLayer", "Overfitting"]
+L19 = ["DataSplit", "ValidationCurve", "ModelRace", "DeepScale", "AutoencoderPCA"]
+SCENES = L11 + L18 + L19
+

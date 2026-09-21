@@ -1,0 +1,53 @@
+---
+title: "Set 10 — k-means and customer segmentation"
+subtitle: "After lecture 11 · 3 November · about 40 minutes"
+---
+
+Data: [`customers.csv`](../materials/customers.csv) — 6 000 customers, RFM-style.
+Columns: `recency`, `frequency`, `monetary`, `tenure`, `returns`, `channel_online`.
+
+## 1 · Scale, and say why
+
+Run `kmeans(customers[, 2:7], centers = 4)` on the **raw** columns, then on
+`scale()`d columns. Compare the cluster sizes.
+
+Which variable dominates the unscaled solution, and what is it about that
+variable that lets it dominate? Answer in one sentence that names the units.
+
+## 2 · Choose k without the elbow
+
+Plot total within-cluster sum of squares for `k = 1:10`. Then compute the
+average silhouette for the same range (`cluster::silhouette`).
+
+The two curves disagree, or one of them is ambiguous. **Say which k you would
+take to a marketing director and what you would say when they ask why.** An
+elbow you cannot see is not an argument.
+
+## 3 · Stability is evidence
+
+Run k-means with `k = 4` twice, with `nstart = 1` and two different seeds. How
+many customers change cluster? Now with `nstart = 50`.
+
+What does `nstart` actually do, and why does the answer to this exercise justify
+never leaving it at 1?
+
+## 4 · Name the segments
+
+Take the `k = 4` solution. Compute the mean of each variable per cluster.
+
+Give each cluster a name a marketing team could use, and one action per segment.
+If two clusters resist being told apart, say so — that is a finding, not a
+failure.
+
+## 5 · The uncomfortable question
+
+A colleague runs the same script with `k = 7` and gets seven "meaningful"
+segments. They are not lying: the clusters exist and the means differ.
+
+Write three sentences explaining why more clusters always look meaningful, and
+what evidence would distinguish a real segment from an arithmetic one.
+
+---
+
+*This set checks: scaling, the difference between an objective that always
+improves and a statistic that does not, and the habit of defending a choice.*

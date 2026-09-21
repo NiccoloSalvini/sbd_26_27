@@ -1,0 +1,44 @@
+---
+title: "Set 11 — hierarchical clustering"
+subtitle: "After lecture 12 · 9 November · about 35 minutes"
+---
+
+Data: [`customers.csv`](../materials/customers.csv). Take a random sample of 300
+rows — a full dendrogram of 6 000 is unreadable, and that is itself part of the
+lesson.
+
+## 1 · Four linkages, four trees
+
+Build the distance matrix on scaled columns, then cluster with `complete`,
+`average`, `single` and `ward.D2`. Plot the four dendrograms.
+
+One of them produces a long thin tree with points joining one at a time. Name
+it, and explain the mechanism that causes it.
+
+## 2 · Cut, and compare
+
+Cut the Ward tree at `k = 4` with `cutree`. Cross-tabulate against the k-means
+solution from Set 10.
+
+How many customers do the two methods place together? Where they disagree, is it
+a few points on a boundary or an entire segment split differently?
+
+## 3 · The height axis means something
+
+On the Ward dendrogram, find the two largest jumps in merge height.
+
+What would cutting at each of them give you, and which cut would you defend?
+Why is a large jump evidence, and what is the argument it is *not* proof?
+
+## 4 · When the tree is the deliverable
+
+Hierarchical clustering gives you a nested structure that k-means cannot.
+
+Describe one business question where the *nesting* is the answer — where
+knowing that segment A splits into A1 and A2 changes a decision — and one where
+the flat partition is all anybody needs.
+
+---
+
+*This set checks: that linkage is a modelling choice with consequences, and that
+a dendrogram is read up the height axis, not across the leaves.*

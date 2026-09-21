@@ -1,0 +1,53 @@
+---
+title: "Set 14 — decision trees"
+subtitle: "After lecture 16 · 23 November · about 40 minutes"
+---
+
+Data: [`churn.csv`](../materials/churn.csv) — 7 000 telecom customers, about 27%
+churn. Hold out 30% of the rows before you start and do not look at them again
+until question 5.
+
+## 1 · Grow one, and read it aloud
+
+Fit `rpart(churn ~ . - id, data = train, method = "class")` and plot it.
+
+Write out the path to the leaf with the highest churn rate as an English
+sentence a retention manager would understand. Report how many training
+customers sit in that leaf.
+
+## 2 · The first split is not an accident
+
+Look at the root split.
+
+Why did the algorithm choose that variable and that threshold, out of nineteen
+columns and thousands of candidate cut points? Explain the criterion in terms of
+impurity, not in terms of "it is the most important variable".
+
+## 3 · Prune, with the table in front of you
+
+`printcp` gives cross-validated error against complexity. Choose a tree with the
+1-SE rule and one at the minimum `xerror`.
+
+How many leaves does each have? Which would you deploy, and what exactly are you
+trading?
+
+## 4 · Instability, demonstrated
+
+Refit the tree on a bootstrap sample of the training rows. Do it three times.
+
+Does the root split change? Does the second level? Write two sentences on what
+this implies for a sentence like *"the model says tenure is the key driver"*.
+
+## 5 · The number you report
+
+Now score the held-out 30% with your chosen tree: accuracy, and the confusion
+matrix.
+
+Accuracy alone is flattering here. Say why, given the churn rate, and propose
+the metric you would put in the report instead — with a reason tied to what the
+company does with a prediction.
+
+---
+
+*This set checks: that a split has a criterion, that a tree is unstable by
+construction, and that accuracy on an unbalanced target is a bad headline.*

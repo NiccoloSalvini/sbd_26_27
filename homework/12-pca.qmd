@@ -1,0 +1,52 @@
+---
+title: "Set 12 — principal components"
+subtitle: "After lecture 14 · 16 November · about 40 minutes"
+---
+
+Data: [`customers.csv`](../materials/customers.csv), the six numeric columns.
+
+## 1 · Correlation or covariance
+
+Run `prcomp` with `scale. = TRUE` and with `scale. = FALSE`. Compare the first
+loading vector in each.
+
+Without scaling, one component is almost entirely one variable. Which, and why?
+State the rule this gives you for any future PCA.
+
+## 2 · How many components
+
+Report the proportion of variance explained by each component and the cumulative
+curve.
+
+Apply three rules: 80% cumulative, eigenvalue > 1, and the scree elbow. They will
+not agree. **Choose, and write the sentence you would put under the figure in a
+report.**
+
+## 3 · Read the loadings, not the numbers
+
+Look at the loadings of PC1 and PC2.
+
+Give each a name in business language — "spending intensity", "loyalty", or
+whatever the signs actually say. Then state one thing a customer high on PC1 and
+low on PC2 looks like in plain words.
+
+## 4 · The biplot trap
+
+Plot the biplot. Two variables' arrows point in nearly the same direction.
+
+What does that mean about those variables? And what does it *not* let you
+conclude about a customer sitting near the tip of one arrow?
+
+## 5 · PCA before clustering
+
+Rerun k-means with `k = 4` on the first two components instead of the six
+columns. Compare with Set 10's clusters.
+
+Did anything improve? Cluster on components and you have thrown away the
+variance PCA discarded — argue in three sentences whether that was a good trade
+here.
+
+---
+
+*This set checks: that PCA is a choice of basis and not a cleaning step, and
+that a component means nothing until you have read its loadings.*

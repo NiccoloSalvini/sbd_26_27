@@ -1,0 +1,57 @@
+---
+title: "Set 16 — neural networks"
+subtitle: "After lecture 18 · 30 November · about 45 minutes · Python"
+---
+
+Data: [`churn.csv`](../materials/churn.csv). This set is in **Python**, like the
+lab — see the [setup page](../setup.qmd#python).
+
+## 1 · The perceptron, by hand
+
+Do not open a computer for this one.
+
+Take the AND gate from the lecture: $W = (0.3, -0.1)$, $\eta = 0.1$, threshold
+$0.25$, no bias. Run **two full epochs** on paper, writing $z$, $\hat y$, the
+error and the updated weights for each of the four rows.
+
+Then answer: what tells you the algorithm has finished, and why does it stop
+changing even though it is still looking at the same four rows?
+
+## 2 · One neuron is a model you already know
+
+Fit `MLPClassifier(hidden_layer_sizes=(1,), activation="logistic", alpha=0)` and
+a plain `LogisticRegression` on the same scaled columns.
+
+Compare the predicted probabilities, not the coefficients. How close are they,
+and why should they be close? Name the loss each one is minimising.
+
+## 3 · Capacity and the validation curve
+
+Grid over `hidden_layer_sizes` in {1, 3, 5, 10, 20, 50} and `alpha` in
+{0, 0.01, 1.0}, scoring log-loss on a validation split.
+
+Plot it. Mark the minimum. Then explain what the `alpha = 0` line does at 50
+neurons, in terms of what the network is fitting.
+
+## 4 · Scaling is not optional
+
+Refit your best configuration **without** the `StandardScaler`.
+
+Report what happens to the log-loss and to the number of iterations. Then explain
+the mechanism: what does an unscaled column do to the gradient of the weights
+attached to it?
+
+## 5 · The recommendation
+
+You now have a network, and from Set 15 a forest and a boosting model, all
+scored on the same test rows.
+
+Write the paragraph you would send to a CFO: which model goes into production,
+what it costs to run, and what you would say if they ask why the *AI* one was
+not chosen.
+
+---
+
+*This set checks: that you can run the update rule by hand, that a one-neuron
+network is a GLM, and that the interesting question is never whether a network
+can fit.*

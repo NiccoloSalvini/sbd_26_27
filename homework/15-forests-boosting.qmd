@@ -1,0 +1,53 @@
+---
+title: "Set 15 — random forests and gradient boosting"
+subtitle: "After lecture 17 · 27 November · about 45 minutes"
+---
+
+Data: [`churn.csv`](../materials/churn.csv), the same split as Set 14.
+
+## 1 · One tree, then five hundred
+
+Fit a random forest (`ranger`, `num.trees = 500`, `probability = TRUE`) and
+compare AUC against your pruned tree from last week.
+
+Where did the improvement come from? Answer with the word *variance* and explain
+what averaging does to it.
+
+## 2 · What `mtry` is for
+
+Refit with `mtry` equal to 2, to the default, and to the number of predictors.
+
+The last one has a name — it is no longer a random forest. Which method is it,
+and why does forcing every split to see every variable make the trees *more*
+alike and the ensemble *worse*?
+
+## 3 · Boosting is a different idea
+
+Fit gradient boosting (`xgboost` or `gbm`) with a small learning rate and enough
+rounds, using early stopping on a validation fold.
+
+Forests average trees fitted independently; boosting fits each tree on what is
+left over. Write three sentences that would let a colleague choose between them
+without using the words "usually better".
+
+## 4 · The overfitting each one can and cannot do
+
+Push both to an extreme: the forest to 2 000 trees, the boosting to 5 000 rounds
+with no early stopping.
+
+One of them degrades and one does not. Report which, and explain the asymmetry —
+it is the most useful single fact in this lecture.
+
+## 5 · Importance, and its price
+
+Extract variable importance from the forest, and SHAP or gain from the boosting.
+
+Do the top three agree? Then answer the question a manager will ask: *"so if we
+change that variable, does churn fall?"* The honest answer is one sentence, and
+it is not yes.
+
+---
+
+*This set checks: variance reduction versus sequential correction, why early
+stopping matters for one and not the other, and that importance is not
+causation.*

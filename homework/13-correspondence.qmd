@@ -1,0 +1,54 @@
+---
+title: "Set 13 — correspondence analysis"
+subtitle: "After lecture 15 · 17 November · about 35 minutes"
+---
+
+Data: [`brands.csv`](../materials/brands.csv) — 2 356 respondent × brand ×
+attribute associations. Build the contingency table with `table(brands$brand,
+brands$attribute)`.
+
+## 1 · Is there anything to analyse
+
+Run `chisq.test` on the table. Report the statistic, the degrees of freedom and
+the p-value.
+
+Correspondence analysis decomposes exactly this statistic. What would it mean to
+run CA on a table where the test came back at p = 0.4 — would the plot be empty,
+or would it be misleading? Answer carefully: this is the trap.
+
+## 2 · Inertia is chi-square in disguise
+
+Fit `ca::ca(tab)`. Report total inertia and the percentage on the first two
+dimensions.
+
+Verify numerically that total inertia equals $\chi^2 / n$. Then say, in one
+sentence, what "explaining 78% of the inertia" is explaining.
+
+## 3 · Read the map, with discipline
+
+Plot the symmetric map.
+
+- Name the contrast each axis captures, in the language of the attributes
+- Identify one brand that sits near the origin. What does that position mean, and
+  why is "average" a better word than "unremarkable"?
+
+## 4 · The distance you are not allowed to read
+
+A student points at brand B and attribute *Reliable*, close together, and says
+"B is reliable".
+
+Explain what is wrong with that reading on a symmetric map, and what you *can*
+legitimately say about B and *Reliable*. Then state what you would have to plot
+instead to make the student's sentence defensible.
+
+## 5 · One slide for the client
+
+Produce a single figure with a one-line title that a brand manager could act on.
+Nothing else — no table, no second panel.
+
+Write the sentence you would say while showing it.
+
+---
+
+*This set checks: that CA is a decomposition of a test you already know, and
+that reading a symmetric map row-to-column is the standard mistake.*

@@ -1,0 +1,51 @@
+---
+title: "Set 18 — dashboards, uncertainty, and the story"
+subtitle: "After lecture 21 · 11 December · about 40 minutes"
+---
+
+No dataset. Bring your churn results from Sets 14 to 17.
+
+## 1 · One figure, three audiences
+
+Take your single best figure and produce three versions: for the data team, for
+the marketing director, for the board.
+
+What changed between them? If the answer is only the font size, you have not
+done the exercise — say what you *removed* each time and why.
+
+## 2 · Put the uncertainty in
+
+Your model reports a churn probability per customer. Add an interval, or a
+calibration plot, or a decile table with observed rates — whichever is honest
+for your model.
+
+Then answer: what does a manager do differently on seeing that a prediction of
+0.7 is really "somewhere between 0.5 and 0.85"?
+
+## 3 · The number that changes a decision
+
+A dashboard with twelve tiles is a dashboard nobody reads.
+
+Choose the **one** number that should be largest on the page, and defend it
+against two rivals you rejected. Tie your choice to an action somebody takes on
+a Monday.
+
+## 4 · The sentence under the chart
+
+Write the caption for your main figure: one sentence, stating what the reader
+should conclude, not what the chart contains.
+
+"Churn by tenure" is a label. "Customers leave in the first six months, and
+almost nowhere else" is a caption. Write captions.
+
+## 5 · Defend it
+
+In pairs: present your figure in ninety seconds. Your partner asks the two
+hardest questions they can, one of which must be *"how do you know?"*
+
+Write down the question you could not answer well. That is your revision list.
+
+---
+
+*This set checks: that a chart is an argument, that uncertainty shown is
+uncertainty managed, and that the caption is the part people remember.*

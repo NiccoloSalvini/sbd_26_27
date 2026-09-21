@@ -57,6 +57,12 @@ Each step can only lower $W$, so it always stops. Usually within a dozen rounds.
 It stops at *a* minimum, not *the* minimum. Different starting points give different answers. Always run it several times and keep the best: `nstart = 25`, never `nstart = 1`.
 :::
 
+## Assign, update, repeat
+
+{{< video media/Lloyd.mp4 width="1000" height="562" >}}
+
+Deliberately bad starting centroids, so the first update is large. Watch $W$: it falls at every half-step, which is *why* the algorithm is guaranteed to stop — it cannot go back up.
+
 ## By hand: six customers, two variables
 
 ::: {.subtitle-frame}
@@ -76,6 +82,12 @@ $k = 2$. Start with centroids at **A** and **D**.
 
 $W = 2.67 + 2.67 = 5.3$. Any other split of these six gives a larger $W$ — try $\{A,B,C,D\}$ vs $\{E,F\}$ and see.
 
+## By hand, watched
+
+{{< video media/KmeansByHand.mp4 width="1000" height="562" >}}
+
+Every squared distance, both centroid updates, and $W$ at the end. Six points is small enough to check the algorithm's arithmetic against your own.
+
 ## Two things that silently break it
 
 ::: {.subtitle-frame}
@@ -84,7 +96,19 @@ Both happen in every real dataset
 
 **Scale.** Income in euros and age in years: income dominates the distance entirely, age is noise. k-means sees only geometry. **Standardise first** — `scale()` — unless you have a reason not to.
 
+## Scale: the distance is income
+
+{{< video media/ScaleBreaks.mp4 width="1000" height="562" >}}
+
+Twenty-eight years against six thousand euro, both squared: $784$ against $36$ million. Age is not weighted lightly, it is absent. The clusters you get back are income bands wearing a segmentation's clothes.
+
 **Shape.** k-means draws straight boundaries between centroids. It finds round, similar-sized blobs. Give it two crescents, or one dense core inside a diffuse halo, and it will cut them wrongly and report a fine $W$.
+
+## Shape: the failure with no error message
+
+{{< video media/ShapeBreaks.mp4 width="1000" height="562" >}}
+
+Two crescents any eye separates instantly. k-means cuts straight down the middle, splits both, and reports a $W$ that looks perfectly reasonable in the output.
 
 ::: {.callout-note}
 Neither failure produces an error message. The output looks like any other segmentation. This is why you *look at the plot* before you trust the numbers.
@@ -97,6 +121,12 @@ Neither failure produces an error message. The output looks like any other segme
 - $k = 1$: $W$ is the total variance
 - $k = n$: $W = 0$, every point is its own cluster
 - In between, $W$ falls monotonically. It **cannot** choose $k$ for you — it always votes for more.
+
+## The elbow, and the elbow you actually get
+
+{{< video media/ElbowLie.mp4 width="1000" height="562" >}}
+
+Textbook curves have a corner. Most real ones bend smoothly, and the elbow you *find* is the elbow you went looking for. Bring a second criterion — silhouette, stability, or a business constraint on how many segments a team can act on.
 
 Two honest tools:
 
