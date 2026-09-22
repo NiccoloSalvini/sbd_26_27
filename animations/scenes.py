@@ -1449,8 +1449,217 @@ class DendrogramRead(Stage):
 
 
 L12 = ["Dendrogram", "LinkageFour", "DendrogramRead"]
+
+
+# ================================================================ lecture 14 — PCA
+class Rotation(Stage):
+    """The definition, made visible: a line turns through the cloud while the
+    variance of the projection is measured at every angle. It stops where that
+    number is largest, and that is the first component — not a metaphor, a
+    maximum."""
+
+    WAIT_SCALE = 1.0
+    PLAY_SCALE = 1.0
+
+    def construct(self):
+        rng = np.random.default_rng(6)
+        ang_true = np.deg2rad(32)
+        t = rng.normal(0, 1.5, 70)
+        n = rng.normal(0, 0.55, 70)
+        P = np.column_stack([t * np.cos(ang_true) - n * np.sin(ang_true),
+                             t * np.sin(ang_true) + n * np.cos(ang_true)])
+
+        ax = Axes(x_range=[-4, 4, 2], y_range=[-3, 3, 1], x_length=6.6, y_length=4.6,
+                  axis_config={"color": MUTED, "include_tip": False, "stroke_width": 1.4})
+        ax.to_edge(LEFT, buff=0.7)
+        self.play(Create(ax), run_time=1.0)
+        dots = VGroup(*[Dot(ax.c2p(*p), radius=0.055, color=SKY) for p in P])
+        self.play(FadeIn(dots, lag_ratio=0.02), run_time=1.4)
+        self.wait(2.0)
+
+        theta = ValueTracker(np.deg2rad(-60))
+
+        def direction():
+            a = theta.get_value()
+            return np.array([np.cos(a), np.sin(a)])
+
+        line = always_redraw(lambda: Line(
+            ax.c2p(*(-3.6 * direction())), ax.c2p(*(3.6 * direction())),
+            color=CREAM, stroke_width=3.5))
+        self.play(Create(line), run_time=1.0)
+
+        def variance():
+            return float(np.var(P @ direction()))
+
+        bar_base = ax.get_right() + RIGHT * 1.9
+        scale = 1.15
+        bar = always_redraw(lambda: Rectangle(
+            width=0.75, height=max(0.02, variance() * scale),
+            color=GOLD, fill_color=GOLD, fill_opacity=0.8, stroke_width=0
+        ).move_to(bar_base + UP * (max(0.02, variance() * scale) / 2 - 1.8)))
+        num = always_redraw(lambda: DecimalNumber(
+            variance(), num_decimal_places=2, color=GOLD, font_size=36
+        ).next_to(bar, UP, buff=0.2))
+        cap = MathTex(r"\operatorname{Var}(X\phi)", color=GOLD, font_size=30).move_to(bar_base + DOWN * 2.15)
+        self.play(FadeIn(bar), FadeIn(num), FadeIn(cap), run_time=1.0)
+        self.wait(2.2)
+
+        # sweep: the number is the argument
+        self.play(theta.animate.set_value(np.deg2rad(120)), run_time=8.0, rate_func=linear)
+        self.wait(1.2)
+        self.play(theta.animate.set_value(ang_true), run_time=3.0)
+        self.wait(1.6)
+
+        pc1 = Line(ax.c2p(*(-3.6 * direction())), ax.c2p(*(3.6 * direction())), color=GOLD, stroke_width=4.5)
+        lab1 = MathTex(r"\phi_1", color=GOLD, font_size=36).next_to(ax.c2p(*(3.2 * direction())), UR, buff=0.1)
+        self.play(FadeIn(pc1), FadeIn(lab1), run_time=1.0)
+        self.play(FadeIn(label("the direction of most spread", 25, GOLD).next_to(ax, DOWN, buff=0.35)), run_time=0.9)
+        self.wait(2.8)
+
+        # the projections themselves
+        d = direction()
+        proj = VGroup(*[Line(ax.c2p(*p), ax.c2p(*((p @ d) * d)), color=CREAM,
+                             stroke_width=1.3, stroke_opacity=0.5) for p in P[:30]])
+        self.play(Create(proj, lag_ratio=0.04), run_time=2.2)
+        self.play(FadeIn(label("each point's score is where it lands", 24, CREAM)
+                         .next_to(ax, UP, buff=0.3)), run_time=0.9)
+        self.wait(2.6)
+
+        # the second component, perpendicular, with what is left
+        d2 = np.array([-d[1], d[0]])
+        pc2 = Line(ax.c2p(*(-2.2 * d2)), ax.c2p(*(2.2 * d2)), color="#c98bb9", stroke_width=4)
+        lab2 = MathTex(r"\phi_2", color="#c98bb9", font_size=34).next_to(ax.c2p(*(2.0 * d2)), UL, buff=0.1)
+        v2 = float(np.var(P @ d2))
+        self.play(FadeOut(proj), Create(pc2), FadeIn(lab2), run_time=1.6)
+        share = MathTex(rf"\frac{{\lambda_1}}{{\lambda_1+\lambda_2}} = "
+                        rf"{variance() / (variance() + v2):.0%}".replace("%", r"\%"),
+                        color=GOLD, font_size=34).next_to(ax, DOWN, buff=0.35)
+        self.play(FadeIn(share), run_time=1.0)
+        self.wait(3.2)
+        closing = label("a rotation, not a deletion — nothing is dropped yet", 25, CREAM).next_to(share, DOWN, buff=0.3)
+        self.play(FadeIn(closing), run_time=1.0)
+        self.wait(3.0)
+
+
+class PCAByHand(Stage):
+    """Height and arm span for four people, standardised. Two columns holding
+    one piece of information, and the second component with variance exactly
+    zero — the simplest case where the method can be seen entire."""
+
+    WAIT_SCALE = 1.0
+    PLAY_SCALE = 1.0
+
+    def construct(self):
+        pts = [(-1.5, -1.5), (-0.5, -0.5), (0.5, 0.5), (1.5, 1.5)]
+        ax = Axes(x_range=[-2.5, 2.5, 1], y_range=[-2.5, 2.5, 1], x_length=5.4, y_length=5.4,
+                  axis_config={"color": MUTED, "include_tip": False, "stroke_width": 1.4})
+        ax.to_edge(LEFT, buff=0.9)
+        self.play(Create(ax), run_time=0.9)
+        self.play(FadeIn(label("height (z)", 20, MUTED).next_to(ax, DOWN, buff=0.25)),
+                  FadeIn(label("arm span (z)", 20, MUTED).next_to(ax, LEFT, buff=0.2).rotate(PI / 2)), run_time=0.7)
+
+        dots = VGroup(*[Dot(ax.c2p(*p), radius=0.085, color=SKY) for p in pts])
+        self.play(FadeIn(dots, lag_ratio=0.2), run_time=1.4)
+        self.wait(3.0)
+
+        diag = ax.plot(lambda x: x, x_range=[-2.2, 2.2], color=GOLD, stroke_width=4)
+        self.play(Create(diag), run_time=1.2)
+        phi = MathTex(r"\phi_1 = (0.71,\ 0.71)", color=GOLD, font_size=34)
+        phi.to_edge(RIGHT, buff=1.2).shift(UP * 2.2)
+        self.play(FadeIn(phi), run_time=0.9)
+        self.wait(3.2)
+
+        # the four scores, one at a time
+        rows = VGroup()
+        prev = phi
+        for (x, y), s in zip(pts, (-2.1, -0.7, 0.7, 2.1)):
+            d = Dot(ax.c2p(x, y), radius=0.1, color=GOLD)
+            t = MathTex(rf"({x},\ {y}) \;\rightarrow\; {s}", color=CREAM, font_size=30)
+            t.next_to(prev, DOWN, buff=0.45).align_to(phi, LEFT)
+            self.play(FadeIn(d, scale=1.5), FadeIn(t, shift=RIGHT * 0.15), run_time=0.8)
+            self.wait(1.6)
+            rows.add(d, t); prev = t
+
+        var1 = MathTex(r"\text{variance} = 2.5", color=GOLD, font_size=34)
+        var1.next_to(prev, DOWN, buff=0.55).align_to(phi, LEFT)
+        self.play(Write(var1), run_time=1.1)
+        self.wait(3.2)
+
+        # the perpendicular one, and its zero
+        perp = ax.plot(lambda x: -x, x_range=[-2.2, 2.2], color="#c98bb9", stroke_width=4)
+        phi2 = MathTex(r"\phi_2 = (0.71,\ -0.71)", color="#c98bb9", font_size=32)
+        phi2.next_to(var1, DOWN, buff=0.6).align_to(phi, LEFT)
+        self.play(Create(perp), FadeIn(phi2), run_time=1.4)
+        self.wait(2.4)
+        zero = MathTex(r"\text{every score } = 0 \quad \text{variance} = 0", color="#c98bb9", font_size=30)
+        zero.next_to(phi2, DOWN, buff=0.35).align_to(phi, LEFT)
+        self.play(Write(zero), run_time=1.2)
+        self.wait(3.5)
+
+        closing = label("two columns, one piece of information", 27, GOLD).next_to(ax, DOWN, buff=0.45)
+        self.play(FadeIn(closing), run_time=1.1)
+        self.wait(4.1)
+
+
+class ScreeChoice(Stage):
+    """Three rules for how many components to keep, applied to one scree plot,
+    giving three different answers. Which is the point."""
+
+    WAIT_SCALE = 1.0
+    PLAY_SCALE = 1.0
+
+    def construct(self):
+        lam = np.array([3.4, 1.55, 1.08, 0.72, 0.51, 0.40, 0.20, 0.14])
+        share = lam / lam.sum()
+        cum = np.cumsum(share)
+
+        ax = Axes(x_range=[0, 9, 2], y_range=[0, 4, 1], x_length=7.4, y_length=4.0,
+                  axis_config={"color": MUTED, "include_tip": False, "stroke_width": 1.4}).shift(DOWN * 0.4)
+        self.play(Create(ax), run_time=1.0)
+        self.play(FadeIn(label("component", 22, MUTED).next_to(ax, DOWN, buff=0.28)),
+                  FadeIn(MathTex(r"\lambda", color=MUTED, font_size=30).next_to(ax, LEFT, buff=0.22)), run_time=0.7)
+
+        bars = VGroup()
+        for k, v in enumerate(lam, start=1):
+            b = Rectangle(width=0.42, height=0.001, color=SKY, fill_color=SKY, fill_opacity=0.75, stroke_width=0)
+            b.move_to(ax.c2p(k, 0), aligned_edge=DOWN)
+            bars.add(b)
+        self.add(bars)
+        self.play(*[b.animate.stretch_to_fit_height(ax.c2p(0, v)[1] - ax.c2p(0, 0)[1]).move_to(
+                        ax.c2p(k, 0), aligned_edge=DOWN)
+                    for b, (k, v) in zip(bars, enumerate(lam, start=1))], run_time=2.0)
+        self.wait(4.1)
+
+        # rule 1 — eigenvalue > 1
+        one = DashedLine(ax.c2p(0, 1), ax.c2p(9, 1), color=GOLD, stroke_width=3)
+        r1 = label("keep λ > 1  →  three components", 25, GOLD).next_to(ax, UP, buff=0.25)
+        self.play(Create(one), FadeIn(r1), run_time=1.3)
+        self.wait(5.1)
+
+        # rule 2 — 80% cumulative
+        k80 = int(np.argmax(cum >= 0.80)) + 1
+        r2 = label(f"keep 80% of the variance  →  {k80} components", 25, "#c98bb9").next_to(ax, UP, buff=0.25)
+        marks = VGroup(*[bars[i].copy().set_fill("#c98bb9", 0.85) for i in range(k80)])
+        self.play(FadeTransform(r1, r2), FadeIn(marks), run_time=1.4)
+        self.wait(5.1)
+
+        # rule 3 — the elbow
+        r3 = label("stop at the elbow  →  two components", 25, CREAM).next_to(ax, UP, buff=0.25)
+        el = Circle(radius=0.3, color=CREAM, stroke_width=3).move_to(ax.c2p(2, lam[1]))
+        self.play(FadeOut(marks), FadeTransform(r2, r3), Create(el), run_time=1.4)
+        self.wait(5.1)
+
+        closing = VGroup(
+            label("three rules, three answers, one dataset", 27, GOLD),
+            label("choose, and write the sentence that defends it", 24, MUTED),
+        ).arrange(DOWN, buff=0.25).next_to(ax, DOWN, buff=0.7)
+        self.play(FadeOut(one), FadeOut(el), FadeTransform(r3, closing), run_time=1.4)
+        self.wait(5.8)
+
+
+L14 = ["Rotation", "PCAByHand", "ScreeChoice"]
 L11 = ["Lloyd", "KmeansByHand", "ScaleBreaks", "ShapeBreaks", "ElbowLie"]
 L18 = ["Boundary", "PerceptronByHand", "Perceptron", "GradientDescent", "Sigmoid", "HiddenLayer", "Overfitting"]
 L19 = ["DataSplit", "ValidationCurve", "ModelRace", "DeepScale", "AutoencoderPCA"]
-SCENES = L11 + L12 + L18 + L19
+SCENES = L11 + L12 + L14 + L18 + L19
 

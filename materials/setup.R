@@ -54,10 +54,16 @@ local({
                 length(missing), length(pkgs), paste(missing, collapse = ", ")))
     cat("  Red text scrolling past is normal. Wait for the summary below.\n\n")
     options(install.packages.compile.from.source = "never")
+    # Use the repository this machine is already set up for. On Linux that is
+    # often a binary mirror, and taking it turns a twenty-minute compile — which
+    # then fails on a missing system library — into a one-minute download.
+    # Windows and macOS get binaries from the cloud mirror either way.
+    repo <- getOption("repos")[["CRAN"]]
+    if (is.null(repo) || !nzchar(repo) || identical(unname(repo), "@CRAN@"))
+      repo <- "https://cloud.r-project.org"
     for (p in missing) {
       tryCatch(
-        suppressWarnings(install.packages(p, quiet = TRUE,
-                                          repos = "https://cloud.r-project.org")),
+        suppressWarnings(install.packages(p, quiet = TRUE, repos = repo)),
         error = function(e) NULL
       )
     }

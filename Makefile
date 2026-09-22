@@ -31,7 +31,8 @@ SCENES_12 := Dendrogram LinkageFour DendrogramRead
 SCENES_18 := Boundary PerceptronByHand Perceptron GradientDescent Sigmoid HiddenLayer Overfitting
 # lecture 19 (the lab) ---------------------------------------------------------
 SCENES_19 := DataSplit ValidationCurve ModelRace DeepScale AutoencoderPCA
-SCENES := $(SCENES_11) $(SCENES_12) $(SCENES_18) $(SCENES_19)
+SCENES_14 := Rotation PCAByHand ScreeChoice
+SCENES := $(SCENES_11) $(SCENES_12) $(SCENES_14) $(SCENES_18) $(SCENES_19)
 clips:
 	cd animations && .venv/bin/manim -qm --disable_caching scenes.py $(SCENES)
 	mkdir -p lectures/media

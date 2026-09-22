@@ -41,7 +41,19 @@ if (v < "4.6.0") {
   pass("reports the running R version (%s)", v)
 }
 
-# 2 — the project folder is the part a student will look for
+# 2 — on a machine with a binary mirror configured, use it: compiling twenty
+#     packages from source is how a Linux setup fails on a missing system library
+if (!mock) {
+  conf <- getOption("repos")[["CRAN"]]
+  if (!is.null(conf) && nzchar(conf) && !identical(unname(conf), "@CRAN@") &&
+      !grepl("cloud.r-project.org", conf, fixed = TRUE)) {
+    if (grepl("compilation|source", txt, ignore.case = TRUE) && grepl("\\bmaking\\b", txt))
+      fail("compiled from source although %s is configured", conf)
+    pass("used the configured repository (%s)", conf)
+  }
+}
+
+# 3 — the project folder is the part a student will look for
 root <- file.path(path.expand("~"), "sbd_26_27")
 for (d in c(root, file.path(root, c("data", "scripts", "output"))))
   if (!dir.exists(d)) fail("missing folder: %s", d)
@@ -49,12 +61,12 @@ pass("project folder and data/ scripts/ output/ exist")
 if (!file.exists(file.path(root, "sbd_26_27.Rproj"))) fail("no .Rproj written")
 pass(".Rproj written")
 
-# 3 — running it twice must be harmless, as the page promises
+# 4 — running it twice must be harmless, as the page promises
 err2 <- tryCatch({ capture.output(source(src)); NULL }, error = function(e) e)
 if (!is.null(err2)) fail("second run failed: %s", conditionMessage(err2))
 pass("second run is harmless")
 
-# 4 — in a real run, the packages must actually be usable
+# 5 — in a real run, the packages must actually be usable
 if (!mock) {
   need <- c("tidyverse", "glmnet", "here", "ranger", "xgboost", "rpart", "cluster",
             "FactoMineR", "factoextra", "iml", "ISLR2", "forecast", "fable")

@@ -46,6 +46,12 @@ Each point's **score** is its coordinate along that line. Each variable's **load
 Nothing is dropped, yet. PCA is a *rotation*. Compression happens when you keep the first few components and discard the others — and you decide how many.
 :::
 
+## The direction, found by looking for it
+
+{{< video media/Rotation.mp4 width="1000" height="562" >}}
+
+A line turns through the cloud while the variance of the projection is measured at every angle. It stops where that number is largest. The first component is not a metaphor about spread — it is the argument of a maximum, and this is that maximum being found.
+
 ## The same thing, in one line
 
 For centred data $X$ ($n \times p$), the first component is the unit vector $\phi_1$ that maximises the variance of the projection:
@@ -70,6 +76,12 @@ Height and arm span, standardised, for four people: $(-1.5,-1.5), (-0.5,-0.5), (
 
 **Two variables, one component, 100% of the variance.** You had two columns and one piece of information. That is the whole method, in the simplest case it can be seen in.
 
+## By hand, watched
+
+{{< video media/PCAByHand.mp4 width="1000" height="562" >}}
+
+Four people, every score computed, and a second component whose variance is exactly zero. When two columns say the same thing, PCA says so with a number.
+
 ## Scale, again
 
 PCA is a variance-hunter. A variable measured in thousands *is* the first component, whatever it means.
@@ -90,6 +102,12 @@ Same trap as clustering, same fix, same reason. Distance and variance are both b
 - **Kaiser**: keep components with eigenvalue $> 1$ on standardised data, i.e. that explain more than one original variable's worth
 
 They disagree often. When they do, prefer the smaller number you can **interpret**. A component nobody can name is not a driver; it is noise with a label.
+
+## Three rules, three answers
+
+{{< video media/ScreeChoice.mp4 width="1000" height="562" >}}
+
+The same scree plot under the three rules you were just given. They disagree, and no amount of staring resolves it. The choice is yours to make and yours to defend — which is why the exercise asks for the sentence, not the number.
 
 ## Naming a component
 
