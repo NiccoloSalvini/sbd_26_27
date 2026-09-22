@@ -61,6 +61,16 @@ local({
     repo <- getOption("repos")[["CRAN"]]
     if (is.null(repo) || !nzchar(repo) || identical(unname(repo), "@CRAN@"))
       repo <- "https://cloud.r-project.org"
+    # On Linux a plain CRAN mirror ships sources only: every package is compiled,
+    # which takes an hour and stops on the first missing system library. Say so
+    # before it happens rather than after.
+    if (identical(Sys.info()[["sysname"]], "Linux") &&
+        !grepl("p3m.dev|packagemanager.posit.co", repo)) {
+      warn("Linux with a source-only mirror (%s).", repo)
+      warn("Packages will be compiled: slow, and it stops on a missing -dev library.")
+      warn("Faster: use Posit Package Manager for your distribution, see")
+      warn("https://p3m.dev/client/#/repos/cran/setup")
+    }
     for (p in missing) {
       tryCatch(
         suppressWarnings(install.packages(p, quiet = TRUE, repos = repo)),

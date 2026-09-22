@@ -23,7 +23,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - {os: ubuntu-latest,  r: 'release'}
+          # Linux the way a Linux user should have it: a binary mirror
+          - {os: ubuntu-latest,  r: 'release', rspm: true}
           - {os: macos-latest,   r: 'release'}   # Apple silicon runner
           - {os: windows-latest, r: 'release'}
           - {os: windows-latest, r: '4.4.1'}     # the student who never updated
@@ -34,6 +35,15 @@ jobs:
         with:
           r-version: ${{ matrix.r }}
           use-public-rspm: true
+
+      # setup-r exports RSPM but leaves options(repos) on a source mirror, which
+      # on Linux means compiling everything. Point R at the binary mirror the
+      # way a Linux user would have it configured in their own ~/.Rprofile.
+      - name: Configure the binary mirror (Linux)
+        if: matrix.rspm
+        run: |
+          echo 'options(repos = c(CRAN = "https://packagemanager.posit.co/cran/__linux__/noble/latest"))' >> ~/.Rprofile
+        shell: bash
 
       # what a student's machine does not have, and what the script must survive
       # without: no system libraries pre-installed beyond the runner's defaults
