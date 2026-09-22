@@ -1,0 +1,47 @@
+# Does the line on the Setup page work on the machines students actually own?
+#
+# Docker can only answer that for Linux. GitHub's runners are real Windows and
+# real macOS, so this is the only honest test of the other two. It runs on any
+# change to the setup script or the page that documents it, and once a week —
+# because the thing that breaks it is usually a package on CRAN, not us.
+name: setup script
+
+on:
+  push:
+    paths: [materials/setup.R, setup.qmd, .github/workflows/setup.yml, tests/setup/**]
+  pull_request:
+    paths: [materials/setup.R, setup.qmd]
+  schedule:
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+jobs:
+  three-operating-systems:
+    name: ${{ matrix.os }} · R ${{ matrix.r }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {os: ubuntu-latest,  r: 'release'}
+          - {os: macos-latest,   r: 'release'}   # Apple silicon runner
+          - {os: windows-latest, r: 'release'}
+          - {os: windows-latest, r: '4.4.1'}     # the student who never updated
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: ${{ matrix.r }}
+          use-public-rspm: true
+
+      # what a student's machine does not have, and what the script must survive
+      # without: no system libraries pre-installed beyond the runner's defaults
+      - name: Run the setup script exactly as a student would
+        run: Rscript tests/setup/assert.R materials/setup.R
+        shell: bash
+
+      - name: Say what was installed
+        if: always()
+        run: Rscript -e 'writeLines(paste(rownames(installed.packages()), collapse = " "))'
+        shell: bash
