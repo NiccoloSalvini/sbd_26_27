@@ -128,18 +128,21 @@ evidence the assignment is correct.
 
 ## Blackboard MCP
 
-`.mcp.json` points at `~/Desktop/py_projects/mcp-blackboard-ucsc` — an MCP server
-for Blackboard Learn Ultra: course content, assessments, questions, gradebook,
-grading.
+`.mcp.json` points at `~/dev/mcp-blackboard-ucsc` — an MCP server for Blackboard
+Learn Ultra: course content, assessments, questions, gradebook, grading,
+attendance, rubrics, adaptive release, groups, and the SVE grade file. Keep the
+checkout out of iCloud; a venv under `~/Desktop` gets evicted file by file and
+every import hangs.
 
-It needs a bearer token. Two ways, both documented in that repo's README:
+**Auth is settled.** The Rome administration registered the application under
+Admin → REST API Integrations on 18 September 2026, bound to Niccolò's user, so
+client credentials work: `bb_whoami` answers with his account, the token lasts an
+hour and the server renews it itself. The `BB_TOKEN` stopgap — a token lifted
+from DevTools, alive for minutes — is gone. Key and secret live in that repo's
+`.env`, never here.
 
-- **`BB_TOKEN`** — a token lifted from a logged-in Ultra session (DevTools →
-  Network → `tokeninfo`). Works now, lasts about an hour. The stopgap.
-- **client credentials** — an application registered at developer.anthology.com
-  *and* a Blackboard administrator adding its ID under Admin → REST API
-  Integrations. Niccolò is not an admin (`systemRoleIds: ["User"]`), so this
-  needs the Rome Blackboard support office. The proper arrangement.
+Getting the same thing at another institution is documented in
+`docs/access.md` there, including the message to send the administrator.
 
 Course IDs: 26/27 is `_170037_1`, 25/26 is `_158385_1`.
 
