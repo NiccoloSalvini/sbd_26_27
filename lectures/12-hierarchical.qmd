@@ -43,6 +43,12 @@ $n - 1$ merges. Record the distance at each. That record *is* the dendrogram.
 Step 2 hides the whole subject. "Closest" between two *points* is obvious. "Closest" between two *clusters* of points is a choice — the **linkage**.
 :::
 
+## Watch the tree get built
+
+{{< video media/Dendrogram.mp4 width="1000" height="562" >}}
+
+The five patients of the next slide, merged one pair at a time. Each merge is drawn at the distance that produced it — and the same tree, cut twice, answers two different questions.
+
 ## Linkage: the distance between two groups
 
 | Linkage | Distance between clusters $A$, $B$ | Produces |
@@ -53,6 +59,12 @@ Step 2 hides the whole subject. "Closest" between two *points* is obvious. "Clos
 | **Ward** | merge that increases within-SS least | k-means-like blobs; the usual default |
 
 Same data, four linkages, four different trees. **Ward** and **complete** are the two you will use; single is the one you should know exists so you recognise its chaining when you see it.
+
+## Chaining, so you recognise it
+
+{{< video media/LinkageFour.mp4 width="1000" height="562" >}}
+
+Two clear groups and seven noisy points between them. Single linkage walks across the bridge one nearest-pair at a time and returns **one** cluster. Nothing in the output says this happened.
 
 ## By hand: five patients, one variable
 
@@ -79,6 +91,12 @@ Cut the tree at height 5 → two groups: *short stays* $\{2,3,6\}$ and *long sta
 ::: {.callout-important title="Attention"}
 The most common misreading is the third bullet. Students — and consultants — see two leaves next to each other and call them similar. Look at the height they join at, nothing else.
 :::
+
+## The misreading, and the proof
+
+{{< video media/DendrogramRead.mp4 width="1000" height="562" >}}
+
+Two leaves drawn side by side, joining only at the top of the tree. Then the same tree with a subtree flipped: the neighbours change, the tree does not. Any dendrogram can be redrawn this way, which is why horizontal position can carry no information.
 
 ## [Section 2]{.section-kicker} Choosing and using {.section-slide background-color="#002f57"}
 

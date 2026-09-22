@@ -1219,8 +1219,238 @@ class ElbowLie(Stage):
         self.wait(4.8)
 
 
+
+
+# ================================================================ lecture 12 — hierarchical
+# The five patients of the by-hand slide: length of stay, in days.
+STAY = [2, 3, 6, 10, 11]
+
+
+class Dendrogram(Stage):
+    """The five patients, merged one pair at a time, with the complete-linkage
+    distance computed before each merge and the tree growing from the heights
+    that result. The deck asserts merges at 1, 1, 4 and 9; here they are earned."""
+
+    WAIT_SCALE = 1.0
+    PLAY_SCALE = 1.0
+
+    def construct(self):
+        ax = Axes(x_range=[0, 12, 2], y_range=[0, 10, 2], x_length=9.0, y_length=4.4,
+                  axis_config={"color": MUTED, "include_tip": False, "stroke_width": 1.4}).shift(DOWN * 0.5)
+        self.play(Create(ax), run_time=1.0)
+        self.play(FadeIn(label("length of stay (days)", 22, MUTED).next_to(ax, DOWN, buff=0.3)),
+                  FadeIn(label("merge height", 22, MUTED).next_to(ax, LEFT, buff=0.2).rotate(PI / 2)), run_time=0.8)
+
+        leaves = {}
+        for v in STAY:
+            d = Dot(ax.c2p(v, 0), radius=0.08, color=CREAM)
+            t = label(str(v), 22, CREAM).next_to(d, DOWN, buff=0.12)
+            leaves[v] = {"x": v, "top": 0.0, "dot": d, "members": [v]}
+            self.add(d, t)
+        self.play(FadeIn(VGroup(*[leaves[v]["dot"] for v in STAY]), lag_ratio=0.15), run_time=1.2)
+        self.wait(2.2)
+
+        clusters = [leaves[v] for v in STAY]
+        rule = MathTex(r"d(A,B) = \max_{a \in A,\, b \in B} |a-b|", color=SKY, font_size=30).to_edge(UP, buff=0.5)
+        self.play(FadeIn(rule), run_time=0.9)
+        self.wait(2.0)
+
+        def dist(a, b):
+            return max(abs(x - y) for x in a["members"] for y in b["members"])
+
+        readout = None
+        for step in range(4):
+            pairs = [(dist(a, b), i, j) for i, a in enumerate(clusters) for j, b in enumerate(clusters) if i < j]
+            h, i, j = min(pairs)
+            a, b = clusters[i], clusters[j]
+
+            shown = MathTex(rf"d(\{{{','.join(map(str, a['members']))}\}},\ "
+                            rf"\{{{','.join(map(str, b['members']))}\}}) = {h}",
+                            color=GOLD, font_size=32).next_to(rule, DOWN, buff=0.45)
+            if readout is None:
+                self.play(FadeIn(shown), run_time=0.8)
+            else:
+                self.play(FadeTransform(readout, shown), run_time=0.8)
+            readout = shown
+            self.wait(1.8)
+
+            # the merge, drawn at the height it happened
+            xa, xb = a["x"], b["x"]
+            left = Line(ax.c2p(xa, a["top"]), ax.c2p(xa, h), color=GOLD, stroke_width=3)
+            right = Line(ax.c2p(xb, b["top"]), ax.c2p(xb, h), color=GOLD, stroke_width=3)
+            top = Line(ax.c2p(xa, h), ax.c2p(xb, h), color=GOLD, stroke_width=3)
+            self.play(Create(left), Create(right), run_time=0.8)
+            self.play(Create(top), run_time=0.7)
+            hl = label(f"{h}", 20, GOLD).next_to(ax.c2p((xa + xb) / 2, h), UP, buff=0.08)
+            self.play(FadeIn(hl), run_time=0.4)
+            self.wait(1.6)
+
+            merged = {"x": (xa + xb) / 2, "top": h, "members": a["members"] + b["members"]}
+            clusters = [c for k, c in enumerate(clusters) if k not in (i, j)] + [merged]
+
+        self.wait(1.4)
+        self.play(FadeOut(readout), run_time=0.6)
+
+        # cut it twice: the same tree answers two different questions
+        for hcut, text, colour in ((5, "cut at 5: two groups", SKY), (2, "cut at 2: three groups", "#c98bb9")):
+            line = DashedLine(ax.c2p(0, hcut), ax.c2p(12, hcut), color=colour, stroke_width=3)
+            cap = label(text, 26, colour).next_to(ax, UP, buff=0.15)
+            self.play(Create(line), FadeIn(cap), run_time=1.2)
+            self.wait(2.8)
+            self.play(FadeOut(line), FadeOut(cap), run_time=0.6)
+
+        closing = label("k was never an input. You choose it by where you cut.", 26, GOLD).next_to(ax, UP, buff=0.15)
+        self.play(FadeIn(closing), run_time=1.0)
+        self.wait(3.0)
+
+
+class LinkageFour(Stage):
+    """Same points, four definitions of 'closest', four different trees — and
+    single linkage chaining, which is the one you must be able to recognise."""
+
+    WAIT_SCALE = 1.0
+    PLAY_SCALE = 1.0
+
+    def construct(self):
+        title = label("same data · four definitions of \"closest\"", 28, CREAM).to_edge(UP, buff=0.5)
+        self.play(FadeIn(title), run_time=0.8)
+
+        defs = [
+            ("complete", r"\max d(a,b)", "compact, similar sizes", GOLD),
+            ("single", r"\min d(a,b)", "long chains", "#e2725b"),
+            ("average", r"\text{mean } d(a,b)", "a compromise", SKY),
+            ("Ward", r"\min \Delta \text{within-SS}", "k-means-like blobs", "#c98bb9"),
+        ]
+        rows = VGroup()
+        for name, formula, effect, colour in defs:
+            n = label(name, 26, colour)
+            f = MathTex(formula, color=CREAM, font_size=28)
+            e = label(effect, 22, MUTED)
+            row = VGroup(n, f, e).arrange(RIGHT, buff=0.7)
+            rows.add(row)
+        rows.arrange(DOWN, buff=0.55, aligned_edge=LEFT).shift(UP * 0.4)
+        for r in rows:
+            self.play(FadeIn(r, shift=RIGHT * 0.2), run_time=0.8)
+            self.wait(2.2)
+        self.wait(2.7)
+
+        # chaining, drawn: single linkage walks along a bridge of noise
+        self.play(FadeOut(rows), FadeOut(title), run_time=0.9)
+        ax = Axes(x_range=[-1, 11, 2], y_range=[-1, 5, 2], x_length=9.0, y_length=3.6,
+                  axis_config={"color": MUTED, "include_tip": False, "stroke_width": 1.3}).shift(DOWN * 0.3)
+        self.play(Create(ax), run_time=0.8)
+        rng = np.random.default_rng(3)
+        blob1 = np.column_stack([rng.normal(1.2, 0.5, 16), rng.normal(2, 0.5, 16)])
+        blob2 = np.column_stack([rng.normal(9.0, 0.5, 16), rng.normal(2, 0.5, 16)])
+        bridge = np.column_stack([np.linspace(2.6, 7.6, 7), np.full(7, 2.0) + rng.normal(0, 0.12, 7)])
+        gb1 = VGroup(*[Dot(ax.c2p(*p), radius=0.055, color=GOLD) for p in blob1])
+        gb2 = VGroup(*[Dot(ax.c2p(*p), radius=0.055, color=SKY) for p in blob2])
+        gbr = VGroup(*[Dot(ax.c2p(*p), radius=0.05, color=MUTED) for p in bridge])
+        self.play(FadeIn(gb1), FadeIn(gb2), run_time=1.0)
+        self.wait(2.4)
+        self.play(FadeIn(gbr, lag_ratio=0.2), run_time=1.2)
+        self.play(FadeIn(label("seven noisy points between them", 24, MUTED).next_to(ax, UP, buff=0.3)), run_time=0.8)
+        self.wait(3.3)
+
+        chain = VGroup()
+        pts = sorted(np.vstack([blob1[np.argsort(blob1[:, 0])][-1:], bridge, blob2[np.argsort(blob2[:, 0])][:1]]).tolist())
+        for p, q in zip(pts, pts[1:]):
+            chain.add(Line(ax.c2p(*p), ax.c2p(*q), color="#e2725b", stroke_width=3))
+        self.play(Create(chain, lag_ratio=0.35), run_time=2.4)
+        self.play(*[d.animate.set_color("#e2725b") for d in [*gb1, *gb2, *gbr]], run_time=1.4)
+        self.play(FadeIn(label("single linkage: one cluster, via the bridge", 26, "#e2725b")
+                         .next_to(ax, DOWN, buff=0.35)), run_time=1.0)
+        self.wait(4.8)
+
+
+class DendrogramRead(Stage):
+    """The misreading the deck calls the most common one: two leaves drawn side
+    by side are not therefore similar. Proved by flipping a subtree — the tree
+    is unchanged, the neighbours are not."""
+
+    WAIT_SCALE = 1.0
+    PLAY_SCALE = 1.0
+
+    def build_tree(self, ax, order, heights):
+        """order: leaf labels left to right. heights: (i, j, h) merges by position."""
+        g = VGroup()
+        x = {lab: k + 1 for k, lab in enumerate(order)}
+        tops = {lab: 0.0 for lab in order}
+        pos = {lab: float(x[lab]) for lab in order}
+        for a, b, h in heights:
+            la = Line(ax.c2p(pos[a], tops[a]), ax.c2p(pos[a], h), color=CREAM, stroke_width=3)
+            lb = Line(ax.c2p(pos[b], tops[b]), ax.c2p(pos[b], h), color=CREAM, stroke_width=3)
+            tp = Line(ax.c2p(pos[a], h), ax.c2p(pos[b], h), color=CREAM, stroke_width=3)
+            g.add(la, lb, tp)
+            mid = (pos[a] + pos[b]) / 2
+            pos[a] = pos[b] = mid
+            tops[a] = tops[b] = h
+            for k in list(pos):
+                if pos[k] in (pos[a], pos[b]) and tops[k] == h:
+                    pos[k], tops[k] = mid, h
+        return g, x
+
+    def construct(self):
+        ax = Axes(x_range=[0, 5, 1], y_range=[0, 10, 2], x_length=7.6, y_length=4.2,
+                  axis_config={"color": MUTED, "include_tip": False, "stroke_width": 1.3}).shift(DOWN * 0.4)
+        self.play(Create(ax), run_time=0.9)
+        self.play(FadeIn(label("merge height", 22, MUTED).next_to(ax, LEFT, buff=0.2).rotate(PI / 2)), run_time=0.6)
+
+        # A,B merge low; C,D merge low; the two pairs only join at the top
+        def draw(order):
+            g = VGroup()
+            xs = {lab: k + 1 for k, lab in enumerate(order)}
+            pairs = [("A", "B", 1.2), ("C", "D", 1.5)]
+            mids = {}
+            for a, b, h in pairs:
+                xa, xb = xs[a], xs[b]
+                g.add(Line(ax.c2p(xa, 0), ax.c2p(xa, h), color=CREAM, stroke_width=3),
+                      Line(ax.c2p(xb, 0), ax.c2p(xb, h), color=CREAM, stroke_width=3),
+                      Line(ax.c2p(xa, h), ax.c2p(xb, h), color=CREAM, stroke_width=3))
+                mids[(a, b)] = ((xa + xb) / 2, h)
+            (m1, h1), (m2, h2) = mids[("A", "B")], mids[("C", "D")]
+            g.add(Line(ax.c2p(m1, h1), ax.c2p(m1, 8.4), color=GOLD, stroke_width=3),
+                  Line(ax.c2p(m2, h2), ax.c2p(m2, 8.4), color=GOLD, stroke_width=3),
+                  Line(ax.c2p(m1, 8.4), ax.c2p(m2, 8.4), color=GOLD, stroke_width=3))
+            labels = VGroup(*[label(lab, 24, CREAM).next_to(ax.c2p(xs[lab], 0), DOWN, buff=0.2) for lab in order])
+            return g, labels
+
+        tree, labs = draw(["A", "B", "C", "D"])
+        self.play(Create(tree), FadeIn(labs), run_time=2.2)
+        self.wait(3.5)
+
+        # the tempting, wrong reading
+        ring = SurroundingRectangle(VGroup(labs[1], labs[2]), color="#e2725b", buff=0.12, stroke_width=3)
+        claim = label("\"B and C sit next to each other, so they are similar\"", 26, "#e2725b")
+        claim.next_to(ax, UP, buff=0.25)
+        self.play(Create(ring), FadeIn(claim), run_time=1.3)
+        self.wait(4.3)
+
+        # what the height actually says
+        hb = DashedLine(ax.c2p(0, 8.4), ax.c2p(5, 8.4), color=GOLD, stroke_width=2)
+        note = label("they only join at height 8.4 — the top of the tree", 26, GOLD).next_to(ax, UP, buff=0.25)
+        self.play(Create(hb), FadeTransform(claim, note), run_time=1.4)
+        self.wait(4.3)
+
+        # and the proof: flip a subtree, nothing changes but the neighbours
+        flip = label("flip one subtree: the same tree, different neighbours", 26, SKY).next_to(ax, UP, buff=0.25)
+        tree2, labs2 = draw(["B", "A", "C", "D"])
+        self.play(FadeOut(ring), FadeOut(hb), FadeTransform(note, flip), run_time=1.0)
+        self.play(Transform(tree, tree2), Transform(labs, labs2), run_time=2.0)
+        self.wait(3.8)
+        tree3, labs3 = draw(["C", "D", "A", "B"])
+        self.play(Transform(tree, tree3), Transform(labs, labs3), run_time=2.0)
+        self.wait(3.8)
+
+        closing = label("horizontal position carries no information. Read the height.",
+                        27, GOLD).next_to(ax, DOWN, buff=0.55)
+        self.play(FadeIn(closing), run_time=1.2)
+        self.wait(4.9)
+
+
+L12 = ["Dendrogram", "LinkageFour", "DendrogramRead"]
 L11 = ["Lloyd", "KmeansByHand", "ScaleBreaks", "ShapeBreaks", "ElbowLie"]
 L18 = ["Boundary", "PerceptronByHand", "Perceptron", "GradientDescent", "Sigmoid", "HiddenLayer", "Overfitting"]
 L19 = ["DataSplit", "ValidationCurve", "ModelRace", "DeepScale", "AutoencoderPCA"]
-SCENES = L11 + L18 + L19
+SCENES = L11 + L12 + L18 + L19
 

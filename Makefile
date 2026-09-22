@@ -25,11 +25,13 @@ clean:
 ## render every manim scene at deck quality, remux moov-first, copy where the site serves them
 # lecture 11 ------------------------------------------------------------------
 SCENES_11 := Lloyd KmeansByHand ScaleBreaks ShapeBreaks ElbowLie
+# lecture 12 ------------------------------------------------------------------
+SCENES_12 := Dendrogram LinkageFour DendrogramRead
 # lecture 18 ------------------------------------------------------------------
 SCENES_18 := Boundary PerceptronByHand Perceptron GradientDescent Sigmoid HiddenLayer Overfitting
 # lecture 19 (the lab) ---------------------------------------------------------
 SCENES_19 := DataSplit ValidationCurve ModelRace DeepScale AutoencoderPCA
-SCENES := $(SCENES_11) $(SCENES_18) $(SCENES_19)
+SCENES := $(SCENES_11) $(SCENES_12) $(SCENES_18) $(SCENES_19)
 clips:
 	cd animations && .venv/bin/manim -qm --disable_caching scenes.py $(SCENES)
 	mkdir -p lectures/media
