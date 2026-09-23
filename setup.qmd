@@ -32,9 +32,17 @@ is, good — you will not be asked to open one.
 source("https://sbd-26-27.netlify.app/materials/setup.R")
 ```
 
-That line installs every course package you are missing, creates a project
-folder for the course, and ends with a plain-words report of what it did. It
-takes a few minutes the first time. Running it again later is harmless.
+That line checks your machine, installs every course package you are missing,
+creates a project folder for the course, and ends with a plain-words report of
+what it did. It takes a few minutes the first time. Running it again later is
+harmless.
+
+The check comes first because most setup failures are not about R at all. If
+your laptop will not let you write to the system library, which is normal on a
+managed machine, it makes you a personal one and carries on. If the network
+blocks R's downloads it says so within seconds, instead of stalling for twenty
+minutes. If your home folder sits inside OneDrive it puts the course folder
+somewhere local, because file sync and R do not get along.
 
 If the report ends with ✓ on every line, **you are done** and the rest of this
 page is reference. If a line starts with `!`, it tells you what to do next.

@@ -5,6 +5,8 @@
 #   ./run.sh              quick: script logic on three R versions, no downloads
 #   ./run.sh --full       slow: really install every package on a clean R 4.6
 #   ./run.sh --url        use the published script instead of the local file
+#   ./run.sh --hostile    the two machines that actually defeat students:
+#                         a read-only system library, and no route to CRAN
 #
 # Covers Linux only. Docker on macOS cannot run Windows containers, and macOS
 # itself cannot be containerised at all — see README.md in this folder.
@@ -12,11 +14,12 @@ set -u
 cd "$(dirname "$0")"
 REPO=$(cd ../.. && pwd)
 
-FULL=0; USE_URL=0
+FULL=0; USE_URL=0; HOSTILE=0
 for a in "$@"; do
   case "$a" in
-    --full) FULL=1 ;;
-    --url)  USE_URL=1 ;;
+    --full)    FULL=1 ;;
+    --url)     USE_URL=1 ;;
+    --hostile) HOSTILE=1 ;;
     *) echo "unknown flag: $a"; exit 2 ;;
   esac
 done
@@ -35,6 +38,36 @@ else
 fi
 
 rc=0
+
+if [ "$HOSTILE" = 1 ]; then
+  IMG=rocker/r-ver:4.6.0
+
+  echo
+  echo "======================================================================"
+  echo "  locked-down laptop: the system library belongs to an administrator"
+  echo "======================================================================"
+  # a non-root user, and a library they may not write to — which is every
+  # managed university machine
+  docker run --rm --platform linux/amd64 -e MOCK=1 -e SCENARIO=locked \
+    "${MOUNT[@]}" -v "$PWD/assert.R:/assert.R:ro" "$IMG" bash -c '
+      useradd -m student
+      chmod -R a-w /usr/local/lib/R/site-library
+      su student -c "Rscript /assert.R '"$SRC"'"'
+  [ $? -ne 0 ] && { echo ">>> locked FAILED"; rc=1; }
+
+  echo
+  echo "======================================================================"
+  echo "  a network that does not let R out: proxy, firewall, campus wifi"
+  echo "======================================================================"
+  docker run --rm --platform linux/amd64 --network none -e MOCK=1 -e SCENARIO=offline \
+    "${MOUNT[@]}" -v "$PWD/assert.R:/assert.R:ro" "$IMG" Rscript /assert.R "$SRC"
+  [ $? -ne 0 ] && { echo ">>> offline FAILED"; rc=1; }
+
+  echo
+  if [ $rc -eq 0 ]; then echo "ALL GREEN"; else echo "SOMETHING FAILED — see above"; fi
+  exit $rc
+fi
+
 for img in "${IMAGES[@]}"; do
   echo
   echo "======================================================================"

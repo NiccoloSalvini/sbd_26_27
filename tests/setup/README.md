@@ -21,7 +21,21 @@ which, in this course, are mostly Windows laptops and M-series MacBooks.
 tests/setup/run.sh            # three R versions, no downloads, ~1 minute
 tests/setup/run.sh --full     # really install all 20 packages on a clean R 4.6
 tests/setup/run.sh --url      # test the published script, not the local file
+tests/setup/run.sh --hostile  # the two machines that actually defeat students
 ```
+
+**`--hostile` is the one worth running before a lab session.** A working laptop
+is not what the setup has to survive; these two are:
+
+| Scenario | How it is built | What must happen |
+|---|---|---|
+| Locked-down laptop | non-root user, system library `chmod a-w` | notice it, create a personal library, carry on |
+| No route to CRAN | `--network none` | say so in seconds, name the proxy, offer Posit Cloud |
+
+Both were failures before they were tests. The offline path printed one line and
+silently dropped the two that told the student what to do, because every line
+went through a single `sprintf`. The test caught it; a student would have
+reported "it just says it cannot reach something".
 
 The quick mode replaces `install.packages` with a stub, so it checks the parts
 that break most often — version detection, the folder it creates, the message an
