@@ -10,8 +10,9 @@ date-format: "dddd D MMMM YYYY"
 ## Objectives
 
 - See what Module 2 adds to Module 1, and why it comes second
-- Speak both dialects: the statistician's and the machine learner's
+- Speak both dialects, the statistician's and the machine learner's — and see how they led to AI
 - State the unsupervised problem precisely — and see why it is harder to grade
+- Tell a database from a dataset, and read a dataset's size, types and scale
 - Check that R, RStudio and the course packages run on your machine
 
 ## [Section 1]{.section-kicker} Where we are {.section-slide background-color="#002f57"}
@@ -59,15 +60,63 @@ Machine learning grew up next door to statistics and renamed the furniture
 
 You will hear both in this room. They are the same objects.
 
-## What actually differs
+## Statistics, then machine learning, then AI
 
-- **Statistics** starts from a *sample* and reasons about a *population*. Standard errors, tests, confidence intervals — all of it lives there.
-- **Machine learning** starts from a *training set* and is judged on a *test set*. There is no population in the picture. The question is only: does it predict well on data it has not seen?
-- Statistics tends to *impose* the form of the relationship; machine learning tries to *learn* it, whatever it is.
-
-::: {.callout-important title="The trade you are about to make"}
-Flexibility and interpretability pull in opposite directions. The further you move toward complex models, the more you predict and the less you can explain, test, or defend. Module 2 is about spending that budget deliberately.
+::: {.subtitle-frame}
+Three generations, asked the same four questions
 :::
+
+<div class="viz">
+<svg viewBox="0 0 1120 430" style="max-width:1120px" xmlns="http://www.w3.org/2000/svg" font-family="Libre Franklin, sans-serif" font-size="18" fill="#1c2226">
+  <!-- axis -->
+  <line x1="200" y1="46" x2="1100" y2="46" stroke="#e6e9ec" stroke-width="3"/>
+  <polygon points="1100,40 1112,46 1100,52" fill="#e6e9ec"/>
+  <!-- row labels and rules -->
+  <g fill="#5f6b75" font-size="15" font-weight="600">
+    <text x="0" y="132">STARTS FROM</text>
+    <text x="0" y="212">JUDGED ON</text>
+    <text x="0" y="292">FORM OF THE</text><text x="0" y="310">RELATIONSHIP</text>
+    <text x="0" y="372">WHAT COMES OUT</text>
+  </g>
+  <g stroke="#e6e9ec" stroke-width="1">
+    <line x1="0" y1="164" x2="1110" y2="164"/>
+    <line x1="0" y1="244" x2="1110" y2="244"/>
+    <line x1="0" y1="324" x2="1110" y2="324"/>
+  </g>
+  <!-- statistics -->
+  <g>
+    <circle cx="210" cy="46" r="9" fill="#002f57"/>
+    <text x="226" y="30" fill="#5f6b75" font-size="15">from the 1900s</text>
+    <text x="200" y="88" fill="#002f57" font-size="24" font-weight="700">Statistics</text>
+    <text x="200" y="132">a <tspan font-weight="700">sample</tspan>, reasoning</text><text x="200" y="152">about a population</text>
+    <text x="200" y="212">standard errors, tests,</text><text x="200" y="232">confidence intervals</text>
+    <text x="200" y="292"><tspan font-weight="700">imposed</tspan> by you:</text><text x="200" y="312" font-style="italic">y = β₀ + β₁x + ε</text>
+    <text x="200" y="372">a coefficient</text><text x="200" y="392">you can defend</text>
+  </g>
+  <!-- machine learning -->
+  <g class="fragment" data-fragment-index="1">
+    <circle cx="510" cy="46" r="9" fill="#002f57"/>
+    <text x="526" y="30" fill="#5f6b75" font-size="15">from the 1990s</text>
+    <text x="500" y="88" fill="#002f57" font-size="24" font-weight="700">Machine learning</text>
+    <text x="500" y="132">a <tspan font-weight="700">training set</tspan> — no</text><text x="500" y="152">population in the picture</text>
+    <text x="500" y="212">a <tspan font-weight="700">test set</tspan> it has</text><text x="500" y="232">never seen</text>
+    <text x="500" y="292"><tspan font-weight="700">learned</tspan> from the data,</text><text x="500" y="312">whatever it is</text>
+    <text x="500" y="372">a prediction</text><text x="500" y="392">that holds up</text>
+  </g>
+  <!-- AI -->
+  <g class="fragment" data-fragment-index="2">
+    <circle cx="810" cy="46" r="9" fill="#b8860b"/>
+    <text x="826" y="30" fill="#5f6b75" font-size="15">from 2017</text>
+    <text x="800" y="88" fill="#b8860b" font-size="24" font-weight="700">AI · foundation models</text>
+    <text x="800" y="132">a large share of everything</text><text x="800" y="152">ever written, coded, drawn</text>
+    <text x="800" y="212">tasks <tspan font-weight="700">nobody trained it for</tspan>,</text><text x="800" y="232">and people judging the answer</text>
+    <text x="800" y="292"><tspan font-weight="700">learned once</tspan>, at scale,</text><text x="800" y="312">reused for many tasks</text>
+    <text x="800" y="372">a generated answer:</text><text x="800" y="392">text, code, images</text>
+  </g>
+</svg>
+</div>
+
+Each column is built on the one before. This module: the first two.
 
 ## Prediction is not inference — a manager's version
 
@@ -124,35 +173,74 @@ All three are *descriptive*. They organise data; they do not predict anything. T
 
 ## R is the language. RStudio is the room you use it in.
 
-- **R** is a programming language: a set of rules for writing instructions a computer runs. It comes with a bare console — a prompt, `>`, and nothing else.
-- **RStudio** is an *IDE*, an integrated development environment: a window that puts the console, your files, your plots and your variables in one place. It starts R for you and talks to it.
-- You will always open RStudio. You will never open R.
+<div class="viz">
+<svg viewBox="0 0 1460 500" style="max-width:1180px;max-height:540px" xmlns="http://www.w3.org/2000/svg" font-family="Libre Franklin, sans-serif" font-size="22" fill="#1c2226">
+  <defs><marker id="ah-r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#b8860b"/></marker></defs>
+  <text x="0" y="28" fill="#002f57" font-size="30" font-weight="700">R, alone</text>
+  <rect x="0" y="50" width="470" height="250" rx="6" fill="#1c2226"/>
+  <g font-family="JetBrains Mono, Menlo, monospace" font-size="18" fill="#e6e9ec">
+    <text x="20" y="86">R version 4.4.2 (2024-10-31)</text>
+    <text x="20" y="112">Copyright (C) 2024</text>
+    <text x="20" y="138" opacity=".55">…</text>
+    <text x="20" y="164">Type 'q()' to quit R.</text>
+    <text x="20" y="208" font-size="24" fill="#fff">&gt; <tspan fill="#b8860b">▌</tspan></text>
+  </g>
+  <text x="0" y="340" fill="#5f6b75">a language and a bare prompt:</text>
+  <text x="0" y="368" fill="#5f6b75">no files, no plots, no variables</text>
+  <text x="530" y="28" fill="#002f57" font-size="30" font-weight="700">RStudio</text>
+  <image href="media/rstudio.jpg" x="530" y="50" width="930" height="470" preserveAspectRatio="xMinYMin meet"/>
+  <rect x="530" y="50" width="930" height="470" fill="none" stroke="#e6e9ec" stroke-width="2"/>
+  <g class="fragment" data-fragment-index="1">
+    <rect x="534" y="328" width="496" height="186" fill="none" stroke="#b8860b" stroke-width="5" rx="3"/>
+    <path d="M 470 250 C 505 250, 505 420, 528 420" fill="none" stroke="#b8860b" stroke-width="5" marker-end="url(#ah-r)"/>
+    <text x="0" y="430" fill="#b8860b" font-weight="700">the same prompt, now</text>
+    <text x="0" y="458" fill="#b8860b" font-weight="700">one pane among four</text>
+  </g>
+</svg>
+</div>
 
-::: {.callout-note}
-The same distinction exists everywhere: Python is a language, VS Code or Jupyter are rooms. Learn the room once; the language is what carries over.
-:::
+RStudio is an *IDE*: it starts R and talks to it. **You will always open RStudio, never R.** [Same split elsewhere: Python is the language, VS Code the room.]{.muted}
 
 ## The four panes
 
 <div class="viz">
-<svg viewBox="0 0 640 400" xmlns="http://www.w3.org/2000/svg" font-family="Libre Franklin, sans-serif" font-size="14">
-  <rect x="10" y="10" width="620" height="380" rx="6" fill="#fff" stroke="#e6e9ec" stroke-width="2"/>
-  <rect x="20" y="20" width="300" height="200" rx="3" fill="#002f57" opacity=".92"/>
-  <text x="34" y="44" fill="#fff" font-weight="700">1 · Source</text>
-  <text x="34" y="66" fill="#fff" opacity=".85">your script, saved as a .R file</text>
-  <text x="34" y="86" fill="#fff" opacity=".85">what you keep</text>
-  <rect x="20" y="230" width="300" height="150" rx="3" fill="#002f57" opacity=".62"/>
-  <text x="34" y="254" fill="#fff" font-weight="700">2 · Console</text>
-  <text x="34" y="276" fill="#fff" opacity=".9">where R actually runs</text>
-  <text x="34" y="296" fill="#fff" opacity=".9">type, Enter, answer — then gone</text>
-  <rect x="330" y="20" width="290" height="200" rx="3" fill="#e6e9ec"/>
-  <text x="344" y="44" fill="#002f57" font-weight="700">3 · Environment</text>
-  <text x="344" y="66" fill="#1c2226">every object that exists right now</text>
-  <text x="344" y="86" fill="#1c2226">data frames, vectors, fitted models</text>
-  <rect x="330" y="230" width="290" height="150" rx="3" fill="#e6e9ec"/>
-  <text x="344" y="254" fill="#002f57" font-weight="700">4 · Files · Plots · Packages · Help</text>
-  <text x="344" y="276" fill="#1c2226">your project folder, the last plot,</text>
-  <text x="344" y="296" fill="#1c2226">and ?function when you are lost</text>
+<svg viewBox="0 0 1460 540" style="max-width:1180px;max-height:540px" xmlns="http://www.w3.org/2000/svg" font-family="Libre Franklin, sans-serif" font-size="20" fill="#1c2226">
+  <defs><marker id="ah-p" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#b8860b"/></marker></defs>
+  <image href="media/rstudio.jpg" x="230" y="20" width="1000" height="505"/>
+  <rect x="230" y="20" width="1000" height="505" fill="none" stroke="#e6e9ec" stroke-width="2"/>
+  <g class="fragment" data-fragment-index="1">
+    <rect x="235" y="65" width="534" height="249" fill="none" stroke="#b8860b" stroke-width="5" rx="3"/>
+    <path d="M 196 150 L 300 175" stroke="#b8860b" stroke-width="5" marker-end="url(#ah-p)"/>
+    <text x="0" y="120" fill="#002f57" font-size="26" font-weight="700">1 · Source</text>
+    <text x="0" y="150">your script,</text>
+    <text x="0" y="176">a .R file:</text>
+    <text x="0" y="202" fill="#5f6b75">what you keep</text>
+  </g>
+  <g class="fragment" data-fragment-index="2">
+    <rect x="235" y="319" width="534" height="201" fill="none" stroke="#b8860b" stroke-width="5" rx="3"/>
+    <path d="M 196 420 L 300 420" stroke="#b8860b" stroke-width="5" marker-end="url(#ah-p)"/>
+    <text x="0" y="390" fill="#002f57" font-size="26" font-weight="700">2 · Console</text>
+    <text x="0" y="420">where R runs</text>
+    <text x="0" y="446" fill="#5f6b75">type, Enter,</text>
+    <text x="0" y="472" fill="#5f6b75">answer, gone</text>
+  </g>
+  <g class="fragment" data-fragment-index="3">
+    <rect x="775" y="65" width="450" height="148" fill="none" stroke="#b8860b" stroke-width="5" rx="3"/>
+    <path d="M 1262 130 L 1170 135" stroke="#b8860b" stroke-width="5" marker-end="url(#ah-p)"/>
+    <text x="1262" y="100" fill="#002f57" font-size="26" font-weight="700">3 · Environment</text>
+    <text x="1262" y="130">every object</text>
+    <text x="1262" y="156">that exists now</text>
+    <text x="1262" y="182" fill="#5f6b75">here: cust</text>
+  </g>
+  <g class="fragment" data-fragment-index="4">
+    <rect x="775" y="218" width="450" height="302" fill="none" stroke="#b8860b" stroke-width="5" rx="3"/>
+    <path d="M 1262 360 L 1170 360" stroke="#b8860b" stroke-width="5" marker-end="url(#ah-p)"/>
+    <text x="1262" y="300" fill="#002f57" font-size="26" font-weight="700">4 · Files,</text>
+    <text x="1262" y="330" fill="#002f57" font-size="26" font-weight="700">Plots, Help</text>
+    <text x="1262" y="360">your folder,</text>
+    <text x="1262" y="386">the last plot,</text>
+    <text x="1262" y="412" fill="#5f6b75">?function</text>
+  </g>
 </svg>
 </div>
 
@@ -205,7 +293,113 @@ Red text in the console is R talking to you, not R breaking. A *warning* lets th
 
 Everything on this slide you will use on Tuesday. Nothing else about programming is required before then.
 
-## [Section 5]{.section-kicker} Setup check {.section-slide background-color="#002f57"}
+## [Section 5]{.section-kicker} From a database to a dataset {.section-slide background-color="#002f57"}
+
+## Database is not dataset
+
+::: {.subtitle-frame}
+Three words, three different objects
+:::
+
+| | Database | Dataset | Data frame |
+|--|--------|--------|--------|
+| **What** | linked tables, always changing | one table, one question, frozen | the dataset, inside R |
+| **Lives** | on a server, behind SQL | in a file: `customers.csv` | in the Environment pane |
+| **Example** | the bank's core system | 40 000 customers × 12 columns | `cust` |
+
+[database]{.navy} → *query* → [dataset]{.navy} → `read_csv()` → [data frame]{.navy}
+
+You never analyse a database. You analyse a dataset someone extracted from it — and **which rows, dates and columns they took was already a choice**.
+
+## How big is big data?
+
+::: {.subtitle-frame}
+A dataset can grow in two directions, and each breaks something different
+:::
+
+<div class="viz">
+<svg viewBox="0 0 1100 300" style="max-width:1000px" xmlns="http://www.w3.org/2000/svg" font-family="Libre Franklin, sans-serif" font-size="19" fill="#1c2226">
+  <rect x="40" y="20" width="70" height="260" fill="#002f57" opacity=".85"/>
+  <text x="75" y="12" text-anchor="middle" fill="#5f6b75" font-size="15">p</text>
+  <text x="22" y="155" text-anchor="middle" fill="#5f6b75" font-size="15">n</text>
+  <text x="140" y="60" fill="#002f57" font-size="24" font-weight="700">Many rows: n</text>
+  <text x="140" y="94">every card swipe, every web visit</text>
+  <text x="140" y="130" fill="#5f6b75">breaks: computation, and the p-value —</text>
+  <text x="140" y="156" fill="#5f6b75">with a million rows, everything is "significant"</text>
+  <text x="140" y="196" font-weight="600">→ judge models on a test set instead</text>
+  <rect x="620" y="110" width="440" height="70" fill="#b8860b" opacity=".85"/>
+  <text x="840" y="102" text-anchor="middle" fill="#5f6b75" font-size="15">p</text>
+  <text x="604" y="150" text-anchor="middle" fill="#5f6b75" font-size="15">n</text>
+  <text x="620" y="40" fill="#b8860b" font-size="24" font-weight="700">Many columns: p</text>
+  <text x="620" y="74">80 behaviours per customer, 20 000 genes</text>
+  <text x="620" y="216" fill="#5f6b75">breaks: distances, coefficients, and the eye —</text>
+  <text x="620" y="242" fill="#5f6b75">when p &gt; n, least squares has no single answer</text>
+  <text x="620" y="280" font-weight="600">→ fewer columns: LASSO, then PCA in week 2</text>
+</svg>
+</div>
+
+Big data usually lives in a **database**. What you analyse is still a **dataset** that fits on your laptop.
+
+## Columns have types
+
+| Type | Column | You can… |
+|---------|-----------|--------|
+| **Numeric**, continuous | `monthly_charge`, `tenure_months` | average, subtract, measure distance |
+| **Numeric**, count | `support_calls` | the same, in whole numbers |
+| **Categorical**, nominal | `region`, `payment` | count, tabulate; no mean |
+| **Categorical**, ordinal | `contract`: month-to-month < … < two-year | rank; gaps not equal |
+| **Categorical**, binary | `churn`: yes / no | the target, from week 4 |
+
+The type decides what you may do. `churn.csv`: **7 numeric, 13 categorical** columns — and clustering and PCA want numbers.
+
+## Five lines you need on Tuesday
+
+```{.r}
+library(tidyverse)                     # load the toolbox, once per session
+cust <- read_csv("customers.csv")      # file → data frame; <- means "call it"
+glimpse(cust)                          # every column, its type, first values
+cust$monetary                          # one column: data frame $ column name
+summary(cust$monetary)                 # a function applied to that column
+```
+
+```{.text}
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max.
+   41.0   267.0   568.0   796.6   991.2  9214.0
+```
+
+`<-` gives a name. `$` picks a column. `f(x)` applies a verb. That is most of the grammar.
+
+## Scale decides who is "close"
+
+Two real customers from `customers.csv`, and what their distance is made of:
+
+| Column | Customer A | Customer B | Share of the distance, **raw** | after `scale()` |
+|---|---|---|---|---|
+| `recency` (days) | 35 | 251 | 8% | **48%** |
+| `frequency` (orders) | 14 | 3 | 0% | **29%** |
+| `monetary` (€) | 607 | 1 338 | **92%** | 5% |
+| `tenure`, `returns`, `online` | … | … | 0% | 18% |
+
+Raw, the distance *is* spending: euros run into the thousands. After `scale()` every column counts in standard deviations — and A and B differ because **one bought last month, the other eight months ago**.
+
+## Train and test, on real customers
+
+```{.r}
+churn <- read_csv("churn.csv")          # 7 000 customers, 28.5% churned
+set.seed(1)                             # same random split for everyone
+idx   <- sample(nrow(churn), 0.7 * nrow(churn))
+train <- churn[idx, ]                   # 4 900 rows: the model learns here
+test  <- churn[-idx, ]                  # 2 100 rows: locked until the end
+```
+
+| | Rows | Churn rate |
+|---|---|---|
+| `train` | 4 900 | 28.7% |
+| `test` | 2 100 | 28.1% |
+
+Same customers, split at random: the two halves look alike. Any gap between the model's score on `train` and on `test` is the model, not the data. **Look at the test set once.**
+
+## [Section 6]{.section-kicker} Setup check {.section-slide background-color="#002f57"}
 
 ## Ten minutes, now, on your own machine
 
