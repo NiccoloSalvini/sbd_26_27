@@ -11,14 +11,67 @@ date-format: "dddd D MMMM YYYY"
 
 | Time | | Min |
 |---|---|---|
-| 17:00 | Where we are · two dialects, statistics to AI | 20' |
-| 17:20 | The unsupervised problem | 20' |
-| 17:40 | Finding your way around RStudio | 20' |
+| 17:00 | Who I am, who you are | 10' |
+| 17:10 | Where we are · two dialects, statistics to AI | 15' |
+| 17:25 | The unsupervised problem | 15' |
+| 17:40 | RStudio: panes, projects, the working directory | 20' |
 | 18:00 | [**Break**]{.gold} | [10']{.gold} |
-| 18:10 | From a database to a dataset | 30' |
-| 18:40 | Setup check, on your machine | 20' |
+| 18:10 | From a database to a dataset | 25' |
+| 18:35 | Setup check · Mac or Windows · already installed? | 25' |
 
 : {tbl-colwidths="[14,76,10]"}
+
+## Who I am {transition="zoom"}
+
+<div class="viz">
+<svg viewBox="0 0 1200 530" style="max-width:1120px;max-height:520px" xmlns="http://www.w3.org/2000/svg" font-family="Libre Franklin, sans-serif" font-size="26" fill="#1c2226">
+  <defs><clipPath id="face"><circle cx="140" cy="150" r="130"/></clipPath></defs>
+  <circle cx="140" cy="150" r="136" fill="#b8860b"/>
+  <image href="media/niccolo.jpg" x="10" y="0" width="260" height="347" clip-path="url(#face)" preserveAspectRatio="xMidYMin slice"/>
+  <text x="140" y="330" text-anchor="middle" fill="#002f57" font-size="26" font-weight="700">Niccolò Salvini, PhD</text>
+  <text x="140" y="362" text-anchor="middle" fill="#5f6b75" font-size="19">niccolosalvini.me</text>
+  <line x1="380" y1="40" x2="380" y2="480" stroke="#e6e9ec" stroke-width="4"/>
+  <g class="fragment" data-fragment-index="1"><circle cx="380" cy="40" r="11" fill="#002f57"/>
+    <text x="410" y="34" fill="#002f57" font-weight="700">Florence</text><text x="410" y="66">Economics</text></g>
+  <g class="fragment" data-fragment-index="2"><circle cx="380" cy="124" r="11" fill="#002f57"/>
+    <text x="410" y="118" fill="#002f57" font-weight="700">Milan</text><text x="410" y="150">MSc, Statistical and Actuarial Sciences</text></g>
+  <g class="fragment" data-fragment-index="3"><circle cx="380" cy="208" r="11" fill="#002f57"/>
+    <text x="410" y="202" fill="#002f57" font-weight="700">Rome</text><text x="410" y="234">PhD, Healthcare Data Science</text></g>
+  <g class="fragment" data-fragment-index="4"><circle cx="380" cy="292" r="11" fill="#002f57"/>
+    <text x="410" y="286" fill="#002f57" font-weight="700">Viterbo</text><text x="410" y="318">Research Fellow (PRIN), Università della Tuscia</text></g>
+  <g class="fragment" data-fragment-index="5"><circle cx="380" cy="376" r="11" fill="#002f57"/>
+    <text x="410" y="370" fill="#002f57" font-weight="700">Intuo</text><text x="410" y="402">data pipelines and AI, for companies</text></g>
+  <g class="fragment" data-fragment-index="6"><circle cx="380" cy="460" r="14" fill="#b8860b"/>
+    <text x="410" y="454" fill="#b8860b" font-weight="700">Now · here</text><text x="410" y="486">Adjunct Professor — Cattolica, and ESE in Florence</text></g>
+</svg>
+</div>
+
+[Statistics in the morning, for clients. Statistics in the evening, for you. Same subject, very different deadlines.]{.muted}
+
+## Who are you?
+
+::: {.subtitle-frame}
+Hands up if you have ever…
+:::
+
+<div class="viz">
+<svg viewBox="0 0 1200 300" style="max-width:1120px" xmlns="http://www.w3.org/2000/svg" font-family="Libre Franklin, sans-serif" fill="#1c2226" text-anchor="middle">
+  <g><rect x="0" y="10" width="280" height="260" rx="10" fill="#002f57"/>
+    <text x="140" y="140" fill="#fff" font-size="96" font-weight="700">R</text>
+    <text x="140" y="215" fill="#fff" font-size="24">written a line of R</text></g>
+  <g class="fragment"><rect x="306" y="10" width="280" height="260" rx="10" fill="#002f57" opacity=".85"/>
+    <text x="446" y="140" fill="#fff" font-size="80" font-weight="700" font-family="JetBrains Mono, monospace">.py</text>
+    <text x="446" y="215" fill="#fff" font-size="24">run some Python</text></g>
+  <g class="fragment"><rect x="612" y="10" width="280" height="260" rx="10" fill="#e6e9ec"/>
+    <text x="752" y="140" fill="#002f57" font-size="80" font-weight="700">Σ</text>
+    <text x="752" y="215" fill="#002f57" font-size="24">built an Excel pivot</text></g>
+  <g class="fragment"><rect x="918" y="10" width="280" height="260" rx="10" fill="#b8860b"/>
+    <text x="1058" y="140" fill="#fff" font-size="80" font-weight="700">✦</text>
+    <text x="1058" y="215" fill="#fff" font-size="24">asked an AI for code</text></g>
+</svg>
+</div>
+
+Nobody? Perfect, we start from zero. Everybody? Better still: this semester you find out **what that code was doing**.
 
 ## Objectives
 
@@ -26,6 +79,7 @@ date-format: "dddd D MMMM YYYY"
 - Speak both dialects, the statistician's and the machine learner's — and see how they led to AI
 - State the unsupervised problem precisely — and see why it is harder to grade
 - Tell a database from a dataset, and read a dataset's size, types and scale
+- Work inside an RStudio project, and know where R is looking for your files
 - Check that R, RStudio and the course packages run on your machine
 
 ## [Section 1]{.section-kicker} Where we are {.section-slide background-color="#002f57"}
@@ -187,27 +241,27 @@ All three are *descriptive*. They organise data; they do not predict anything. T
 ## R is the language. RStudio is the room you use it in.
 
 <div class="viz">
-<svg viewBox="0 0 1460 500" style="max-width:1180px;max-height:540px" xmlns="http://www.w3.org/2000/svg" font-family="Libre Franklin, sans-serif" font-size="22" fill="#1c2226">
+<svg viewBox="0 0 1460 560" style="max-width:1180px;max-height:540px" xmlns="http://www.w3.org/2000/svg" font-family="Libre Franklin, sans-serif" font-size="22" fill="#1c2226">
   <defs><marker id="ah-r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#b8860b"/></marker></defs>
   <text x="0" y="28" fill="#002f57" font-size="30" font-weight="700">R, alone</text>
-  <rect x="0" y="50" width="470" height="250" rx="6" fill="#1c2226"/>
-  <g font-family="JetBrains Mono, Menlo, monospace" font-size="18" fill="#e6e9ec">
-    <text x="20" y="86">R version 4.4.2 (2024-10-31)</text>
-    <text x="20" y="112">Copyright (C) 2024</text>
-    <text x="20" y="138" opacity=".55">…</text>
-    <text x="20" y="164">Type 'q()' to quit R.</text>
-    <text x="20" y="208" font-size="24" fill="#fff">&gt; <tspan fill="#b8860b">▌</tspan></text>
+  <rect x="0" y="50" width="510" height="260" rx="6" fill="#1c2226"/>
+  <g font-family="JetBrains Mono, Menlo, monospace" font-size="19" fill="#e6e9ec">
+    <text x="20" y="88">R version 4.6.1 (2026-06-24)</text>
+    <text x="20" y="116">Copyright (C) 2026</text>
+    <text x="20" y="144" opacity=".55">…</text>
+    <text x="20" y="172">Type 'q()' to quit R.</text>
+    <text x="20" y="220" font-size="26" fill="#fff">&gt; <tspan fill="#b8860b">▌</tspan></text>
   </g>
-  <text x="0" y="340" fill="#5f6b75">a language and a bare prompt:</text>
-  <text x="0" y="368" fill="#5f6b75">no files, no plots, no variables</text>
-  <text x="530" y="28" fill="#002f57" font-size="30" font-weight="700">RStudio</text>
-  <image href="media/rstudio.jpg" x="530" y="50" width="930" height="470" preserveAspectRatio="xMinYMin meet"/>
-  <rect x="530" y="50" width="930" height="470" fill="none" stroke="#e6e9ec" stroke-width="2"/>
+  <text x="0" y="350" fill="#5f6b75">a language and a bare prompt:</text>
+  <text x="0" y="378" fill="#5f6b75">no files, no plots, no variables</text>
+  <text x="600" y="28" fill="#002f57" font-size="30" font-weight="700">RStudio</text>
+  <image href="media/rstudio.jpg" x="600" y="50" width="760" height="502"/>
+  <rect x="600" y="50" width="760" height="502" fill="none" stroke="#e6e9ec" stroke-width="2"/>
   <g class="fragment" data-fragment-index="1">
-    <rect x="534" y="328" width="496" height="186" fill="none" stroke="#b8860b" stroke-width="5" rx="3"/>
-    <path d="M 470 250 C 505 250, 505 420, 528 420" fill="none" stroke="#b8860b" stroke-width="5" marker-end="url(#ah-r)"/>
-    <text x="0" y="430" fill="#b8860b" font-weight="700">the same prompt, now</text>
-    <text x="0" y="458" fill="#b8860b" font-weight="700">one pane among four</text>
+    <rect x="605" y="347" width="401" height="199" fill="none" stroke="#b8860b" stroke-width="5" rx="3"/>
+    <path d="M 510 260 C 560 260, 560 445, 600 445" fill="none" stroke="#b8860b" stroke-width="5" marker-end="url(#ah-r)"/>
+    <text x="0" y="450" fill="#b8860b" font-weight="700">the same prompt, now</text>
+    <text x="0" y="478" fill="#b8860b" font-weight="700">one pane among four</text>
   </g>
 </svg>
 </div>
@@ -217,47 +271,137 @@ RStudio is an *IDE*: it starts R and talks to it. **You will always open RStudio
 ## The four panes
 
 <div class="viz">
-<svg viewBox="0 0 1460 540" style="max-width:1180px;max-height:540px" xmlns="http://www.w3.org/2000/svg" font-family="Libre Franklin, sans-serif" font-size="20" fill="#1c2226">
-  <defs><marker id="ah-p" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#b8860b"/></marker></defs>
-  <image href="media/rstudio.jpg" x="230" y="20" width="1000" height="505"/>
-  <rect x="230" y="20" width="1000" height="505" fill="none" stroke="#e6e9ec" stroke-width="2"/>
+<svg viewBox="0 0 1460 545" style="max-width:1180px;max-height:540px" xmlns="http://www.w3.org/2000/svg" font-family="Libre Franklin, sans-serif" font-size="20" fill="#1c2226">
+  <defs><marker id="ah-rstudio" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#b8860b"/></marker></defs>
+  <image href="media/rstudio.jpg" x="340" y="20" width="780" height="515"/>
+  <rect x="340" y="20" width="780" height="515" fill="none" stroke="#e6e9ec" stroke-width="2"/>
   <g class="fragment" data-fragment-index="1">
-    <rect x="235" y="65" width="534" height="249" fill="none" stroke="#b8860b" stroke-width="5" rx="3"/>
-    <path d="M 196 150 L 300 175" stroke="#b8860b" stroke-width="5" marker-end="url(#ah-p)"/>
+    <rect x="346" y="70" width="412" height="249" fill="none" stroke="#b8860b" stroke-width="5" rx="3"/>
+    <path d="M 290 155 L 420 175" stroke="#b8860b" stroke-width="5" fill="none" marker-end="url(#ah-rstudio)"/>
     <text x="0" y="120" fill="#002f57" font-size="26" font-weight="700">1 · Source</text>
     <text x="0" y="150">your script,</text>
     <text x="0" y="176">a .R file:</text>
     <text x="0" y="202" fill="#5f6b75">what you keep</text>
   </g>
   <g class="fragment" data-fragment-index="2">
-    <rect x="235" y="319" width="534" height="201" fill="none" stroke="#b8860b" stroke-width="5" rx="3"/>
-    <path d="M 196 420 L 300 420" stroke="#b8860b" stroke-width="5" marker-end="url(#ah-p)"/>
-    <text x="0" y="390" fill="#002f57" font-size="26" font-weight="700">2 · Console</text>
-    <text x="0" y="420">where R runs</text>
-    <text x="0" y="446" fill="#5f6b75">type, Enter,</text>
-    <text x="0" y="472" fill="#5f6b75">answer, gone</text>
+    <rect x="346" y="325" width="412" height="204" fill="none" stroke="#b8860b" stroke-width="5" rx="3"/>
+    <path d="M 290 425 L 420 425" stroke="#b8860b" stroke-width="5" fill="none" marker-end="url(#ah-rstudio)"/>
+    <text x="0" y="395" fill="#002f57" font-size="26" font-weight="700">2 · Console</text>
+    <text x="0" y="425">where R runs</text>
+    <text x="0" y="451" fill="#5f6b75">type, Enter,</text>
+    <text x="0" y="477" fill="#5f6b75">answer, gone</text>
   </g>
   <g class="fragment" data-fragment-index="3">
-    <rect x="775" y="65" width="450" height="148" fill="none" stroke="#b8860b" stroke-width="5" rx="3"/>
-    <path d="M 1262 130 L 1170 135" stroke="#b8860b" stroke-width="5" marker-end="url(#ah-p)"/>
-    <text x="1262" y="100" fill="#002f57" font-size="26" font-weight="700">3 · Environment</text>
-    <text x="1262" y="130">every object</text>
-    <text x="1262" y="156">that exists now</text>
-    <text x="1262" y="182" fill="#5f6b75">here: cust</text>
+    <rect x="764" y="70" width="350" height="147" fill="none" stroke="#b8860b" stroke-width="5" rx="3"/>
+    <path d="M 1155 130 L 1060 140" stroke="#b8860b" stroke-width="5" fill="none" marker-end="url(#ah-rstudio)"/>
+    <text x="1160" y="100" fill="#002f57" font-size="26" font-weight="700">3 · Environment</text>
+    <text x="1160" y="130">every object</text>
+    <text x="1160" y="156">that exists now</text>
+    <text x="1160" y="182" fill="#5f6b75">here: cust</text>
   </g>
   <g class="fragment" data-fragment-index="4">
-    <rect x="775" y="218" width="450" height="302" fill="none" stroke="#b8860b" stroke-width="5" rx="3"/>
-    <path d="M 1262 360 L 1170 360" stroke="#b8860b" stroke-width="5" marker-end="url(#ah-p)"/>
-    <text x="1262" y="300" fill="#002f57" font-size="26" font-weight="700">4 · Files,</text>
-    <text x="1262" y="330" fill="#002f57" font-size="26" font-weight="700">Plots, Help</text>
-    <text x="1262" y="360">your folder,</text>
-    <text x="1262" y="386">the last plot,</text>
-    <text x="1262" y="412" fill="#5f6b75">?function</text>
+    <rect x="764" y="222" width="350" height="307" fill="none" stroke="#b8860b" stroke-width="5" rx="3"/>
+    <path d="M 1155 370 L 1060 370" stroke="#b8860b" stroke-width="5" fill="none" marker-end="url(#ah-rstudio)"/>
+    <text x="1160" y="310" fill="#002f57" font-size="26" font-weight="700">4 · Files,</text>
+    <text x="1160" y="340" fill="#002f57" font-size="26" font-weight="700">Plots, Help</text>
+    <text x="1160" y="370">your folder,</text>
+    <text x="1160" y="396">the last plot,</text>
+    <text x="1160" y="422" fill="#5f6b75">?function</text>
   </g>
 </svg>
 </div>
 
 You will spend the semester in **1** and read the results in **2**. Panes 3 and 4 are for checking.
+
+## Where is R looking?
+
+::: {.subtitle-frame}
+The **working directory**: the one folder R reads from and writes to, unless told otherwise
+:::
+
+<div class="viz">
+<svg viewBox="0 0 1200 430" style="max-width:1120px" xmlns="http://www.w3.org/2000/svg" font-family="JetBrains Mono, Menlo, monospace" font-size="20" fill="#1c2226">
+  <text x="0" y="40" font-weight="700">🏠 Home</text>
+  <text x="0" y="80">├─ Desktop/</text>
+  <text x="0" y="120">├─ Downloads/</text>
+  <text x="0" y="160" fill="#5f6b75">│</text><text x="36" y="160" fill="#5f6b75">└─ customers (3).csv</text>
+  <text x="0" y="200" font-weight="700" fill="#002f57">└─ sbd_26_27/</text>
+  <text x="36" y="240">├─ sbd_26_27.Rproj</text>
+  <text x="36" y="280">├─ data/</text>
+  <text x="36" y="320">│</text><text x="72" y="320">└─ customers.csv</text>
+  <text x="36" y="360">├─ scripts/</text>
+  <text x="36" y="400">└─ output/</text>
+  <g font-family="Libre Franklin, sans-serif">
+    <path d="M 180 34 l 26 -12 v 24 z" fill="#b23b3b"/>
+    <text x="214" y="42" fill="#b23b3b" font-size="20" font-weight="700">R is here, by default</text>
+    <rect x="560" y="10" width="640" height="170" rx="6" fill="#b23b3b" opacity=".08"/>
+    <text x="580" y="46" font-size="21" font-weight="700" fill="#b23b3b">✗ Without a project</text>
+    <text x="580" y="82" font-size="19" font-family="JetBrains Mono, monospace">read_csv("customers.csv")</text>
+    <text x="580" y="118" font-size="18" fill="#b23b3b">'customers.csv' does not exist in</text>
+    <text x="580" y="142" font-size="18" fill="#b23b3b">current working directory: '/Users/anna'.</text>
+  </g>
+  <g class="fragment" font-family="Libre Franklin, sans-serif">
+    <path d="M 250 194 l 26 -12 v 24 z" fill="#2e7d4f"/>
+    <text x="284" y="202" fill="#2e7d4f" font-size="20" font-weight="700">R is here, in the project</text>
+    <rect x="560" y="210" width="640" height="190" rx="6" fill="#2e7d4f" opacity=".08"/>
+    <text x="580" y="246" font-size="21" font-weight="700" fill="#2e7d4f">✓ Inside the project</text>
+    <text x="580" y="282" font-size="19" font-family="JetBrains Mono, monospace">read_csv(here("data", "customers.csv"))</text>
+    <text x="580" y="318" font-size="18" fill="#2e7d4f">6 000 rows. And the same line works on</text>
+    <text x="580" y="342" font-size="18" fill="#2e7d4f">your laptop, mine, and the exam machines.</text>
+  </g>
+</svg>
+</div>
+
+`getwd()` tells you where R is looking. Most "file not found" errors in this course are this slide.
+
+## A project is a folder R opens in
+
+<div class="viz">
+<svg viewBox="0 0 1460 545" style="max-width:1180px;max-height:540px" xmlns="http://www.w3.org/2000/svg" font-family="Libre Franklin, sans-serif" font-size="20" fill="#1c2226">
+  <defs><marker id="ah-rstudio-project" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#b8860b"/></marker></defs>
+  <image href="media/rstudio-project.jpg" x="340" y="20" width="780" height="515"/>
+  <rect x="340" y="20" width="780" height="515" fill="none" stroke="#e6e9ec" stroke-width="2"/>
+  <g class="fragment" data-fragment-index="1">
+    <rect x="1040" y="44" width="78" height="20" fill="none" stroke="#b8860b" stroke-width="5" rx="3"/>
+    <path d="M 1155 70 L 1124 58" stroke="#b8860b" stroke-width="5" fill="none" marker-end="url(#ah-rstudio-project)"/>
+    <text x="1160" y="70" fill="#002f57" font-size="26" font-weight="700">1 · Which</text>
+    <text x="1160" y="100" fill="#002f57" font-size="26" font-weight="700">project</text>
+    <text x="1160" y="128">its name, top</text>
+    <text x="1160" y="154">right: click to</text>
+    <text x="1160" y="180" fill="#5f6b75">switch or close</text>
+  </g>
+  <g class="fragment" data-fragment-index="2">
+    <rect x="374" y="340" width="116" height="18" fill="none" stroke="#b8860b" stroke-width="5" rx="3"/>
+    <path d="M 290 352 L 368 352" stroke="#b8860b" stroke-width="5" fill="none" marker-end="url(#ah-rstudio-project)"/>
+    <text x="0" y="300" fill="#002f57" font-size="26" font-weight="700">2 · Working</text>
+    <text x="0" y="330" fill="#002f57" font-size="26" font-weight="700">directory</text>
+    <text x="0" y="360">= the project</text>
+    <text x="0" y="386">folder, set for</text>
+    <text x="0" y="412" fill="#5f6b75">you. No setwd()</text>
+  </g>
+  <g class="fragment" data-fragment-index="3">
+    <rect x="769" y="256" width="345" height="110" fill="none" stroke="#b8860b" stroke-width="5" rx="3"/>
+    <path d="M 1155 300 L 1120 300" stroke="#b8860b" stroke-width="5" fill="none" marker-end="url(#ah-rstudio-project)"/>
+    <text x="1160" y="260" fill="#002f57" font-size="26" font-weight="700">3 · Your folders</text>
+    <text x="1160" y="290">data, scripts,</text>
+    <text x="1160" y="316">output: the</text>
+    <text x="1160" y="342" fill="#5f6b75">same on every</text>
+    <text x="1160" y="368" fill="#5f6b75">machine</text>
+  </g>
+</svg>
+</div>
+
+**Double-click `sbd_26_27.Rproj`** and RStudio opens there — or `File ▸ Open Project`. The setup script already made yours.
+
+## Three habits, from today
+
+| Do | Don't |
+|---|---|
+| One project per course: `sbd_26_27` | Loose scripts on the Desktop |
+| Data in `data/`, read with `here("data", "file.csv")` | `setwd("C:/Users/anna/Desktop/...")` — a path that exists on one computer on Earth |
+| Open the project first, then the script | Open a `.R` file by double-clicking it: R starts in the wrong folder |
+
+[The exam machines are not your laptop. A project plus `here()` is why your script will still run there.]{.muted}
 
 ## Script or console?
 
@@ -434,8 +578,94 @@ If a plot appears, you are ready for Tuesday. If not, that is what the next ten 
 Bring a laptop that runs the line above. Nobody discovers a missing package in a lab; they discover it tonight.
 :::
 
+## Already installed? Check, don't reinstall
+
+```{.r}
+R.version.string          # needs "R version 4.6" or newer
+```
+
+- **R older than 4.6?** Install the new R from CRAN over it. Your scripts survive; your packages do not — the next line puts them back
+- **RStudio**: `Help ▸ Check for Updates`. It updates separately from R: updating one never updates the other
+- **Then the same line as everyone else.** It installs only what is missing and changes nothing that works — running it twice is harmless:
+
+```{.r}
+source("https://sbd-26-27.netlify.app/materials/setup.R")
+```
+
+## Mac or Windows: what actually differs
+
+| | Mac | Windows |
+|---|---|---|
+| Shortcuts | `⌘` | `Ctrl` |
+| Settings | `RStudio ▸ Settings` | `Tools ▸ Global Options` |
+| Installer trap | **arm64** (M1 on) vs **Intel**: pick right | needs **admin** rights |
+| Paths | `/Users/anna/...` | `C:\Users\...`: backslashes break R — use `here()` |
+| Quiet killer | iCloud *Desktop* sync | **OneDrive**: setup keeps you out of it |
+
+All the rest is identical. Details and screenshots: the [Setup page](../setup.qmd) — **reread it at home, calmly**.
+
 ## Reading
 
 - **ISLR** chapter 12, §12.1–12.2 — unsupervised learning, PCA
 - **Provost & Fawcett** chapter 6 — *similarity, neighbours, clusters*: read this one for the business framing
 - Optional: ISLR chapter 2, §2.1.4 — supervised vs unsupervised, two pages
+
+## [Appendix]{.section-kicker} Make RStudio yours {.section-slide background-color="#002f57"}
+
+## Dark, rainbow, piped
+
+<div class="viz">
+<svg viewBox="0 0 1460 545" style="max-width:1180px;max-height:540px" xmlns="http://www.w3.org/2000/svg" font-family="Libre Franklin, sans-serif" font-size="20" fill="#1c2226">
+  <defs><marker id="ah-d" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#b8860b"/></marker></defs>
+  <image href="media/rstudio-dark.jpg" x="340" y="20" width="780" height="515"/>
+  <g class="fragment" data-fragment-index="1">
+    <path d="M 290 130 L 380 110" stroke="#b8860b" stroke-width="5" marker-end="url(#ah-d)"/>
+    <text x="0" y="120" fill="#002f57" font-size="26" font-weight="700">Theme</text>
+    <text x="0" y="148">Dracula; or Cobalt,</text><text x="0" y="174" fill="#5f6b75">Tomorrow Night…</text>
+  </g>
+  <g class="fragment" data-fragment-index="2">
+    <rect x="440" y="168" width="290" height="22" fill="none" stroke="#b8860b" stroke-width="4" rx="3"/>
+    <path d="M 290 260 L 440 185" stroke="#b8860b" stroke-width="5" marker-end="url(#ah-d)"/>
+    <text x="0" y="250" fill="#002f57" font-size="26" font-weight="700">Rainbow</text>
+    <text x="0" y="278" fill="#002f57" font-size="26" font-weight="700">parentheses</text>
+    <text x="0" y="306">every ( matches</text><text x="0" y="332" fill="#5f6b75">its ) by colour</text>
+  </g>
+  <g class="fragment" data-fragment-index="3">
+    <rect x="383" y="218" width="262" height="56" fill="none" stroke="#b8860b" stroke-width="4" rx="3"/>
+    <path d="M 1155 246 L 650 246" stroke="#b8860b" stroke-width="5" marker-end="url(#ah-d)"/>
+    <text x="1160" y="210" fill="#002f57" font-size="26" font-weight="700">Native pipe |&gt;</text>
+    <text x="1160" y="238">"and then":</text><text x="1160" y="264">read it top</text><text x="1160" y="290" fill="#5f6b75">to bottom</text>
+  </g>
+</svg>
+</div>
+
+## Where the switches are
+
+:::: {.columns}
+::: {.column width="52%"}
+![](../images/setup/03_rstudio_preferences_appearance.png){width="100%"}
+:::
+::: {.column width="48%"}
+`Tools ▸ Global Options` · Mac: `RStudio ▸ Settings`
+
+- **Appearance**: theme, font, zoom. On the desktop app, install *Fira Code* or *JetBrains Mono* for ligatures: `|>` and `<-` become single glyphs
+- **Code ▸ Display**: rainbow parentheses, indent guides, highlight function calls
+- **Code ▸ Editing**: *Use native pipe operator* — then `⌘/Ctrl ⇧ M` types `|>`
+- **Pane Layout**: console on the right, if you prefer a wide editor
+:::
+::::
+
+## Shortcuts that make you look fluent
+
+| Keys (Windows: `Ctrl` for `⌘`) | Does |
+|---|---|
+| `⌘ ⏎` | run the line, or the selection |
+| `⌥ -` (Windows `Alt -`) | types ` <- ` |
+| `⌘ ⇧ M` | types the pipe, ` \|> ` |
+| `⌘ ⇧ C` | comment / uncomment the selection |
+| `⌘ ⇧ F10` | restart R — the honest test that your script runs from scratch |
+| `⌘ ⇧ P` | the command palette: type what you want, RStudio finds it |
+| `Tab` | complete a function, a column or a file name |
+
+[Nobody is graded on their theme. But the restart shortcut will save you once before the exam.]{.muted}
+
