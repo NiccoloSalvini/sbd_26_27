@@ -7,6 +7,29 @@ date: 2026-11-27
 date-format: "dddd D MMMM YYYY"
 ---
 
+## Last time
+
+::: {.subtitle-frame}
+Lecture 16 · Decision trees · Mon 23 Nov
+:::
+
+- A tree asks one question at a time, choosing the split that most reduces impurity (Gini)
+- Grown to the end it memorises the training set; pruning with `cp` and cross-validation brings it back
+- **A tree is a model you can argue with** — and a small change in the data grows a different one
+
+## Today
+
+| Time | | Min |
+|---|---|---|
+| 10:00 | Last time · Set 14, the [In class]{.gold} questions | 15' |
+| 10:15 | Many trees: bagging and random forests | 50' |
+| 11:05 | Boosting: learn from the mistakes, slowly | 25' |
+| 11:30 | [**Break**]{.gold} | [15']{.gold} |
+| 11:45 | Lab: churn, end to end | 65' |
+| 12:50 | Set 15 | 10' |
+
+: {tbl-colwidths="[14,76,10]"}
+
 ## Objectives
 
 - Understand why averaging many bad trees gives one good model — and the one trick that makes it work
@@ -135,9 +158,9 @@ Then the comparison that matters: forest vs boosting vs Monday's pruned tree vs 
 
 ## Churn, end to end
 
-`churn.csv` on Blackboard: 7 000 telecom customers, 19 columns, `churn` yes/no.
+`churn.csv` on Blackboard: 7 000 telecom customers, 18 predictors, `churn` yes/no.
 
-1. Split 70/30, **stratified** on `churn` — it is 27% yes, and a random split can drift
+1. Split 70/30, **stratified** on `churn` — it is 28.5% yes, and a random split can drift
 2. Logistic regression: the baseline nobody may skip
 3. Pruned tree — print it, read it
 4. Random forest, default $m$; then $m = p/3$
@@ -148,6 +171,18 @@ Then the comparison that matters: forest vs boosting vs Monday's pruned tree vs 
 Deliverable: the table in step 6, and one paragraph on **which model you would deploy, and why the answer is not simply "the most accurate one"**.
 
 ## Every tree in a forest is wrong. The forest is right because they are wrong in different ways.  {.statement}
+
+## Practice: Set 15
+
+::: {.subtitle-frame}
+[Random forests and gradient boosting](../homework/15-forests-boosting.html) · about 40 minutes · before Mon 30 Nov
+:::
+
+1. **Do it** in your own script, with the seed the set gives you.
+2. **Check your numbers on Blackboard**: test *Set 15*. Feedback the moment you submit — as many attempts as you like.
+3. **Bring the sentences.** Questions marked [In class]{.gold} have no number to check: we discuss them on Mon 30 Nov, at the start of lecture 18.
+
+[Not graded. The test is a mirror, not an exam.]{.muted}
 
 ## Reading
 

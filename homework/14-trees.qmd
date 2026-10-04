@@ -3,19 +3,33 @@ title: "Set 14 — decision trees"
 subtitle: "After lecture 16 · 23 November · about 40 minutes"
 ---
 
-Data: [`churn.csv`](../materials/churn.csv) — 7 000 telecom customers, about 27%
+Data: [`churn.csv`](../materials/churn.csv) — 7 000 telecom customers, 28.5%
 churn. Hold out 30% of the rows before you start and do not look at them again
-until question 5.
+until question 5. This exact split is used again in Sets 15 and 17:
+
+```{.r}
+churn <- read.csv("churn.csv", stringsAsFactors = TRUE)
+churn$id <- NULL                                   # an identifier, not a predictor
+set.seed(1)
+idx   <- sample(nrow(churn), 0.7 * nrow(churn))
+train <- churn[idx, ]                              # 4 900 rows
+test  <- churn[-idx, ]                             # 2 100 rows, locked until question 5
+```
+
+Before you start: `set.seed(14)` right before the `rpart()` call — the Blackboard
+test checks your numbers against this seed.
 
 ## 1 · Grow one, and read it aloud
 
-Fit `rpart(churn ~ . - id, data = train, method = "class")` and plot it.
+Fit `rpart(churn ~ ., data = train, method = "class")` and plot it.
 
 Write out the path to the leaf with the highest churn rate as an English
 sentence a retention manager would understand. Report how many training
 customers sit in that leaf.
 
-## 2 · The first split is not an accident
+## 2 · The first split is not an accident [In class]{.badge-class}
+
+[We discuss this one in lecture 17, on 27 Nov — bring your answer.]{.muted}
 
 Look at the root split.
 
@@ -31,7 +45,9 @@ impurity, not in terms of "it is the most important variable".
 How many leaves does each have? Which would you deploy, and what exactly are you
 trading?
 
-## 4 · Instability, demonstrated
+## 4 · Instability, demonstrated [In class]{.badge-class}
+
+[We discuss this one in lecture 17, on 27 Nov — bring your answer.]{.muted}
 
 Refit the tree on a bootstrap sample of the training rows. Do it three times.
 
@@ -41,11 +57,17 @@ this implies for a sentence like *"the model says tenure is the key driver"*.
 ## 5 · The number you report
 
 Now score the held-out 30% with your chosen tree: accuracy, and the confusion
-matrix.
+matrix. For the Blackboard check, use the minimum-`xerror` tree.
 
 Accuracy alone is flattering here. Say why, given the churn rate, and propose
 the metric you would put in the report instead — with a reason tied to what the
 company does with a prediction.
+
+## Check yourself on Blackboard
+
+Open the test **Set 14** on Blackboard and enter your numbers. Feedback appears
+as soon as you submit. Nothing is graded, and you can take it as many times as
+you like.
 
 ---
 

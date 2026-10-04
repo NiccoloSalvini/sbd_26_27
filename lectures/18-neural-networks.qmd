@@ -7,6 +7,30 @@ date: 2026-11-30
 date-format: "dddd D MMMM YYYY"
 ---
 
+## Last time
+
+::: {.subtitle-frame}
+Lecture 17 · Random forests and boosting · Fri 27 Nov
+:::
+
+- Bagging averages away a tree's variance; a random forest decorrelates the trees with `mtry`
+- Boosting fits each small tree to the previous mistakes, slowly — the learning rate is the brake
+- **Every tree in a forest is wrong; the forest is right because they are wrong in different ways**
+
+## Today
+
+| Time | | Min |
+|---|---|---|
+| 17:00 | Last time · Set 15, the [In class]{.gold} questions | 10' |
+| 17:10 | From linear to nonlinear · the perceptron, by hand | 40' |
+| 17:50 | Gradient descent | 10' |
+| 18:00 | [**Break**]{.gold} | [10']{.gold} |
+| 18:10 | One neuron is a GLM | 15' |
+| 18:25 | Hidden layers | 25' |
+| 18:50 | Set 16 · in Python | 10' |
+
+: {tbl-colwidths="[14,76,10]"}
+
 ## Objectives
 
 - See where neural networks come from, and what problem they were built to solve
@@ -266,6 +290,18 @@ mean((p > 0.5) == d$default[-tr])                                    # held-out 
 - Run the block. Change `size` to 1. Compare with `glm(family = binomial)` on the same rows: are the coefficients close? (They should be — why?)
 - `size = 20, decay = 0`. Training accuracy? Test accuracy? Draw the curve you saw on slide 17 in your head.
 - Reread lecture 14, last section: *autoencoders*. Friday we make the connection.
+
+## Practice: Set 16
+
+::: {.subtitle-frame}
+[Neural networks, in Python](../homework/16-neural-networks.html) · about 40 minutes · before Fri 4 Dec
+:::
+
+1. **Do it** in your own script, with the seed the set gives you.
+2. **Check your numbers on Blackboard**: test *Set 16*. Feedback the moment you submit — as many attempts as you like.
+3. **Bring the sentences.** Questions marked [In class]{.gold} have no number to check: we discuss them at the lab on Fri 4 Dec.
+
+[Not graded. The test is a mirror, not an exam.]{.muted}
 
 ## Reading
 

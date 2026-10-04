@@ -3,15 +3,27 @@ title: "Set 17 — interpretability"
 subtitle: "After lecture 20 · 9 December · about 40 minutes"
 ---
 
-Data: [`churn.csv`](../materials/churn.csv) and your boosting model from Set 15.
+Data: [`churn.csv`](../materials/churn.csv), the split from Set 14, and the forest
+from lecture 20, so that everyone explains the same model:
+
+```{.r}
+set.seed(17)
+rf <- ranger(churn ~ ., data = train, num.trees = 300, probability = TRUE)
+```
+
+Before you start: `set.seed(17)` as above — the Blackboard test checks your
+numbers against it. Your boosting model from Set 15 works for every question too;
+only the numbers will differ.
 
 ## 1 · Partial dependence, and what it assumes
 
 Compute the partial dependence of churn probability on `tenure_months`.
 
 The curve is produced by averaging over the other columns *as if* they were
-independent of tenure. Find one column in this dataset where that assumption is
-plainly false, and say what it does to the shape you plotted.
+independent of tenure. Check that assumption here: `cor()` of `tenure_months`
+with the numeric columns, and its mean by `contract`. Then name one column in a
+*real* telecom table where the assumption would be plainly false, and say what
+it would do to the shape you plotted.
 
 ## 2 · One customer, one explanation
 
@@ -21,7 +33,9 @@ Compute SHAP values for that single prediction.
 Write the two-sentence explanation you would put in a retention agent's screen.
 No jargon: the agent has ninety seconds before the call.
 
-## 3 · Global and local disagree
+## 3 · Global and local disagree [In class]{.badge-class}
+
+[We discuss this one in lecture 21, on 11 Dec — bring your answer.]{.muted}
 
 Compare the global importance ranking with the SHAP values for your chosen
 customer.
@@ -38,13 +52,21 @@ Use the model to answer, then write the caveat. The model was fitted on
 observational data; say precisely what would have to be true for the number to
 be a prediction of the intervention rather than an artefact of the fit.
 
-## 5 · The model card
+## 5 · The model card [In class]{.badge-class}
+
+[We discuss this one in lecture 21, on 11 Dec — bring your answer.]{.muted}
 
 Produce a half-page summary of your deployed model: what it predicts, on what
 population, its test performance, the three variables that drive it, two
 situations where it should not be trusted, and the date it should be refitted.
 
 Someone must be able to read it without opening R.
+
+## Check yourself on Blackboard
+
+Open the test **Set 17** on Blackboard and enter your numbers. Feedback appears
+as soon as you submit. Nothing is graded, and you can take it as many times as
+you like.
 
 ---
 

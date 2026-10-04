@@ -3,7 +3,13 @@ title: "Set 15 — random forests and gradient boosting"
 subtitle: "After lecture 17 · 27 November · about 45 minutes"
 ---
 
-Data: [`churn.csv`](../materials/churn.csv), the same split as Set 14.
+Data: [`churn.csv`](../materials/churn.csv), the same split as Set 14
+(`set.seed(1)`, 70/30, `id` dropped).
+
+Before you start: `set.seed(15)` right before every `ranger()`, `xgb.cv()` and
+`xgboost()` call — the Blackboard test checks your numbers against this seed.
+Forest and boosting results shift a little between package versions; the test
+allows for that.
 
 ## 1 · One tree, then five hundred
 
@@ -21,7 +27,9 @@ The last one has a name — it is no longer a random forest. Which method is it,
 and why does forcing every split to see every variable make the trees *more*
 alike and the ensemble *worse*?
 
-## 3 · Boosting is a different idea
+## 3 · Boosting is a different idea [In class]{.badge-class}
+
+[We discuss this one in lecture 18, on 30 Nov — bring your answer.]{.muted}
 
 Fit gradient boosting (`xgboost` or `gbm`) with a small learning rate and enough
 rounds, using early stopping on a validation fold.
@@ -38,13 +46,21 @@ with no early stopping.
 One of them degrades and one does not. Report which, and explain the asymmetry —
 it is the most useful single fact in this lecture.
 
-## 5 · Importance, and its price
+## 5 · Importance, and its price [In class]{.badge-class}
+
+[We discuss this one in lecture 18, on 30 Nov — bring your answer.]{.muted}
 
 Extract variable importance from the forest, and SHAP or gain from the boosting.
 
 Do the top three agree? Then answer the question a manager will ask: *"so if we
 change that variable, does churn fall?"* The honest answer is one sentence, and
 it is not yes.
+
+## Check yourself on Blackboard
+
+Open the test **Set 15** on Blackboard and enter your numbers. Feedback appears
+as soon as you submit. Nothing is graded, and you can take it as many times as
+you like.
 
 ---
 

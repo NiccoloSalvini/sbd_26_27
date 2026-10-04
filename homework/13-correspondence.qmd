@@ -7,6 +7,8 @@ Data: [`brands.csv`](../materials/brands.csv) — 2 356 respondent × brand ×
 attribute associations. Build the contingency table with `table(brands$brand,
 brands$attribute)`.
 
+Nothing here is random: no seed needed, and the Blackboard test checks your numbers as they come.
+
 ## 1 · Is there anything to analyse
 
 Run `chisq.test` on the table. Report the statistic, the degrees of freedom and
@@ -22,7 +24,7 @@ Fit `ca::ca(tab)`. Report total inertia and the percentage on the first two
 dimensions.
 
 Verify numerically that total inertia equals $\chi^2 / n$. Then say, in one
-sentence, what "explaining 78% of the inertia" is explaining.
+sentence, what "explaining 98% of the inertia" is explaining.
 
 ## 3 · Read the map, with discipline
 
@@ -32,7 +34,9 @@ Plot the symmetric map.
 - Identify one brand that sits near the origin. What does that position mean, and
   why is "average" a better word than "unremarkable"?
 
-## 4 · The distance you are not allowed to read
+## 4 · The distance you are not allowed to read [In class]{.badge-class}
+
+[We discuss this one in lecture 16, on 23 Nov — bring your answer.]{.muted}
 
 A student points at brand B and attribute *Reliable*, close together, and says
 "B is reliable".
@@ -41,12 +45,18 @@ Explain what is wrong with that reading on a symmetric map, and what you *can*
 legitimately say about B and *Reliable*. Then state what you would have to plot
 instead to make the student's sentence defensible.
 
-## 5 · One slide for the client
+## 5 · One slide for the client [In class]{.badge-class}
+
+[We discuss this one in lecture 16, on 23 Nov — bring your answer.]{.muted}
 
 Produce a single figure with a one-line title that a brand manager could act on.
 Nothing else — no table, no second panel.
 
 Write the sentence you would say while showing it.
+
+## Check yourself on Blackboard
+
+Open the test **Set 13** on Blackboard, enter your numbers, and read the feedback as soon as you submit. Not graded; as many attempts as you like.
 
 ---
 

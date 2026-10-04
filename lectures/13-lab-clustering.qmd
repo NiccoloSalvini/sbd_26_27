@@ -7,17 +7,32 @@ date: 2026-11-13
 date-format: "dddd D MMMM YYYY"
 ---
 
+## Last time
+
+::: {.subtitle-frame}
+Lecture 12 · Hierarchical clustering · Mon 9 Nov
+:::
+
+- Agglomerative clustering merges the two closest groups, over and over — the record is the dendrogram
+- Linkage is the choice that changes everything: single chains, complete and Ward make compact groups
+- Height is distance. **The tree is not the answer; the cut is**
+
 ## Today
 
-Three hours, one table, one deliverable: **a segmentation a marketing director could act on Monday**.
+| Time | | Min |
+|---|---|---|
+| 09:00 | Last time · Sets 10–11, the [In class]{.gold} questions | 20' |
+| 09:20 | Step 1 · load and look | 25' |
+| 09:45 | Step 2 · prepare: transform, then scale | 20' |
+| 10:05 | Step 3 · explore with a tree on a sample | 25' |
+| 10:30 | [**Break**]{.gold} | [15']{.gold} |
+| 10:45 | Step 4 · decide $k$, deploy with k-means | 35' |
+| 11:20 | Step 5 · profile, name, hand over | 30' |
+| 11:50 | The deliverable | 10' |
 
-1. Load and look
-2. Prepare — the step everyone skips
-3. Explore the structure with a tree
-4. Decide $k$, deploy with k-means
-5. Profile, name, and hand over
+: {tbl-colwidths="[14,76,10]"}
 
-No new theory. Every slide is a step you run.
+One table, one deliverable: **a segmentation a marketing director could act on Monday**. No new theory.
 
 ## The table
 

@@ -10,3 +10,6 @@ _site/
 /.quarto/
 .netlify/
 .omc/
+
+# answer keys for the Blackboard tests: the repo is public
+private/

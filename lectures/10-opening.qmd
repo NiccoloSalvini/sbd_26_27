@@ -7,6 +7,19 @@ date: 2026-11-02
 date-format: "dddd D MMMM YYYY"
 ---
 
+## Today
+
+| Time | | Min |
+|---|---|---|
+| 17:00 | Where we are · two dialects, statistics to AI | 20' |
+| 17:20 | The unsupervised problem | 20' |
+| 17:40 | Finding your way around RStudio | 20' |
+| 18:00 | [**Break**]{.gold} | [10']{.gold} |
+| 18:10 | From a database to a dataset | 30' |
+| 18:40 | Setup check, on your machine | 20' |
+
+: {tbl-colwidths="[14,76,10]"}
+
 ## Objectives
 
 - See what Module 2 adds to Module 1, and why it comes second

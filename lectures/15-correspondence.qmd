@@ -7,6 +7,29 @@ date: 2026-11-17
 date-format: "dddd D MMMM YYYY"
 ---
 
+## Last time
+
+::: {.subtitle-frame}
+Lecture 14 · Principal components · Mon 16 Nov
+:::
+
+- A component is the direction of greatest variance — loadings say what it is made of, scores where each row sits
+- Scale again: correlation, not covariance, when the units differ; stop where the scree flattens
+- **Naming a component is your job, not the algorithm's**
+
+## Today
+
+| Time | | Min |
+|---|---|---|
+| 10:00 | Last time · Set 12, the [In class]{.gold} questions | 15' |
+| 10:15 | From a table to distances: chi-square | 45' |
+| 11:00 | Reading the map — and what not to read | 30' |
+| 11:30 | [**Break**]{.gold} | [15']{.gold} |
+| 11:45 | Lab: from a survey file to the map | 65' |
+| 12:50 | Set 13 | 10' |
+
+: {tbl-colwidths="[14,76,10]"}
+
 ## Objectives
 
 - Take a contingency table and turn it into a **map**
@@ -138,6 +161,18 @@ fviz_ca_biplot(ca, repel = TRUE) + labs(title = "Brand perception, 1 200 respond
 Then, in pairs: write the four sentences for *this* map. Swap with the pair next to you. Where do you disagree, and is it the map or the reading?
 
 ## A perception map does not tell you where to go. It tells you where you are, and who is standing next to you.  {.statement}
+
+## Practice: Set 13
+
+::: {.subtitle-frame}
+[Correspondence analysis](../homework/13-correspondence.html) · about 40 minutes · before Mon 23 Nov
+:::
+
+1. **Do it** in your own script, with the seed the set gives you.
+2. **Check your numbers on Blackboard**: test *Set 13*. Feedback the moment you submit — as many attempts as you like.
+3. **Bring the sentences.** Questions marked [In class]{.gold} have no number to check: we discuss them on Mon 23 Nov, at the start of lecture 16.
+
+[Not graded. The test is a mirror, not an exam.]{.muted}
 
 ## Reading
 

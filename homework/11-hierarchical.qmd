@@ -5,7 +5,14 @@ subtitle: "After lecture 12 · 9 November · about 35 minutes"
 
 Data: [`customers.csv`](../materials/customers.csv). Take a random sample of 300
 rows — a full dendrogram of 6 000 is unreadable, and that is itself part of the
-lesson.
+lesson:
+
+```r
+set.seed(11)
+s <- customers[sample(nrow(customers), 300), ]
+```
+
+The Blackboard test checks your numbers against this sample.
 
 ## 1 · Four linkages, four trees
 
@@ -17,8 +24,9 @@ it, and explain the mechanism that causes it.
 
 ## 2 · Cut, and compare
 
-Cut the Ward tree at `k = 4` with `cutree`. Cross-tabulate against the k-means
-solution from Set 10.
+Cut the Ward tree at `k = 4` with `cutree`. Cross-tabulate against k-means on
+the same 300 scaled rows: `set.seed(11)`, then `kmeans(scale(s[, 2:7]), 4,
+nstart = 25)`.
 
 How many customers do the two methods place together? Where they disagree, is it
 a few points on a boundary or an entire segment split differently?
@@ -30,13 +38,19 @@ On the Ward dendrogram, find the two largest jumps in merge height.
 What would cutting at each of them give you, and which cut would you defend?
 Why is a large jump evidence, and what is the argument it is *not* proof?
 
-## 4 · When the tree is the deliverable
+## 4 · When the tree is the deliverable [In class]{.badge-class}
+
+[We discuss this one in lecture 13, on 13 Nov — bring your answer.]{.muted}
 
 Hierarchical clustering gives you a nested structure that k-means cannot.
 
 Describe one business question where the *nesting* is the answer — where
 knowing that segment A splits into A1 and A2 changes a decision — and one where
 the flat partition is all anybody needs.
+
+## Check yourself on Blackboard
+
+Open the test **Set 11** on Blackboard, enter your numbers, and read the feedback as soon as you submit. Not graded; as many attempts as you like.
 
 ---
 

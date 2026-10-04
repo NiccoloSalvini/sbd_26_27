@@ -4,17 +4,21 @@ subtitle: "Optional exercises — not graded"
 ---
 
 ::: {.callout-important appearance="simple"}
-The syllabus states it plainly: **no individual or group assignments are required**. Nothing on this page is graded and nothing is handed in. It exists because the exam has a coding part, and the only way that part goes well is if you have typed the code before.
+The syllabus states it plainly: **no individual or group assignments are required**. Nothing on this page is graded. It exists because the exam has a coding part, and the only way that part goes well is if you have typed the code before.
 :::
 
-## How to use this page
+## How it works
 
-Each set goes live after the lecture it belongs to. A set is small on purpose — 30 to 45 minutes, one dataset, a handful of questions. Solutions are posted one week later.
+Each set goes live after the lecture it belongs to: 30 to 45 minutes, one dataset, a handful of questions.
 
-Work in R unless a set says otherwise — set 16 is in Python, like the lab it follows. See [Setup](setup.qmd) if your machine is not ready. Bring what breaks to [office hours](office-hours.qmd) — a broken script is a better question than a vague one.
+1. **Do it** in your own R script. Every set starts with a `set.seed()` — use it, so your numbers can be checked.
+2. **Check yourself on Blackboard.** Each set has a test with the same name (*Set 10*, *Set 11*, …). Type in your numbers; the feedback arrives the moment you submit. As many attempts as you like, and **it counts for nothing**: it is a mirror, not an exam.
+3. **Bring the sentences.** Questions marked [In class]{.badge-class} end in a judgement, not a number, so no test can check them. We discuss them at the start of the lecture named under the question.
+
+Solutions are posted one week later. Work in R unless a set says otherwise — set 16 is in Python, like the lab it follows. See [Setup](setup.qmd) if your machine is not ready, and bring what breaks to [office hours](office-hours.qmd).
 
 ::: {.callout-note appearance="simple"}
-Most questions end in a sentence you have to write, not a number you have to get. That is deliberate: the exam asks you to justify a choice, and the justification is the part that is hard to improvise.
+The test checks the numbers; the exam asks you to justify a choice. That is why the [In class]{.badge-class} questions matter more than the score.
 :::
 
 ## Module 1 · Prof. Arbia

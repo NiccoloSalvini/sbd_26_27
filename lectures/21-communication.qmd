@@ -7,6 +7,31 @@ date: 2026-12-11
 date-format: "dddd D MMMM YYYY"
 ---
 
+## Last time
+
+::: {.subtitle-frame}
+Lecture 20 · Interpretability · Wed 9 Dec
+:::
+
+- More accuracy usually means less explanation — and someone pays for the difference
+- Global tools describe the model; local tools explain one customer. Neither proves cause
+- **A model you cannot explain is a decision you cannot defend**
+
+## Today
+
+| Time | | Min |
+|---|---|---|
+| 10:00 | Last time · Set 17, the [In class]{.gold} questions | 15' |
+| 10:15 | Dashboards | 30' |
+| 10:45 | Uncertainty | 25' |
+| 11:10 | Charts that lie | 20' |
+| 11:30 | [**Break**]{.gold} | [15']{.gold} |
+| 11:45 | The story | 25' |
+| 12:10 | Human and AI | 20' |
+| 12:30 | Closing · Set 18 · the exam | 30' |
+
+: {tbl-colwidths="[14,76,10]"}
+
 ## Objectives
 
 - Communicate a model's output to someone who will decide with it and never see the code
@@ -176,6 +201,18 @@ Marks are not discussed at office hours. The feedback on Blackboard says why eac
 :::
 
 ## Every model in this course ends in a sentence a person can act on. If you cannot write that sentence, you are not finished.  {.statement}
+
+## Practice: Set 18
+
+::: {.subtitle-frame}
+[Dashboards, uncertainty, and the story](../homework/18-communication.html) · about 40 minutes · before the exam
+:::
+
+1. **Do it** in your own script, or on paper — this set is mostly words.
+2. **Check your numbers on Blackboard**: test *Set 18*. Feedback the moment you submit — as many attempts as you like.
+3. **The sentences** have no number to check, and no lecture left to discuss them in: bring them to office hours — they are the closest thing to the exam's written part.
+
+[Not graded. The test is a mirror, not an exam.]{.muted}
 
 ## Reading
 

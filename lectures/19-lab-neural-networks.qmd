@@ -7,13 +7,29 @@ date: 2026-12-04
 date-format: "dddd D MMMM YYYY"
 ---
 
+## Last time
+
+::: {.subtitle-frame}
+Lecture 18 · Neural networks · Mon 30 Nov
+:::
+
+- The perceptron: weights, a threshold, and an update rule you can run by hand
+- Gradient descent is the engine; **one neuron with a sigmoid is logistic regression**
+- A hidden layer lets the model bend — flexibility and overfitting arrive together
+
 ## Today
 
-1. Fit a network on Friday's churn table, properly — three splits, `size`, `decay`
-2. Put it in the table next to logistic regression, the forest and the boosting
-3. Watch it lose, and understand why
-4. See what *deep* learning is, in one slide, and where it wins instead
-5. Leave with a rule you can use on Monday
+| Time | | Min |
+|---|---|---|
+| 10:00 | Last time · Set 16, the [In class]{.gold} questions | 15' |
+| 10:15 | We switch to Python: setup | 15' |
+| 10:30 | Fit one properly: three splits, the validation curve | 60' |
+| 11:30 | [**Break**]{.gold} | [15']{.gold} |
+| 11:45 | Refit, touch the test set once · the four rivals | 30' |
+| 12:15 | What you will see · deep learning in one slide | 25' |
+| 12:40 | The rule · deliverable | 20' |
+
+: {tbl-colwidths="[14,76,10]"}
 
 ## Today we switch to Python
 

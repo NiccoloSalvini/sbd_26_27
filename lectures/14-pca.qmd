@@ -7,6 +7,29 @@ date: 2026-11-16
 date-format: "dddd D MMMM YYYY"
 ---
 
+## Last time
+
+::: {.subtitle-frame}
+Lecture 13 · Lab: clustering end to end · Fri 13 Nov
+:::
+
+- Read the table before touching it; write down what you expect
+- Transform, then scale; a tree on a sample to see the structure, k-means on everything to deploy
+- Profile in the units people understand — **finished means someone else can act on it**
+
+## Today
+
+| Time | | Min |
+|---|---|---|
+| 17:00 | Last time · questions | 10' |
+| 17:10 | The idea: a component is a direction, by hand | 50' |
+| 18:00 | [**Break**]{.gold} | [10']{.gold} |
+| 18:10 | How many components, and what they mean | 30' |
+| 18:40 | Compression as a model | 10' |
+| 18:50 | Set 12 | 10' |
+
+: {tbl-colwidths="[14,76,10]"}
+
 ## Objectives
 
 - See what a principal component *is*: a direction, not a variable
@@ -178,6 +201,18 @@ Hold this thought for week 5. A neural network that learns to compress its input
 - `prcomp` on `USArrests`, with and without `scale. = TRUE`. Compare the first loading vector. Which state moved most?
 - On `customers.csv` from Friday: PCA on the six behavioural columns. How many components for 80%? Name PC1 and PC2 from the loadings.
 - Then: `kmeans` on the first two scores instead of all six columns. Same segments?
+
+## Practice: Set 12
+
+::: {.subtitle-frame}
+[Principal components](../homework/12-pca.html) · about 40 minutes · before Tue 17 Nov
+:::
+
+1. **Do it** in your own script, with the seed the set gives you.
+2. **Check your numbers on Blackboard**: test *Set 12*. Feedback the moment you submit — as many attempts as you like.
+3. **Bring the sentences.** Questions marked [In class]{.gold} have no number to check: we discuss them on Tue 17 Nov, at the start of lecture 15.
+
+[Not graded. The test is a mirror, not an exam.]{.muted}
 
 ## Reading
 

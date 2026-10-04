@@ -7,6 +7,29 @@ date: 2026-11-23
 date-format: "dddd D MMMM YYYY"
 ---
 
+## Last time
+
+::: {.subtitle-frame}
+Lecture 15 · Correspondence analysis · Tue 17 Nov
+:::
+
+- A contingency table becomes row and column profiles; chi-square distance, then PCA on it
+- The map shows which profiles resemble each other — the distance *between* a brand and an attribute is not to be read
+- **A perception map tells you where you are, and who is standing next to you**
+
+## Today
+
+| Time | | Min |
+|---|---|---|
+| 17:00 | Last time · Set 13, the [In class]{.gold} questions | 15' |
+| 17:15 | Growing a tree: one split, by hand | 45' |
+| 18:00 | [**Break**]{.gold} | [10']{.gold} |
+| 18:10 | Too far, and back: pruning | 30' |
+| 18:40 | Reading the tree you printed | 10' |
+| 18:50 | Set 14 | 10' |
+
+: {tbl-colwidths="[14,76,10]"}
+
 ## Objectives
 
 - Grow a tree by hand: one split, one impurity calculation, one decision
@@ -235,6 +258,18 @@ The last two rows are one problem, and Friday's lecture is one answer: **many tr
 - Run today's block. Prune at the 1-SE `cp` instead of the minimum. How many leaves do you lose? Does test error move?
 - Fit a tree on `customers.csv` with `segment` (from week 1) as the target. Which variable is at the top? Is that the variable *you* would have named the segments by?
 - Bootstrap: `d[sample(nrow(d), replace = TRUE), ]` three times, three trees. Compare the top splits.
+
+## Practice: Set 14
+
+::: {.subtitle-frame}
+[Decision trees](../homework/14-trees.html) · about 40 minutes · before Fri 27 Nov
+:::
+
+1. **Do it** in your own script, with the seed the set gives you.
+2. **Check your numbers on Blackboard**: test *Set 14*. Feedback the moment you submit — as many attempts as you like.
+3. **Bring the sentences.** Questions marked [In class]{.gold} have no number to check: we discuss them on Fri 27 Nov, at the start of lecture 17.
+
+[Not graded. The test is a mirror, not an exam.]{.muted}
 
 ## Reading
 

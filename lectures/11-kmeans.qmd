@@ -7,6 +7,30 @@ date: 2026-11-03
 date-format: "dddd D MMMM YYYY"
 ---
 
+## Last time
+
+::: {.subtitle-frame}
+Lecture 10 · Learning without a label · Mon 2 Nov
+:::
+
+- Statistics, machine learning, AI: the same four questions, answered differently
+- Unsupervised means no $y$ and no residual — structure is judged by coherence, stability and usefulness
+- A database is not a dataset; and **scale decides who is close** — raw, euros swamp days
+
+## Today
+
+| Time | | Min |
+|---|---|---|
+| 09:00 | Last time · questions | 10' |
+| 09:10 | The algorithm: Lloyd's four lines, by hand | 60' |
+| 10:10 | Two silent failures: scale and shape | 20' |
+| 10:30 | [**Break**]{.gold} | [15']{.gold} |
+| 10:45 | Choosing $k$: the elbow, and the elbow you get | 35' |
+| 11:20 | From clusters to segments | 25' |
+| 11:45 | In R · Set 10 | 15' |
+
+: {tbl-colwidths="[14,76,10]"}
+
 ## Objectives
 
 - Run the k-means algorithm by hand once, so it is never a black box again
@@ -190,6 +214,18 @@ Friday is clustering end to end, on a real customer table. Come having run today
 - What is the elbow $k$? The silhouette $k$? Do they agree?
 - Rerun `kmeans` with `nstart = 1` three times. Do the clusters change?
 - Profile the clusters. Write one sentence naming each.
+
+## Practice: Set 10
+
+::: {.subtitle-frame}
+[k-means and customer segmentation](../homework/10-kmeans.html) · about 40 minutes · before Mon 9 Nov
+:::
+
+1. **Do it** in your own script, with the seed the set gives you.
+2. **Check your numbers on Blackboard**: test *Set 10*. Feedback the moment you submit — as many attempts as you like.
+3. **Bring the sentences.** Questions marked [In class]{.gold} have no number to check: we discuss them at the lab on Fri 13 Nov.
+
+[Not graded. The test is a mirror, not an exam.]{.muted}
 
 ## Reading
 

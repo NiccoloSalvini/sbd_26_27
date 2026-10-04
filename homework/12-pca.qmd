@@ -5,6 +5,8 @@ subtitle: "After lecture 14 · 16 November · about 40 minutes"
 
 Data: [`customers.csv`](../materials/customers.csv), the six numeric columns.
 
+Before you start: the only random step is in question 5, and it names its seeds — the Blackboard test checks your numbers against them.
+
 ## 1 · Correlation or covariance
 
 Run `prcomp` with `scale. = TRUE` and with `scale. = FALSE`. Compare the first
@@ -22,7 +24,9 @@ Apply three rules: 80% cumulative, eigenvalue > 1, and the scree elbow. They wil
 not agree. **Choose, and write the sentence you would put under the figure in a
 report.**
 
-## 3 · Read the loadings, not the numbers
+## 3 · Read the loadings, not the numbers [In class]{.badge-class}
+
+[We discuss this one in lecture 15, on 17 Nov — bring your answer.]{.muted}
 
 Look at the loadings of PC1 and PC2.
 
@@ -37,14 +41,21 @@ Plot the biplot. Two variables' arrows point in nearly the same direction.
 What does that mean about those variables? And what does it *not* let you
 conclude about a customer sitting near the tip of one arrow?
 
-## 5 · PCA before clustering
+## 5 · PCA before clustering [In class]{.badge-class}
+
+[We discuss this one in lecture 15, on 17 Nov — bring your answer.]{.muted}
 
 Rerun k-means with `k = 4` on the first two components instead of the six
-columns. Compare with Set 10's clusters.
+columns: `set.seed(12)`, `kmeans(pca$x[, 1:2], 4, nstart = 25)`. Compare with
+Set 10's clusters: `set.seed(10)`, `kmeans(scale(customers[, 2:7]), 4, nstart = 25)`.
 
 Did anything improve? Cluster on components and you have thrown away the
 variance PCA discarded — argue in three sentences whether that was a good trade
 here.
+
+## Check yourself on Blackboard
+
+Open the test **Set 12** on Blackboard, enter your numbers, and read the feedback as soon as you submit. Not graded; as many attempts as you like.
 
 ---
 

@@ -7,6 +7,30 @@ date: 2026-12-09
 date-format: "dddd D MMMM YYYY"
 ---
 
+## Last time
+
+::: {.subtitle-frame}
+Lecture 19 · Lab: neural networks · Fri 4 Dec
+:::
+
+- Three sets, not two: tune on validation, report on test, touched once
+- On a tabular churn table the network loses to boosting — and we saw why
+- **The question is never whether a network can; it is whether anything simpler could**
+
+## Today
+
+| Time | | Min |
+|---|---|---|
+| 17:00 | Last time · questions | 10' |
+| 17:10 | The trade-off: accuracy against interpretability | 20' |
+| 17:30 | Global tools: importance, partial dependence | 30' |
+| 18:00 | [**Break**]{.gold} | [10']{.gold} |
+| 18:10 | Local tools: Shapley values, LIME | 25' |
+| 18:35 | Deciding where to stand | 15' |
+| 18:50 | Set 17 | 10' |
+
+: {tbl-colwidths="[14,76,10]"}
+
 ## Objectives
 
 - Name the trade-off precisely: what you give up when accuracy goes up, and who pays
@@ -160,6 +184,18 @@ Everything else is for the appendix, and for you.
 - Run importance and PDP on last week's forest. Which top-3 variable has a *non-monotone* PDP? What does that mean for the offer?
 - Shapley for three customers: one high-risk, one low, one at the threshold. Write each a two-line explanation.
 - Read the last slide again, then draft the four-line board summary for the churn model. Friday is about delivering it.
+
+## Practice: Set 17
+
+::: {.subtitle-frame}
+[Interpretability](../homework/17-interpretability.html) · about 40 minutes · before Fri 11 Dec
+:::
+
+1. **Do it** in your own script, with the seed the set gives you.
+2. **Check your numbers on Blackboard**: test *Set 17*. Feedback the moment you submit — as many attempts as you like.
+3. **Bring the sentences.** Questions marked [In class]{.gold} have no number to check: we discuss them on Fri 11 Dec, at the start of lecture 21.
+
+[Not graded. The test is a mirror, not an exam.]{.muted}
 
 ## Reading
 

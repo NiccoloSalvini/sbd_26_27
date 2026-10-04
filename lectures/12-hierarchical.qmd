@@ -7,6 +7,28 @@ date: 2026-11-09
 date-format: "dddd D MMMM YYYY"
 ---
 
+## Last time
+
+::: {.subtitle-frame}
+Lecture 11 · k-means · Tue 3 Nov
+:::
+
+- Lloyd's algorithm: assign to the nearest centre, move the centre, repeat — it minimises within-cluster variance
+- $W$ always falls as $k$ grows: the elbow is an argument only when you can see it
+- Scale and shape break k-means silently; a cluster becomes a **segment** only when someone can act on it
+
+## Today
+
+| Time | | Min |
+|---|---|---|
+| 17:00 | Last time · questions | 10' |
+| 17:10 | Growing the tree: linkage, chaining, by hand | 50' |
+| 18:00 | [**Break**]{.gold} | [10']{.gold} |
+| 18:10 | Reading a dendrogram · choosing and using | 40' |
+| 18:50 | Set 11 | 10' |
+
+: {tbl-colwidths="[14,76,10]"}
+
 ## Objectives
 
 - Build a dendrogram and read it — height, merges, and where to cut
@@ -156,6 +178,18 @@ Cost dominates everything if you do not scale it. And a cluster with three patie
 - Run today's block on `USArrests` with `ward.D2`, `complete` and `single`. Three trees. Which one chains?
 - Cut Ward at $k=4$ and compare `cutree()` with Tuesday's `kmeans(k = 4)` — `table(km$cluster, groups)`. How many states move?
 - Friday's lab does this on a real customer table, start to finish, and ends with segment names.
+
+## Practice: Set 11
+
+::: {.subtitle-frame}
+[Hierarchical clustering](../homework/11-hierarchical.html) · about 40 minutes · before Fri 13 Nov
+:::
+
+1. **Do it** in your own script, with the seed the set gives you.
+2. **Check your numbers on Blackboard**: test *Set 11*. Feedback the moment you submit — as many attempts as you like.
+3. **Bring the sentences.** Questions marked [In class]{.gold} have no number to check: we discuss them at the lab on Fri 13 Nov.
+
+[Not graded. The test is a mirror, not an exam.]{.muted}
 
 ## Reading
 
