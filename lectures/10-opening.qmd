@@ -14,7 +14,7 @@ date-format: "dddd D MMMM YYYY"
 | 17:00 | Who I am, who you are | 10' |
 | 17:10 | Where we are · two dialects, statistics to AI | 15' |
 | 17:25 | The unsupervised problem | 15' |
-| 17:40 | RStudio: panes, projects, the working directory | 20' |
+| 17:40 | RStudio: panes, running code, projects | 20' |
 | 18:00 | [**Break**]{.gold} | [10']{.gold} |
 | 18:10 | From a database to a dataset | 25' |
 | 18:35 | Setup check · Mac or Windows · already installed? | 25' |
@@ -412,6 +412,41 @@ The **working directory**: the one folder R reads from and writes to, unless tol
 | for *trying* something | for *keeping* something |
 
 Habit to build this week: **everything that matters goes in the script**. The console is a scratchpad. `Cmd/Ctrl + Enter` runs the line your cursor is on; `Cmd/Ctrl + Shift + Enter` runs the whole script.
+
+## Running code: select, then Run
+
+<div class="viz">
+<svg viewBox="0 0 1240 610" style="max-width:1120px;max-height:560px" xmlns="http://www.w3.org/2000/svg" font-family="Libre Franklin, sans-serif" font-size="21" fill="#1c2226">
+  <defs><marker id="ah-run" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#b8860b"/></marker></defs>
+  <image href="media/rstudio-run.jpg" x="380" y="60" width="620" height="539"/>
+  <rect x="380" y="60" width="620" height="539" fill="none" stroke="#e6e9ec" stroke-width="2"/>
+  <g class="fragment" data-fragment-index="1">
+    <rect x="414" y="139" width="462" height="86" fill="none" stroke="#b8860b" stroke-width="5" rx="3"/>
+    <path d="M 330 182 L 408 182" stroke="#b8860b" stroke-width="5" marker-end="url(#ah-run)"/>
+    <text x="0" y="150" fill="#002f57" font-size="27" font-weight="700">1 · Select</text>
+    <text x="0" y="182">drag over the lines</text><text x="0" y="208">you want to run</text>
+    <text x="0" y="234" fill="#5f6b75">no selection: just the</text><text x="0" y="260" fill="#5f6b75">line the cursor is on</text>
+  </g>
+  <g class="fragment" data-fragment-index="2">
+    <rect x="822" y="111" width="42" height="20" fill="none" stroke="#b8860b" stroke-width="4" rx="3"/>
+    <path d="M 843 46 L 843 106" stroke="#b8860b" stroke-width="5" marker-end="url(#ah-run)"/>
+    <text x="560" y="34" fill="#002f57" font-size="27" font-weight="700">2 · Click Run</text>
+    <text x="748" y="34" fill="#5f6b75">or ⌘ ⏎ · Ctrl ⏎</text>
+  </g>
+  <g class="fragment" data-fragment-index="3">
+    <rect x="384" y="533" width="290" height="44" fill="none" stroke="#b8860b" stroke-width="5" rx="3"/>
+    <path d="M 1018 555 L 682 555" stroke="#b8860b" stroke-width="5" marker-end="url(#ah-run)"/>
+    <text x="1024" y="520" fill="#002f57" font-size="27" font-weight="700">3 · Read</text>
+    <text x="1024" y="552">the answer, in</text><text x="1024" y="578">the Console</text>
+  </g>
+  <g class="fragment" data-fragment-index="4">
+    <rect x="907" y="111" width="40" height="20" fill="none" stroke="#5f6b75" stroke-width="3" rx="3" stroke-dasharray="5 4"/>
+    <path d="M 1018 200 C 990 200, 960 170, 935 136" fill="none" stroke="#5f6b75" stroke-width="3" marker-end="url(#ah-run)"/>
+    <text x="1024" y="196" fill="#5f6b75" font-weight="700">Source</text>
+    <text x="1024" y="222" fill="#5f6b75">runs the whole</text><text x="1024" y="248" fill="#5f6b75">file, top to bottom</text>
+  </g>
+</svg>
+</div>
 
 ## Notebook or script?
 
