@@ -452,10 +452,10 @@ Everything on this slide you will use on Tuesday. Nothing else about programming
 
 ## [Section 5]{.section-kicker} From a database to a dataset {.section-slide background-color="#002f57"}
 
-## Database is not dataset
+## Database ≠ dataset [😡]{.angry}
 
 ::: {.subtitle-frame}
-Three words, three different objects
+Three different objects. Mix them up and you will see this face again
 :::
 
 | | Database | Dataset | Data frame |
@@ -537,7 +537,7 @@ Two real customers from `customers.csv`, and what their distance is made of:
 | `monetary` (€) | 607 | 1 338 | **92%** | 5% |
 | `tenure`, `returns`, `online` | … | … | 0% | 18% |
 
-Raw, the distance *is* spending: euros run into the thousands. After `scale()` every column counts in standard deviations — and A and B differ because **one bought last month, the other eight months ago**.
+Raw, the distance *is* spending: euros run into the thousands. After `scale()` every column counts in standard deviations — and A and B differ because **one bought last month, one eight months ago**.
 
 ## Train and test, on real customers
 
@@ -668,4 +668,28 @@ All the rest is identical. Details and screenshots: the [Setup page](../setup.qm
 | `Tab` | complete a function, a column or a file name |
 
 [Nobody is graded on their theme. But the restart shortcut will save you once before the exam.]{.muted}
+
+## More tricks: writing code
+
+| Keys (Windows: `Ctrl` for `⌘`, `Alt` for `⌥`) | Does |
+|---|---|
+| `⌥ ↑` / `⌥ ↓` | move the line up or down |
+| `⌘ ⌥ ↑` / `⌘ ⌥ ↓` | copy the line above or below |
+| `⌘ D` | delete the line |
+| `⌥` + drag | rectangular selection: edit ten lines at once |
+| `⌘ I` · `⌘ ⇧ A` | re-indent · reformat the selection |
+| `⌘ ⌥ ⇧ M` | rename a variable everywhere it appears in the script |
+| `Tab` inside `"…"` | completes a file name: no more typos in paths |
+
+## More tricks: finding your way
+
+| Keys | Does |
+|---|---|
+| `# Load data ----` | four dashes make a **section**; `⌘ ⇧ O` shows the outline |
+| `F1` on a function | its help page, without leaving the script |
+| `F2` on a function | jumps to where it is defined |
+| `Ctrl .` | go to any file or function in the project by name |
+| `⌘ ↑` in the Console | your past commands, filtered as you type |
+| `View(cust)` | the data frame as a spreadsheet |
+| `⌥ ⇧ K` | every shortcut there is |
 

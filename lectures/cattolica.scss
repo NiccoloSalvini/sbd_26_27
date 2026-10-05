@@ -184,3 +184,8 @@ $presentation-block-margin: 14px;
 // ---- manim clips ----
 .reveal .clip { display: block; margin: 0.3em auto 0; max-width: 100%; max-height: 520px; border: 1px solid $rule; }
 
+
+// The face the course makes when "database" means "dataset"
+.reveal .angry { display: inline-block; font-size: 1.25em; margin-left: .15em; }
+.reveal section.present .angry { animation: shake .6s ease-in-out .4s 2; }
+@keyframes shake { 0%,100% { transform: rotate(0); } 25% { transform: rotate(-14deg); } 75% { transform: rotate(14deg); } }
