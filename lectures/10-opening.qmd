@@ -519,7 +519,7 @@ cust$monetary                          # one column: data frame $ column name
 summary(cust$monetary)                 # a function applied to that column
 ```
 
-```{.text}
+```{.text code-line-numbers="false"}
    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.
    41.0   267.0   568.0   796.6   991.2  9214.0
 ```
@@ -528,7 +528,7 @@ summary(cust$monetary)                 # a function applied to that column
 
 ## Scale decides who is "close"
 
-Two real customers from `customers.csv`, and what their distance is made of:
+Two real customers, and what their distance is made of:
 
 | Column | Customer A | Customer B | Share of the distance, **raw** | after `scale()` |
 |---|---|---|---|---|
@@ -537,7 +537,7 @@ Two real customers from `customers.csv`, and what their distance is made of:
 | `monetary` (€) | 607 | 1 338 | **92%** | 5% |
 | `tenure`, `returns`, `online` | … | … | 0% | 18% |
 
-Raw, the distance *is* spending: euros run into the thousands. After `scale()` every column counts in standard deviations — and A and B differ because **one bought last month, one eight months ago**.
+Raw, the distance *is* spending. After `scale()` every column counts in standard deviations — and A and B differ because **one bought last month, one eight months ago**.
 
 ## Train and test, on real customers
 
@@ -693,3 +693,155 @@ All the rest is identical. Details and screenshots: the [Setup page](../setup.qm
 | `View(cust)` | the data frame as a spreadsheet |
 | `⌥ ⇧ K` | every shortcut there is |
 
+
+## [Appendix]{.section-kicker} R in one page {.section-slide background-color="#002f57"}
+
+## Vectors, tables, missing values
+
+```{.r}
+x <- c(607, 1338, 325, NA)       # a vector: c() combines values of one type
+x[2]                             # 1338 — R counts from 1, not 0
+mean(x)                          # NA: one missing value poisons the result
+mean(x, na.rm = TRUE)            # 756.67 — say what to do with it
+class(cust$monetary)             # "numeric"; class(churn$region) is "character"
+
+cust[1:3, ]                      # rows 1–3, every column      table[rows, columns]
+cust[, c("recency", "monetary")] # every row, two columns
+cust[cust$monetary > 5000, ]     # the rows that pass a condition
+```
+
+[Square brackets read as *table [which rows, which columns]*. An empty side means "all".]{.muted}
+
+## The five verbs, and the pipe
+
+```{.r}
+cust |>
+  filter(recency < 90) |>                         # keep rows
+  select(id, frequency, monetary) |>              # keep columns
+  mutate(avg_order = monetary / frequency) |>     # add a column
+  group_by(frequency > 10) |>                     # split into groups
+  summarise(n = n(), spend = mean(monetary))      # one row per group
+```
+
+| Verb | Question it answers |
+|---|---|
+| `filter` · `select` | which rows · which columns |
+| `mutate` | what new column do I need |
+| `group_by` + `summarise` | what is the number, per group |
+
+## Factors, and one plot template
+
+```{.r}
+churn$contract <- factor(churn$contract,
+  levels = c("month-to-month", "one-year", "two-year"))   # categories, in your order
+table(churn$contract)                                     # counts per category
+
+ggplot(cust, aes(x = recency, y = monetary)) +   # data, and which column goes where
+  geom_point(alpha = 0.3) +                      # what to draw
+  labs(x = "Days since last purchase", y = "Spend (€)")
+```
+
+Every ggplot is the same three parts: **data**, **aesthetics** (`aes`: what goes on which axis), **geometry** (`geom_`: points, bars, lines). Change one, keep the others.
+
+## [Appendix]{.section-kicker} Module 1, in R {.section-slide background-color="#002f57"}
+
+## What Prof. Arbia did, and the line that does it
+
+| Question | Function | Read in the output |
+|---------|------------|---------|
+| Mean equal to a value? | `t.test(x, mu = 750)` | `p-value`, 95% interval |
+| Two groups differ? | `t.test(y ~ group)` | interval of the difference |
+| Three or more groups? | `summary(aov(y ~ group))` | `F value`, `Pr(>F)` |
+| *y* against one *x* | `lm(y ~ x)` | `Estimate`, its p-value |
+| …holding others fixed | `lm(y ~ x1 + x2 + x3)` | `Adjusted R-squared` |
+| Redundant predictors? | `car::vif(fit)` | above 5–10 is trouble |
+| A yes/no target | `glm(y ~ ., family = binomial)` | `exp(coef(fit))` |
+
+[Next slides: each one run on `customers.csv` or `churn.csv`.]{.muted}
+
+## One mean, two means
+
+```{.r}
+t.test(cust$monetary, mu = 750)                 # is average spend 750 €?
+```
+```{.text code-line-numbers="false"}
+t = 4.4405, df = 5999, p-value = 0.000009137
+95 percent confidence interval:  776.0  817.1
+```
+
+```{.r}
+cust$online <- cust$channel_online > 0.5        # TRUE for mostly-online customers
+t.test(monetary ~ online, data = cust)          # Welch: unequal variances, by default
+```
+```{.text code-line-numbers="false"}
+t = 40.171, df = 5997.8, p-value < 2.2e-16
+mean in group FALSE  mean in group TRUE
+          1038.2842            351.5777
+```
+
+The interval does not contain 750, so we reject. Mostly-online customers spend about **€690 less** — the interval says between 653 and 720.
+
+## ANOVA: three groups or more
+
+```{.r}
+fit <- aov(monthly_charge ~ contract, data = churn)
+summary(fit)
+```
+```{.text code-line-numbers="false"}
+              Df  Sum Sq Mean Sq F value Pr(>F)
+contract       2     237   118.5   0.177  0.838
+Residuals   6997 4684482   669.5
+```
+
+```{.r}
+tapply(churn$monthly_charge, churn$contract, mean)   # 65.5, 65.1, 65.4
+```
+
+**p = 0.84: no evidence of a difference.** Contract type does not change the monthly charge. An honest ANOVA often says *no* — and then `TukeyHSD(fit)` has nothing to find.
+
+## Simple, then multiple regression
+
+```{.r}
+lm(monetary ~ frequency, data = cust) |> summary()
+lm(monetary ~ frequency + recency + tenure + returns, data = cust) |> summary()
+```
+
+| | Simple | Multiple |
+|---|---|---|
+| `frequency` estimate | **−41.3** | **−8.0** |
+| `recency` | — | +5.5 per day |
+| `tenure` | — | +9.2 per month |
+| `Adjusted R-squared` | 0.072 | 0.447 |
+
+The frequency effect shrinks by four fifths once recency enters: alone, it was carrying recency's effect too. **Adjusted R²** penalises each extra predictor; here it barely moves from the plain R² (0.4472 → 0.4468) because 6 000 rows can afford four predictors.
+
+## Collinearity: are two predictors saying the same thing?
+
+```{.r}
+round(cor(cust[, c("frequency", "recency", "tenure", "returns")]), 2)
+car::vif(fit)          # install.packages("car") once
+```
+```{.text code-line-numbers="false"}
+frequency   recency    tenure   returns
+ 1.785508  1.494547  1.206512  1.160302
+```
+
+VIF = 1 / (1 − R²) of each predictor regressed on the others. **1 is no overlap; above 5–10 the standard errors inflate** and the coefficients start swapping signs from sample to sample. Here, all below 2: the four predictors carry distinct information.
+
+## Logistic regression: a yes/no target
+
+```{.r}
+churn$churn <- factor(churn$churn)                 # models "yes"
+fit <- glm(churn ~ tenure_months + contract + monthly_charge,
+           data = churn, family = binomial)
+exp(coef(fit))                                          # odds ratios
+predict(fit, newdata = tibble(tenure_months = 3, contract = "month-to-month",
+                              monthly_charge = 90), type = "response")
+```
+```{.text code-line-numbers="false"}
+  tenure_months contractone-year contracttwo-year  monthly_charge
+          0.990            0.313            0.121           1.011
+                                                          → 0.535
+```
+
+A two-year contract cuts the odds of leaving by **88%** (0.121). A new, month-to-month, €90 customer: **53.5%** chance of churning. That last number is where Module 2 picks up — with trees and forests instead of one equation.
