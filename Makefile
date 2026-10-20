@@ -33,7 +33,7 @@ SCENES_18 := Boundary PerceptronByHand Perceptron GradientDescent Sigmoid Hidden
 SCENES_19 := DataSplit ValidationCurve ModelRace DeepScale AutoencoderPCA
 SCENES_14 := Rotation PCAByHand ScreeChoice
 # the lab: Module 1 in R ------------------------------------------------------
-SCENES_LAB := LeastSquares Decompose
+SCENES_LAB := TwoMeans LeastSquares LogitCurve ShrinkPath Decompose
 SCENES := $(SCENES_11) $(SCENES_12) $(SCENES_14) $(SCENES_18) $(SCENES_19) $(SCENES_LAB)
 clips:
 	cd animations && .venv/bin/manim -qm --disable_caching scenes.py $(SCENES)

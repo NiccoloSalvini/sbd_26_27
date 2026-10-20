@@ -142,6 +142,12 @@ The same on every machine on Earth, which is why textbooks and help pages use th
 
 ## [Section 1]{.section-kicker} Foundations {.section-slide background-color="#002f57"}
 
+## Two means, watched
+
+{{< video media/TwoMeans.mp4 width="1000" height="562" >}}
+
+[Two heaps of cars, two means, and the interval for the gap between them. The test is whether zero fits inside that interval; `t.test()` prints it.]{.muted}
+
 ## Look before you test
 
 ```{.r}
@@ -247,6 +253,12 @@ Read them in that order. A result with a tiny p-value and a tiny estimate is **s
 
 ## [Section 2]{.section-kicker} Regression {.section-slide background-color="#002f57"}
 
+## Least squares, watched
+
+{{< video media/LeastSquares.mp4 width="1000" height="562" >}}
+
+[The line moves, the squares change size, and one number is read out each time: `lm()` returns the line where that sum is smallest, and nothing else.]{.muted}
+
 ## Simple: what does weight cost in fuel?
 
 :::: {.columns}
@@ -270,12 +282,6 @@ Multiple R-squared: 0.753  Adjusted: 0.745
 ::::
 
 **Each extra 1 000 lb costs 5.3 mpg**, give or take 0.6. Weight alone explains **75%** of the variation in consumption. The intercept, 37 mpg for a weightless car, is a number nobody should quote.
-
-## Least squares, watched
-
-{{< video media/LeastSquares.mp4 width="1000" height="562" >}}
-
-[The line moves, the squares change size, and one number is read out each time: `lm()` returns the line where that sum is smallest, and nothing else.]{.muted}
 
 ## Multiple: weight *and* power
 
@@ -380,6 +386,12 @@ A model is judged on rows it **did not see**. R², residual plots, p-values are 
 
 ## [Section 3]{.section-kicker} GLM: a yes/no, a count, a time {.section-slide background-color="#002f57"}
 
+## Logistic, watched
+
+{{< video media/LogitCurve.mp4 width="1000" height="562" >}}
+
+[A straight line through 0s and 1s leaves the unit interval; the logistic bend keeps it inside. Two weights, two probabilities, read off the curve.]{.muted}
+
 ## Logistic: is this car a manual?
 
 :::: {.columns}
@@ -460,6 +472,12 @@ Median survival **270 days for men, 426 for women**; the hazard for women is **0
 
 ## [Section 4]{.section-kicker} Ridge and LASSO {.section-slide background-color="#002f57"}
 
+## Shrinkage, watched
+
+{{< video media/ShrinkPath.mp4 width="1000" height="562" >}}
+
+[The penalty grows and seven coefficients reach exactly zero, one after another. What `cv.glmnet()` keeps at λ.1se is cyl, hp and wt.]{.muted}
+
 ## Ten predictors, thirty-two cars
 
 ```{.r}
@@ -501,6 +519,12 @@ coef(cv, s = "lambda.1se")
 LASSO kept three columns and **halved the prediction error**. Ridge (`alpha = 0`) keeps all ten, shrunk; CV error 9.3. Both beat OLS; LASSO also tells you *which* three.
 
 ## [Section 5]{.section-kicker} Time series {.section-slide background-color="#002f57"}
+
+## Decomposition, watched
+
+{{< video media/Decompose.mp4 width="1000" height="562" >}}
+
+[One layer at a time: the moving average is the trend, the twelve factors are the season, and what is left over is the remainder `plot(d)` draws at the bottom.]{.muted}
 
 ## A series is a vector that knows its dates
 
@@ -547,12 +571,6 @@ round(d$figure, 2)   # the 12 seasonal factors
 ![](media/lab-decompose.png){width=100%}
 :::
 ::::
-
-## Decomposition, watched
-
-{{< video media/Decompose.mp4 width="1000" height="562" >}}
-
-[One layer at a time: the moving average is the trend, the twelve factors are the season, and what is left over is the remainder `plot(d)` draws at the bottom.]{.muted}
 
 ## Smoothing: Holt–Winters
 
