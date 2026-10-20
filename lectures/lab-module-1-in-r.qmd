@@ -399,7 +399,7 @@ A model is judged on rows it **did not see**. R², residual plots, p-values are 
 1. `mpg ~ hp`: how many mpg does a car lose **per 10 hp**? What share of the variation does power explain?
 2. Add `qsec` (quarter-mile time) to `mpg ~ wt + hp`. Does it earn its place? Use its p-value *and* the adjusted R²
 3. A 2 500 lb, 100 hp car: predicted mpg, and the range **a single car** could land in
-4. Split `cars` 70/30 with `set.seed(1)`. Fit degrees 1, 2, 3 on `train`: which has the lowest error on `test`? Does it agree with the five-fold result?
+4. Split `cars` 70/30 with `set.seed(1)`. Fit degrees 1, 2 and 3 on `train` and score each on `test`. Is the gap between degrees 1 and 2 large or small, compared with the jump to degree 3?
 
 [Solutions in the appendix.]{.muted}
 
@@ -818,7 +818,7 @@ for (d in 1:3) { f <- lm(dist ~ poly(speed, d), cars[idx, ])
 1. **0.7 mpg per 10 hp**; power alone explains 60% — less than weight's 75%
 2. **No.** `qsec` adds 0.002 to the adjusted R² and its p-value is 0.25: with weight and power in, quarter-mile time says nothing new
 3. **24.4 mpg**, and a single such car anywhere from **19 to 30**
-4. On this split **the line wins** (102 vs 145). Five-fold CV said the parabola, by a whisker. With 50 cars, degree 1 vs 2 is a coin toss; what is never in the race is degree 9
+4. Test error **102, 145, 218**. Degrees 1 and 2 are close, and which one wins depends on the split (five-fold CV picked the parabola by a whisker); the cubic is clearly worse. With 50 cars the data cannot separate a line from a gentle curve, but they can rule out wiggles
 
 ## Solutions 3 · GLM
 
