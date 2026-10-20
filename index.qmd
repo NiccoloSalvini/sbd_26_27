@@ -30,6 +30,7 @@ Everything you need for this course is on this page. Each lecture gets a row: sl
 | 6 | Mon 5 Oct | 17:00–19:00 · 204 | Survival models · **lecture by Prof. Salvini** — [schedule change](#change-5-oct) | — |
 | 7 | Fri 9 Oct | 09:00–13:00 · 204 | Regularisation and high-dimensional methods: Ridge, LASSO, Elastic Net | — |
 | 8 | Fri 16 Oct | 09:00–13:00 · 204 | Time series: components, visualization, smoothing, trend and seasonality | — |
+| Lab | Tue 20 Oct | 16:00–19:00 · 204 | **Extra session, Prof. Salvini** — Module 1 in R: every method, one question, one dataset · reading a CSV from the site | [slides](lectures/lab-module-1-in-r.html) · [script](materials/lab-module-1.R) · [data](materials/churn.csv) |
 | 9 | Fri 23 Oct | 09:00–13:00 · 204 | AR and ARIMA models · space–time modelling · business applications | — |
 
 : {tbl-colwidths="[4,12,16,48,20]"}

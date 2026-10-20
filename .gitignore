@@ -13,3 +13,5 @@ _site/
 
 # answer keys for the Blackboard tests: the repo is public
 private/
+
+**/*.quarto_ipynb
