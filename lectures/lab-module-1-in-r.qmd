@@ -111,17 +111,6 @@ Today we use all of it, on every method Prof. Arbia has covered.
 - Get a dataset from the course site into R, and answer business questions on it
 - Leave with a script that reruns, top to bottom, on Friday's lab machines
 
-## Why a manager cares
-
-::: {.subtitle-frame}
-Prof. Arbia gave you the theory. The exam is sat on a lab machine.
-:::
-
-- Every method in Module 1 is **one line of R**. The hard part was never the line
-- The hard part is the **sentence after it**: *does the interval contain zero? what does the coefficient mean, in euros? which model would you ship?*
-- In a company nobody asks you for a p-value. They ask *"should we do it?"* — the sentence is the deliverable
-- The exam asks for exactly that: a result, the code that produced it, and a justified choice
-
 ## How a lab works
 
 | Step | What you do | Example |
@@ -136,23 +125,20 @@ Steps 3 and 4 are mechanical. **Steps 1 and 5 are the exam.** Today we do all fi
 
 ## Datasets that ship with R
 
-```{.r}
-data()                 # every built-in dataset, with a one-line description
-?mtcars                # the codebook: what each column is, and its unit
-head(mtcars, 4)        # first rows
-dim(mtcars)            # 32 rows, 11 columns
-```
+`data()` lists every one; `?mtcars` is the codebook; `head(mtcars)` the first rows.
 
 | Dataset | Rows | What | We use it for |
 |---|---|---|---|
 | `mtcars` | 32 cars | fuel use, weight, power, gearbox | tests, regression, logit, LASSO |
 | `PlantGrowth` | 30 plants | yield under three treatments | ANOVA |
-| `cars` | 50 cars | speed and stopping distance | nonlinear regression, cross-validation |
-| `warpbreaks` | 54 looms | breaks per loom, wool and tension | Poisson |
+| `cars` | 50 cars | speed, stopping distance | a curve, cross-validation |
+| `warpbreaks` | 54 looms | breaks per loom, wool, tension | Poisson |
 | `lung` | 228 patients | survival time, status, age, sex | survival |
-| `AirPassengers` | 144 months | monthly airline passengers, 1949–60 | time series |
+| `AirPassengers` | 144 months | airline passengers, 1949–60 | time series |
 
-They are the same on every machine on Earth, which is why textbooks and help pages use them.
+: {tbl-colwidths="[20,16,38,26]"}
+
+The same on every machine on Earth, which is why textbooks and help pages use them.
 
 ## [Section 1]{.section-kicker} Foundations {.section-slide background-color="#002f57"}
 
@@ -175,32 +161,46 @@ A test confirms what a plot already shows. **If the boxplot surprises you, the t
 
 ## One mean: is the average 20 mpg?
 
+:::: {.columns}
+::: {.column width="52%"}
 ```{.r}
 t.test(mtcars$mpg, mu = 20)
 ```
 ```{.text code-line-numbers="false"}
 t = 0.085, df = 31, p-value = 0.9
-95 percent confidence interval:  17.92  22.26
+95 percent confidence interval:
+  17.92  22.26
 mean of x: 20.09
 ```
+:::
+::: {.column width="48%"}
+![](media/lab-one-mean.png){width=100%}
+:::
+::::
 
-- **Estimate**: 20.1 mpg
-- **Interval**: 17.9 to 22.3 — *contains 20*
-- **p-value**: 0.93 — no evidence against 20
+- **Estimate** 20.1 mpg · **interval** 17.9 to 22.3, *contains 20* · **p-value** 0.93: no evidence against 20
 
 The sentence: *"Average consumption is compatible with 20 mpg; with 32 cars we cannot tell 20 from anything between 18 and 22."*
 
 ## Two means: do manual cars use less fuel?
 
+:::: {.columns}
+::: {.column width="56%"}
 ```{.r}
-t.test(mpg ~ am, data = mtcars)       # Welch: unequal variances, the default
+t.test(mpg ~ am, data = mtcars)   # Welch
 ```
 ```{.text code-line-numbers="false"}
 t = -3.8, df = 18, p-value = 0.001
-95 percent confidence interval:  -11.28  -3.21
+95 percent confidence interval:
+  -11.28  -3.21
 mean in group 0   mean in group 1
-          17.15            24.39
+          17.15             24.39
 ```
+:::
+::: {.column width="44%"}
+![](media/lab-two-means.png){width=100%}
+:::
+::::
 
 Manual cars do **7.2 mpg more**, and the interval says between **3.2 and 11.3**: it does not contain zero.
 
@@ -210,20 +210,27 @@ The interval is the answer; the p-value only says the interval misses zero. *"p 
 
 ## Three groups: ANOVA
 
+:::: {.columns}
+::: {.column width="56%"}
 ```{.r}
 fit <- aov(weight ~ group, data = PlantGrowth)
 summary(fit)
-TukeyHSD(fit)                          # which pairs differ, with intervals
+TukeyHSD(fit)        # which pairs differ
 ```
 ```{.text code-line-numbers="false"}
-            Df Sum Sq Mean Sq F value Pr(>F)
-group        2   3.77   1.883    4.85  0.016
+         Df Sum Sq Mean Sq F value Pr(>F)
+group     2   3.77   1.883    4.85  0.016
 
             diff    lwr    upr  p adj
 trt1-ctrl -0.371 -1.062  0.320  0.391
 trt2-ctrl  0.494 -0.197  1.185  0.198
 trt2-trt1  0.865  0.174  1.556  0.012
 ```
+:::
+::: {.column width="44%"}
+![](media/lab-anova.png){width=100%}
+:::
+::::
 
 ANOVA says *some* group differs (p = 0.016). Tukey says *which*: only **treatment 2 vs treatment 1**. Neither treatment is distinguishable from the control. One line, then the honest sentence.
 
@@ -242,18 +249,25 @@ Read them in that order. A result with a tiny p-value and a tiny estimate is **s
 
 ## Simple: what does weight cost in fuel?
 
+:::: {.columns}
+::: {.column width="56%"}
 ```{.r}
-fit <- lm(mpg ~ wt, data = mtcars)     # wt in thousands of pounds
+fit <- lm(mpg ~ wt, data = mtcars)
 summary(fit)
 plot(mpg ~ wt, data = mtcars); abline(fit)
 ```
 ```{.text code-line-numbers="false"}
-            Estimate Std. Error t value   Pr(>|t|)
-(Intercept)   37.285      1.878   19.86   < 2e-16
-wt            -5.344      0.559   -9.56   1.3e-10
+            Estimate Std. Error t value
+(Intercept)   37.285      1.878   19.86
+wt            -5.344      0.559   -9.56
 
-Multiple R-squared:  0.753,   Adjusted R-squared:  0.745
+Multiple R-squared: 0.753  Adjusted: 0.745
 ```
+:::
+::: {.column width="44%"}
+![](media/lab-simple.png){width=100%}
+:::
+::::
 
 **Each extra 1 000 lb costs 5.3 mpg**, give or take 0.6. Weight alone explains **75%** of the variation in consumption. The intercept, 37 mpg for a weightless car, is a number nobody should quote.
 
@@ -297,15 +311,22 @@ A 3 000 lb, 150 hp car: **about 21 mpg, and a new car of that kind could land an
 
 ## Nonlinear: a curve where a line is wrong
 
+:::: {.columns}
+::: {.column width="56%"}
 ```{.r}
-lm(dist ~ speed, data = cars)                 # a line
-lm(dist ~ poly(speed, 2), data = cars)        # a parabola
-lm(dist ~ poly(speed, 9), data = cars)        # a nine-degree polynomial
+lm(dist ~ speed, data = cars)           # line
+lm(dist ~ poly(speed, 2), data = cars)  # parabola
+lm(dist ~ poly(speed, 9), data = cars)  # degree 9
 ```
 
 | Degree | 1 | 2 | 9 |
 |---|---|---|---|
 | R² on the 50 cars | 0.651 | 0.667 | **0.713** |
+:::
+::: {.column width="44%"}
+![](media/lab-nonlinear.png){width=100%}
+:::
+::::
 
 R² **always** rises with degree — a degree-49 polynomial would score 1.000 by passing through every point. So R² cannot choose the degree. Something that has never seen the data must.
 
@@ -321,11 +342,20 @@ cv_mse <- function(d) mean(sapply(1:5, function(k) {
 sapply(c(1, 2, 3, 5, 9), cv_mse)
 ```
 
+:::: {.columns}
+::: {.column width="60%"}
 | Degree | 1 | **2** | 3 | 5 | 9 |
 |---|---|---|---|---|---|
 | CV error (MSE) | 239 | **227** | 319 | 322 | 9 410 |
 
-Degree 9 fit the 50 cars best and predicts new cars **forty times worse**. That is variance. Degree 1 is a touch too stiff — that is bias. The **parabola** wins, and it is the one physics would have guessed: stopping distance grows with speed squared.
+Degree 9 fit the 50 cars best and predicts new cars **forty times worse**. That is variance. Degree 1 is a touch too stiff — that is bias. The **parabola** wins.
+:::
+::: {.column width="40%"}
+![](media/lab-cv.png){width=100%}
+:::
+::::
+
+[And it is the one physics would have guessed: stopping distance grows with speed squared.]{.muted}
 
 ## Train and test, the habit
 
@@ -346,58 +376,79 @@ A model is judged on rows it **did not see**. R², residual plots, p-values are 
 
 ## Logistic: is this car a manual?
 
+:::: {.columns}
+::: {.column width="56%"}
 ```{.r}
-fit <- glm(am ~ wt, family = binomial, data = mtcars)
-exp(coef(fit))                                                 # odds ratios
-predict(fit, data.frame(wt = c(2.5, 3.5)), type = "response")  # probabilities
+fit <- glm(am ~ wt, data = mtcars,
+           family = binomial)
+exp(coef(fit))            # odds ratios
+predict(fit, data.frame(wt = c(2.5, 3.5)),
+        type = "response")  # probabilities
 ```
 ```{.text code-line-numbers="false"}
 (Intercept)          wt
- 169459.571       0.018          ← odds ratio per 1 000 lb
+ 169459.571       0.018   ← per 1 000 lb
 
     1     2
 0.879 0.115
 ```
+:::
+::: {.column width="44%"}
+![](media/lab-logit.png){width=100%}
+:::
+::::
 
 - Each extra 1 000 lb **multiplies the odds of a manual gearbox by 0.018**: heavy cars are automatic
-- A 2 500 lb car: **88%** manual. A 3 500 lb car: **11%**
-- `type = "response"` gives a probability; without it you get the log-odds, which nobody can read
+- A 2 500 lb car: **88%** manual. A 3 500 lb car: **11%**. `type = "response"` gives a probability; without it you get log-odds, which nobody can read
 
 ## Poisson: how many breaks per loom?
 
+:::: {.columns}
+::: {.column width="56%"}
 ```{.r}
-fit <- glm(breaks ~ wool + tension, family = poisson, data = warpbreaks)
-exp(coef(fit))                                  # multiplicative effects on the count
+fit <- glm(breaks ~ wool + tension,
+           data = warpbreaks,
+           family = poisson)
+exp(coef(fit))   # multiplicative effects
 ```
 ```{.text code-line-numbers="false"}
-(Intercept)       woolB    tensionM    tensionH
-     40.124       0.814       0.725       0.595
+(Intercept)    woolB  tensionM  tensionH
+     40.124    0.814     0.725     0.595
 ```
+:::
+::: {.column width="44%"}
+![](media/lab-poisson.png){width=100%}
+:::
+::::
 
-- Baseline — wool A, low tension — **40 breaks** per loom
-- Wool B: **19% fewer** (×0.81). Medium tension: 27% fewer. High tension: **40% fewer** (×0.60)
+- Baseline — wool A, low tension — **40 breaks** per loom. Wool B: **19% fewer** (×0.81). High tension: **40% fewer** (×0.60)
 - The sentence for production: *switch to wool B at high tension and expect about half the breaks*
-
-A count is not a yes/no and not a continuous number: `family = poisson` keeps predictions positive and whole.
+- A count is not a yes/no and not a continuous number: `family = poisson` keeps predictions positive and whole
 
 ## Survival: how long until the event?
 
+:::: {.columns}
+::: {.column width="58%"}
 ```{.r}
 library(survival)
-fit <- survfit(Surv(time, status) ~ sex, data = lung)   # Kaplan–Meier, by sex
-fit; plot(fit, col = c("navy", "goldenrod"))
-survdiff(Surv(time, status) ~ sex, data = lung)         # log-rank test
-coxph(Surv(time, status) ~ sex + age, data = lung)      # Cox: hazard ratios
+s  <- Surv(time, status)        # time + status
+km <- survfit(s ~ sex, data = lung)
+km; plot(km)                    # Kaplan–Meier
+survdiff(s ~ sex, data = lung)  # log-rank
+coxph(s ~ sex + age, data = lung)
 ```
 ```{.text code-line-numbers="false"}
         n events median 0.95LCL 0.95UCL
-sex=1 138    112     270     212     310
-sex=2  90     53     426     348     550
-Chisq = 10.3 on 1 df, p = 0.001
-
-     coef exp(coef) se(coef)     z Pr(>|z|)
-sex -0.513     0.599    0.167 -3.07   0.0022
+sex=1 138    112    270     212     310
+sex=2  90     53    426     348     550
+log-rank:  Chisq = 10.3 on 1 df, p = 0.001
+Cox:       sex  coef -0.513  exp(coef) 0.599
 ```
+:::
+::: {.column width="42%"}
+![](media/lab-survival.png){width=100%}
+:::
+::::
 
 Median survival **270 days for men, 426 for women**; the hazard for women is **0.60** that of men, adjusting for age. `status` is what makes this survival and not regression: the people still alive are **censored**, not missing.
 
@@ -417,13 +468,15 @@ That is the high-dimensional problem in miniature. Ordinary least squares has no
 
 ## LASSO: let the data drop columns
 
+:::: {.columns}
+::: {.column width="58%"}
 ```{.r}
 library(glmnet)
-x <- model.matrix(mpg ~ ., data = mtcars)[, -1]   # predictors as a matrix
+x <- model.matrix(mpg ~ ., mtcars)[, -1]
 y <- mtcars$mpg
 set.seed(1)
-cv <- cv.glmnet(x, y, alpha = 1)          # alpha = 1: LASSO; alpha = 0: ridge
-coef(cv, s = "lambda.1se")                # simplest model within one SE of the best
+cv <- cv.glmnet(x, y, alpha = 1)  # 0 = ridge
+coef(cv, s = "lambda.1se")
 ```
 
 | | OLS | LASSO |
@@ -433,6 +486,11 @@ coef(cv, s = "lambda.1se")                # simplest model within one SE of the 
 | `wt` | −3.72 | **−2.37** |
 | the other 7 | all nonzero | **all exactly 0** |
 | CV error | 20.9 | **9.8** |
+:::
+::: {.column width="42%"}
+![](media/lab-lasso.png){width=100%}
+:::
+::::
 
 LASSO kept three columns and **halved the prediction error**. Ridge (`alpha = 0`) keeps all ten, shrunk; CV error 9.3. Both beat OLS; LASSO also tells you *which* three.
 
@@ -440,62 +498,100 @@ LASSO kept three columns and **halved the prediction error**. Ridge (`alpha = 0`
 
 ## A series is a vector that knows its dates
 
+:::: {.columns}
+::: {.column width="66%"}
 ```{.r}
-AirPassengers                      # 144 months, Jan 1949 – Dec 1960
-frequency(AirPassengers)           # 12: monthly
+AirPassengers             # 1949 – 1960
+frequency(AirPassengers)  # 12: monthly
 plot(AirPassengers)
 ```
 ```{.text code-line-numbers="false"}
-     Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec
-1949 112 118 132 129 121 135 148 148 136 119 104 118
-1960 417 391 419 461 472 535 622 606 508 461 390 432
+     Jan Feb Mar Apr May Jun   Jul Aug Sep Oct Nov Dec
+1949 112 118 132 129 121 135   148 148 136 119 104 118
+1960 417 391 419 461 472 535   622 606 508 461 390 432
 ```
+:::
+::: {.column width="34%"}
+![](media/lab-series.png){width=100%}
+:::
+::::
 
-Two things visible without a model: **a trend** (four times more passengers in twelve years) and **a season** (July is the peak, November the trough) whose swing **grows with the level** — the pattern that asks for a multiplicative model, or a log.
+Two things visible without a model: **a trend** (four times more passengers in twelve years) and **a season** (July the peak, November the trough) whose swing **grows with the level** — the pattern that asks for a multiplicative model, or a log.
 
 ## Decompose: trend, season, remainder
 
+:::: {.columns}
+::: {.column width="62%"}
 ```{.r}
-d <- decompose(AirPassengers, type = "multiplicative")
+d <- decompose(AirPassengers,
+               type = "multiplicative")
 plot(d)
-round(d$figure, 2)                 # the twelve seasonal factors
+round(d$figure, 2)   # the 12 seasonal factors
 ```
 ```{.text code-line-numbers="false"}
- Jan  Feb  Mar  Apr  May  Jun  Jul  Aug  Sep  Oct  Nov  Dec
-0.91 0.88 1.01 0.98 0.98 1.11 1.23 1.22 1.06 0.92 0.80 0.90
+ Jan  Feb  Mar  Apr  May  Jun
+0.91 0.88 1.01 0.98 0.98 1.11
+ Jul  Aug  Sep  Oct  Nov  Dec
+1.23 1.22 1.06 0.92 0.80 0.90
 ```
 
 **July runs 23% above the trend, November 20% below.** That is the sentence a planner needs: how much capacity to add in summer, as a share.
+:::
+::: {.column width="38%"}
+![](media/lab-decompose.png){width=100%}
+:::
+::::
 
 ## Smoothing: Holt–Winters
 
+:::: {.columns}
+::: {.column width="60%"}
 ```{.r}
-hw <- HoltWinters(AirPassengers, seasonal = "multiplicative")
-predict(hw, 12)                    # the next twelve months
+hw <- HoltWinters(AirPassengers,
+                  seasonal = "multiplicative")
+predict(hw, 12)     # the next twelve months
 ```
 ```{.text code-line-numbers="false"}
-     Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec
-1961 447 420 465 496 508 575 667 658 550 493 420 466
+     Jan Feb Mar Apr May Jun
+1961 447 420 465 496 508 575
+     Jul Aug Sep Oct Nov Dec
+     667 658 550 493 420 466
 ```
+:::
+::: {.column width="40%"}
+![](media/lab-holtwinters.png){width=100%}
+:::
+::::
 
 Three smoothing weights, estimated from the data: level 0.28, trend 0.03, season 0.87. No equation to defend, one forecast per month, and it already carries the season. **Fine for next year; silent about how wrong it might be.**
 
 ## ARIMA: the airline model
 
+:::: {.columns}
+::: {.column width="62%"}
 ```{.r}
-fit <- arima(log(AirPassengers), order = c(0, 1, 1), seasonal = c(0, 1, 1))
-fit                                               # ma1 = -0.40, sma1 = -0.56
-exp(predict(fit, 12)$pred)                        # back from the log scale
-Box.test(residuals(fit), lag = 24, type = "Ljung-Box")   # anything left? p = 0.3: no
+fit <- arima(log(AirPassengers),
+             order = c(0, 1, 1),
+             seasonal = c(0, 1, 1))
+exp(predict(fit, 12)$pred)   # back from the log
+Box.test(residuals(fit), lag = 24,
+         type = "Ljung-Box")
 ```
 ```{.text code-line-numbers="false"}
-     Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec
-1961 450 426 479 492 509 583 670 667 558 497 430 477
+     Jan Feb Mar Apr May Jun
+1961 450 426 479 492 509 583
+     Jul Aug Sep Oct Nov Dec
+     670 667 558 497 430 477
+Box-Ljung: p = 0.3, nothing left in the residuals
 ```
+:::
+::: {.column width="38%"}
+![](media/lab-arima.png){width=100%}
+:::
+::::
 
-- `log` turns the growing swing into a constant one; the two `1`s difference away trend and season; the two MA terms model what is left
-- `forecast::auto.arima(AirPassengers, lambda = 0)` picks **exactly this model** on its own
-- Holt–Winters and ARIMA agree within 2%. Where they differ is the **interval**: ARIMA's is ±8% in January and ±17% by December, and it widens honestly
+- `log` makes the growing swing constant; the two `1`s difference away trend and season; the MA terms model what is left. `forecast::auto.arima(AirPassengers, lambda = 0)` picks **exactly this model** on its own
+- Holt–Winters and ARIMA agree within 2%. Where they differ is the **interval**: ±8% in January, ±17% by December, and it widens honestly
 
 ## [Section 6]{.section-kicker} A CSV from the course site {.section-slide background-color="#002f57"}
 
@@ -519,20 +615,27 @@ glimpse(churn)                                   # 7 000 rows, 20 columns, types
 
 ## The same questions, on 7 000 customers
 
+:::: {.columns}
+::: {.column width="58%"}
 ```{.r}
-mean(churn$churn == "yes")                                  # 0.285: churn rate
-t.test(monthly_charge ~ churn, data = churn)                # do leavers pay more?
-prop.table(table(churn$contract, churn$churn), 1)           # churn rate by contract
+mean(churn$churn == "yes")       # 0.285
+t.test(monthly_charge ~ churn, data = churn)
+tab <- table(churn$contract, churn$churn)
+prop.table(tab, 1)               # rates by row
 ```
 ```{.text code-line-numbers="false"}
-mean in group no   mean in group yes        95% CI of the difference
-           63.54               70.04        -7.8  -5.2
+mean no 63.54   mean yes 70.04   CI  -7.8  -5.2
 
                    no    yes
   month-to-month 0.592  0.408
   one-year       0.818  0.182
   two-year       0.919  0.081
 ```
+:::
+::: {.column width="42%"}
+![](media/lab-churn-contract.png){width=100%}
+:::
+::::
 
 Leavers pay **€6.5 more a month** (between 5 and 8). Churn runs **41% on monthly contracts, 8% on two-year ones**. Two lines, two sentences a retention team can act on.
 
