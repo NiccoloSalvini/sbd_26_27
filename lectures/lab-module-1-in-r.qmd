@@ -251,6 +251,16 @@ ANOVA says *some* group differs (p = 0.016). Tukey says *which*: only **treatmen
 
 Read them in that order. A result with a tiny p-value and a tiny estimate is **significant and useless** — common with 7 000 rows, as we will see at the end.
 
+## Exercises 1 · Foundations
+
+Same datasets, your script, one line and one sentence each. Ten minutes.
+
+1. Is the average horsepower in `mtcars` **150**? State the interval, not just the verdict
+2. Do V-shaped engines (`vs = 0`) and straight ones (`vs = 1`) differ in `mpg`? By how much, *at least*?
+3. Does `mpg` differ by number of cylinders? `factor(cyl)` turns 4, 6, 8 into groups. **Which pairs** differ?
+
+[Solutions in the appendix at the end of the deck. Try before you look.]{.muted}
+
 ## [Section 2]{.section-kicker} Regression {.section-slide background-color="#002f57"}
 
 ## Least squares, watched
@@ -384,6 +394,15 @@ mean((test$mpg - predict(fit, test))^2)       # one number: error on cars never 
 A model is judged on rows it **did not see**. R², residual plots, p-values are all computed on the training rows, and all of them improve as the model gets more complicated. Only the test error can get worse — which is why it is the one you trust.
 :::
 
+## Exercises 2 · Regression
+
+1. `mpg ~ hp`: how many mpg does a car lose **per 10 hp**? What share of the variation does power explain?
+2. Add `qsec` (quarter-mile time) to `mpg ~ wt + hp`. Does it earn its place? Use its p-value *and* the adjusted R²
+3. A 2 500 lb, 100 hp car: predicted mpg, and the range **a single car** could land in
+4. Split `cars` 70/30 with `set.seed(1)`. Fit degrees 1, 2, 3 on `train`: which has the lowest error on `test`? Does it agree with the five-fold result?
+
+[Solutions in the appendix.]{.muted}
+
 ## [Section 3]{.section-kicker} GLM: a yes/no, a count, a time {.section-slide background-color="#002f57"}
 
 ## Logistic, watched
@@ -469,6 +488,14 @@ Cox:       sex  coef -0.513  exp(coef) 0.599
 
 Median survival **270 days for men, 426 for women**; the hazard for women is **0.60** that of men, adjusting for age. `status` is what makes this survival and not regression: the people still alive are **censored**, not missing.
 
+## Exercises 3 · GLM
+
+1. Logistic `am ~ hp`. The odds ratio **per 10 hp** is `exp(10 * coef(fit)["hp"])`. P(manual) at 100 hp and at 200 hp?
+2. Poisson on `InsectSprays` (72 plots, six sprays, `count ~ spray`). Which spray leaves the **fewest** insects, and by what factor compared with spray A?
+3. Add `ph.ecog` (a 0–3 performance score) to the Cox model `~ sex + age`. Hazard ratio **per point**? Is `age` still in the picture?
+
+[Solutions in the appendix.]{.muted}
+
 ## [Section 4]{.section-kicker} Ridge and LASSO {.section-slide background-color="#002f57"}
 
 ## Shrinkage, watched
@@ -516,6 +543,13 @@ coef(cv, s = "lambda.1se")
 ::::
 
 Three columns kept, **prediction error halved**. Ridge (`alpha = 0`) keeps all ten, shrunk: CV error 9.3. LASSO also tells you *which* three.
+
+## Exercises 4 · Ridge and LASSO
+
+1. Ridge on the same `x` and `y` (`alpha = 0`). How many coefficients are **exactly zero** at `lambda.1se`? CV error against LASSO's 9.8?
+2. LASSO on `swiss` — 47 provinces of Switzerland in 1888, `Fertility ~ .`, five predictors. Which predictors **survive** at `lambda.1se`? Compare with the five that `lm` keeps
+
+[Solutions in the appendix.]{.muted}
 
 ## [Section 5]{.section-kicker} Time series {.section-slide background-color="#002f57"}
 
@@ -628,6 +662,16 @@ Box-Ljung: p = 0.3, nothing left in the residuals
 - Where they differ is the **interval**: ±8% in January, ±17% by December, and it widens honestly. Holt–Winters gave you no interval at all
 - Ljung–Box p = 0.3: the residuals are noise. If they were not, the model would have left something on the table
 
+## Exercises 5 · Time series
+
+`co2`: monthly CO₂ at Mauna Loa, 1959–1997, 468 months. Already a `ts`.
+
+1. `decompose(co2)`: **additive or multiplicative**, and why? Which month peaks, which troughs, by how many ppm?
+2. `HoltWinters(co2)`, then twelve months ahead. What does **May 1998** look like?
+3. `arima(co2, order = c(0, 1, 1), seasonal = c(0, 1, 1))` — no `log` this time: why? Compare its May 1998 with Holt–Winters', and check the residuals with `Box.test`
+
+[Solutions in the appendix.]{.muted}
+
 ## [Section 6]{.section-kicker} A CSV from the course site {.section-slide background-color="#002f57"}
 
 ## Download, then read
@@ -711,12 +755,12 @@ With 7 000 rows almost anything becomes "significant", so a p-value stops being 
 
 On `churn.csv`, in your script, one line and one sentence each:
 
-1. Do customers who leave have shorter **tenure**? (`t.test`) — *answer: 6.7 months shorter, between 5.2 and 8.2*
-2. Does churn rise with **support calls**? Make the table of churn rate by `support_calls` — *23% with none, 67% with five*
-3. Fit the logit above **plus `support_calls`**. What is the odds ratio? Is it the biggest effect in the model?
-4. Split 70/30 with `set.seed(1)`. Fit on `train`, predict probabilities on `test`, and compute the share of churners among the 10% with the highest predicted probability
+1. Do customers who leave have shorter **tenure**? (`t.test`) By how much?
+2. Does churn rise with **support calls**? Make the table of churn rate by `support_calls`
+3. Fit the logit above **plus `support_calls`**. What is its odds ratio? Is it the biggest effect in the model?
+4. Split 70/30 with `set.seed(1)`. Fit on `train`, predict probabilities on `test`, and compute the share of churners among the **10% with the highest** predicted probability
 
-Bring question 4's number on Friday. It is the number Module 2 starts from.
+Bring question 4's number on Friday. It is the number Module 2 starts from. [Solutions in the appendix.]{.muted}
 
 ## Every method in Module 1 is one line. The sentence after it is the exam. {.statement}
 
@@ -738,6 +782,112 @@ Bring question 4's number on Friday. It is the number Module 2 starts from.
 - **Provost & Fawcett** chapter 4, *Fitting a model to data*, and chapter 5, *Overfitting*: the bias–variance story told for managers
 - **Shmueli & Polak** chapters 2–3: time series components and smoothing, in R
 - Reference: `?t.test`, `?lm`, `?glm`, `?survfit`, `?cv.glmnet`, `?arima`
+
+## [Appendix]{.section-kicker} Solutions {.section-slide background-color="#002f57"}
+
+## Solutions 1 · Foundations
+
+```{.r}
+t.test(mtcars$hp, mu = 150)        # 146.7, interval 122 to 171, p = 0.79
+t.test(mpg ~ vs, data = mtcars)    # 16.6 vs 24.6, gap between 4.4 and 11.5
+TukeyHSD(aov(mpg ~ factor(cyl), data = mtcars))
+```
+```{.text code-line-numbers="false"}
+       diff     lwr     upr  p adj
+6-4  -6.921 -10.769 -3.072 0.0003
+8-4 -11.564 -14.771 -8.357 0.0000
+8-6  -4.643  -8.328 -0.958 0.0112
+```
+
+1. **Compatible with 150**: the interval runs from 122 to 171 hp; 32 cars cannot pin the mean down closer than that
+2. Straight engines do **7.9 mpg more**, and at least **4.4**: the interval is well clear of zero
+3. **Every pair differs**: 4 cylinders do 26.7 mpg, 6 do 19.7, 8 do 15.1. Even 8 vs 6, the closest pair, is at least 1 mpg apart
+
+## Solutions 2 · Regression
+
+```{.r}
+lm(mpg ~ hp, data = mtcars)                  # hp −0.068, R² 0.60
+lm(mpg ~ wt + hp + qsec, data = mtcars)      # qsec p = 0.25, adj R² 0.817
+predict(fit2, data.frame(wt = 2.5, hp = 100),
+        interval = "prediction")             # 24.4, from 18.9 to 29.8
+set.seed(1); idx <- sample(nrow(cars), 0.7 * nrow(cars))
+for (d in 1:3) { f <- lm(dist ~ poly(speed, d), cars[idx, ])
+  print(mean((cars$dist[-idx] - predict(f, cars[-idx, ]))^2)) }   # 102 145 218
+```
+
+1. **0.7 mpg per 10 hp**; power alone explains 60% — less than weight's 75%
+2. **No.** `qsec` adds 0.002 to the adjusted R² and its p-value is 0.25: with weight and power in, quarter-mile time says nothing new
+3. **24.4 mpg**, and a single such car anywhere from **19 to 30**
+4. On this split **the line wins** (102 vs 145). Five-fold CV said the parabola, by a whisker. With 50 cars, degree 1 vs 2 is a coin toss; what is never in the race is degree 9
+
+## Solutions 3 · GLM
+
+```{.r}
+fit <- glm(am ~ hp, family = binomial, data = mtcars)
+exp(10 * coef(fit)["hp"])                                        # 0.92 per 10 hp
+predict(fit, data.frame(hp = c(100, 200)), type = "response")    # 0.49, 0.30
+exp(coef(glm(count ~ spray, family = poisson, data = InsectSprays)))
+coxph(Surv(time, status) ~ sex + age + ph.ecog, data = lung)
+```
+```{.text code-line-numbers="false"}
+sprayB 1.057  sprayC 0.144  sprayD 0.339  sprayE 0.241  sprayF 1.149
+sex 0.575 (p = 0.001)   age 1.011 (p = 0.23)   ph.ecog 1.590 (p < 0.001)
+```
+
+1. Each 10 hp multiplies the odds of a manual by **0.92**: 49% at 100 hp, 30% at 200 hp. Weak, next to weight
+2. **Spray C**: 0.14 times A's count, about 2 insects per plot against 14.5. F is the worst
+3. Each ECOG point multiplies the hazard by **1.59**; `age` is **not** significant any more (p = 0.23): the score carries what age was hinting at
+
+## Solutions 4 · Ridge and LASSO
+
+```{.r}
+set.seed(1); r <- cv.glmnet(x, y, alpha = 0)
+coef(r, s = "lambda.1se")                    # all 10 nonzero, CV error 9.3
+xs <- model.matrix(Fertility ~ ., data = swiss)[, -1]
+set.seed(1); l <- cv.glmnet(xs, swiss$Fertility, alpha = 1)
+coef(l, s = "lambda.1se")
+```
+```{.text code-line-numbers="false"}
+                  Agriculture Examination Education Catholic Infant.Mortality
+lm                     -0.172      -0.258    -0.871    0.104            1.077
+LASSO, lambda.1se       0.000      -0.158    -0.546    0.054            0.889
+```
+
+1. **None are zero**: ridge shrinks, it never drops. CV error 9.3, a shade better than LASSO's 9.8, half of OLS's 20.9
+2. **Agriculture is dropped**; the other four survive, shrunk towards zero. Education stays the strongest, −0.55 against −0.87 unpenalised
+
+## Solutions 5 · Time series
+
+```{.r}
+d <- decompose(co2); round(d$figure, 2)   # May +3.0, Oct −3.25 ppm
+hw <- HoltWinters(co2); predict(hw, 12)   # May 1998: 368.7
+fit <- arima(co2, order = c(0, 1, 1), seasonal = c(0, 1, 1))
+predict(fit, 12)$pred                     # May 1998: 368.8
+Box.test(residuals(fit), lag = 24, type = "Ljung-Box")   # p = 0.5
+```
+
+1. **Additive**: the seasonal swing is about 6 ppm in 1959 and about 6 ppm in 1997, while the level rose from 315 to 365. A swing that does not grow with the level is added, not multiplied. Peak **May +3.0 ppm**, trough **October −3.25**
+2. May 1998: **368.7 ppm**, a year after May 1997's 366.8 — the trend is 1.5 to 2 ppm a year and the model carries it
+3. No `log` for the same reason: additive season. ARIMA says **368.8**, within 0.1 ppm of Holt–Winters; the Ljung–Box p-value of 0.5 says the residuals are noise
+
+## Solutions 6 · churn.csv
+
+```{.r}
+t.test(tenure_months ~ churn, data = churn)              # 31.3 vs 24.6
+tapply(churn$churn == "yes", churn$support_calls, mean)  # 0.23 … 0.67
+fit <- glm(churn ~ tenure_months + contract + monthly_charge
+                 + support_calls, family = binomial, data = churn)
+exp(coef(fit))                                           # support_calls 1.51
+set.seed(1); idx <- sample(nrow(churn), 0.7 * nrow(churn))
+g <- update(fit, data = churn[idx, ])
+p <- predict(g, churn[-idx, ], type = "response")
+mean(churn$churn[-idx][p >= quantile(p, 0.9)] == "yes")  # 0.595
+```
+
+1. Leavers have been customers **6.7 months less**, between 5.2 and 8.2
+2. Churn climbs with every call: **23%** with none, 37% at two, **67%** at five
+3. Each call multiplies the odds of leaving by **1.51**. Per unit it is not the biggest effect: a two-year contract divides the odds by about **9** (0.114)
+4. **59.5%** of the riskiest tenth actually churn, against 28% overall: the model doubles the hit rate of a retention call. Friday starts here
 
 ## [Appendix]{.section-kicker} The cheat sheet {.section-slide background-color="#002f57"}
 
