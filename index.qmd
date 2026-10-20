@@ -31,7 +31,7 @@ Everything you need for this course is on this page. Each lecture gets a row: sl
 | 7 | Fri 9 Oct | 09:00–13:00 · 204 | Regularisation and high-dimensional methods: Ridge, LASSO, Elastic Net | — |
 | 8 | Fri 16 Oct | 09:00–13:00 · 204 | Time series: components, visualization, smoothing, trend and seasonality | — |
 | Lab | Tue 20 Oct | 16:00–19:00 · 204 | **Extra session, Prof. Salvini** — Module 1 in R: every method, one question, one dataset · reading a CSV from the site | [slides](lectures/lab-module-1-in-r.html) · [script](materials/lab-module-1.R) · [data](materials/churn.csv) |
-| 9 | Fri 23 Oct | 09:00–13:00 · 204 | AR and ARIMA models · space–time modelling · business applications | — |
+| 9 | Fri 23 Oct | 10:00–13:00 · **Aula 1** | **Mock exam** on the lab machines · Prof. Salvini — [schedule change](#change-23-oct) | [slides](lectures/lab-module-1-in-r.html) · [script](materials/lab-module-1.R) |
 
 : {tbl-colwidths="[4,12,16,48,20]"}
 
@@ -39,6 +39,14 @@ Everything you need for this course is on this page. Each lecture gets a row: sl
 **Change to the published schedule — lecture 6, Monday 5 October.** Prof. Salvini
 lectures in place of Prof. Arbia, who has a supervening commitment. Date, time,
 room and topic are unchanged: 17:00–19:00, room 204, survival models.
+:::
+
+::: {#change-23-oct .callout-important appearance="simple"}
+**Change to the published schedule — lecture 9, Friday 23 October.** Prof. Arbia is
+away. The morning slot becomes a **mock exam on the lab machines**: 10:00–13:00,
+**Aula 1** (next to the Laboratorio informatica), with Prof. Salvini. The questions
+look like the [exercises in the lab slides](lectures/lab-module-1-in-r.html).
+Nothing is graded.
 :::
 
 ::: {.callout-note appearance="simple"}
