@@ -114,7 +114,7 @@ matplot(L, t(B), type = "l", lty = 1, lwd = ifelse(rownames(B) %in% keep, 4, 2),
 abline(h = 0, col = LIGHT)
 abline(v = log(cv$lambda.1se), col = GOLD, lwd = 3, lty = 2)
 axis(4, at = B[keep, 1], labels = keep, las = 1, tick = FALSE, line = -0.6, col.axis = NAVY, font = 2)
-text(log(cv$lambda.1se), min(B) * 0.85, "chosen lambda:\nonly 3 columns left", col = GOLD, font = 2, adj = c(-0.05, 0), cex = 1.05)
+text(log(cv$lambda.1se), max(B) * 0.9, "chosen lambda:\n3 columns left", col = GOLD, font = 2, adj = c(1.05, 1), cex = 1.05)
 dev.off()
 
 # 11 · the series -------------------------------------------------------------

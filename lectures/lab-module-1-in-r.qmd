@@ -146,7 +146,7 @@ The same on every machine on Earth, which is why textbooks and help pages use th
 
 {{< video media/TwoMeans.mp4 width="1000" height="562" >}}
 
-[Two heaps of cars, two means, and the interval for the gap between them. The test is whether zero fits inside that interval; `t.test()` prints it.]{.muted}
+[Two means, the gap, and its interval. The test asks one thing: does zero fit inside?]{.muted}
 
 ## Look before you test
 
@@ -257,7 +257,7 @@ Read them in that order. A result with a tiny p-value and a tiny estimate is **s
 
 {{< video media/LeastSquares.mp4 width="1000" height="562" >}}
 
-[The line moves, the squares change size, and one number is read out each time: `lm()` returns the line where that sum is smallest, and nothing else.]{.muted}
+[`lm()` returns the line where the sum of the squares is smallest, and nothing else.]{.muted}
 
 ## Simple: what does weight cost in fuel?
 
@@ -390,7 +390,7 @@ A model is judged on rows it **did not see**. R², residual plots, p-values are 
 
 {{< video media/LogitCurve.mp4 width="1000" height="562" >}}
 
-[A straight line through 0s and 1s leaves the unit interval; the logistic bend keeps it inside. Two weights, two probabilities, read off the curve.]{.muted}
+[A line through 0s and 1s leaves the unit interval; the logistic bend keeps it inside.]{.muted}
 
 ## Logistic: is this car a manual?
 
@@ -439,9 +439,8 @@ exp(coef(fit))   # multiplicative effects
 :::
 ::::
 
-- Baseline — wool A, low tension — **40 breaks** per loom. Wool B: **19% fewer** (×0.81). High tension: **40% fewer** (×0.60)
-- The sentence for production: *switch to wool B at high tension and expect about half the breaks*
-- A count is not a yes/no and not a continuous number: `family = poisson` keeps predictions positive and whole
+- Baseline, wool A at low tension: **40 breaks**. Wool B: **19% fewer** (×0.81). High tension: **40% fewer** (×0.60)
+- For production: *wool B at high tension, expect about half the breaks*. `family = poisson` keeps a count positive and whole
 
 ## Survival: how long until the event?
 
@@ -476,7 +475,7 @@ Median survival **270 days for men, 426 for women**; the hazard for women is **0
 
 {{< video media/ShrinkPath.mp4 width="1000" height="562" >}}
 
-[The penalty grows and seven coefficients reach exactly zero, one after another. What `cv.glmnet()` keeps at λ.1se is cyl, hp and wt.]{.muted}
+[The penalty grows; seven coefficients reach exactly zero. Three columns survive.]{.muted}
 
 ## Ten predictors, thirty-two cars
 
@@ -516,7 +515,7 @@ coef(cv, s = "lambda.1se")
 :::
 ::::
 
-LASSO kept three columns and **halved the prediction error**. Ridge (`alpha = 0`) keeps all ten, shrunk; CV error 9.3. Both beat OLS; LASSO also tells you *which* three.
+Three columns kept, **prediction error halved**. Ridge (`alpha = 0`) keeps all ten, shrunk: CV error 9.3. LASSO also tells you *which* three.
 
 ## [Section 5]{.section-kicker} Time series {.section-slide background-color="#002f57"}
 
@@ -524,7 +523,7 @@ LASSO kept three columns and **halved the prediction error**. Ridge (`alpha = 0`
 
 {{< video media/Decompose.mp4 width="1000" height="562" >}}
 
-[One layer at a time: the moving average is the trend, the twelve factors are the season, and what is left over is the remainder `plot(d)` draws at the bottom.]{.muted}
+[Trend from a moving average, season from twelve factors, the rest is remainder.]{.muted}
 
 ## A series is a vector that knows its dates
 
@@ -620,8 +619,14 @@ Box-Ljung: p = 0.3, nothing left in the residuals
 :::
 ::::
 
-- `log` makes the growing swing constant; the two `1`s difference away trend and season; the MA terms model what is left. `forecast::auto.arima(AirPassengers, lambda = 0)` picks **exactly this model** on its own
-- Holt–Winters and ARIMA agree within 2%. Where they differ is the **interval**: ±8% in January, ±17% by December, and it widens honestly
+`log` makes the growing swing constant; the two `1`s difference away trend and season; the MA terms model what is left.
+
+## ARIMA, read
+
+- `forecast::auto.arima(AirPassengers, lambda = 0)` picks **exactly this model** on its own — the "airline model", named after this very series
+- Holt–Winters and ARIMA agree **within 2%** on the point forecast
+- Where they differ is the **interval**: ±8% in January, ±17% by December, and it widens honestly. Holt–Winters gave you no interval at all
+- Ljung–Box p = 0.3: the residuals are noise. If they were not, the model would have left something on the table
 
 ## [Section 6]{.section-kicker} A CSV from the course site {.section-slide background-color="#002f57"}
 
@@ -639,9 +644,9 @@ churn <- read_csv(here("data", "churn.csv"))               # file → data frame
 glimpse(churn)                                   # 7 000 rows, 20 columns, types
 ```
 
-- `download.file` fetches once and keeps a copy in `data/`: your script works **offline, and on Friday's machines**
-- `read_csv` guesses each column's type. `glimpse` shows you the guess — **check it before anything else**: `churn` came in as text, `senior` as a number, both fine for now
-- The same two lines read any CSV on the course site: `customers.csv`, `brands.csv`
+- `download.file` fetches once and keeps a copy in `data/`: the script works **offline, and on Friday's machines**
+- `read_csv` guesses each column's type; `glimpse` shows the guess. **Check it before anything else**
+- The same two lines read any CSV on the site: `customers.csv`, `brands.csv`
 
 ## The same questions, on 7 000 customers
 
@@ -736,18 +741,27 @@ Bring question 4's number on Friday. It is the number Module 2 starts from.
 
 ## [Appendix]{.section-kicker} The cheat sheet {.section-slide background-color="#002f57"}
 
-## Question → function → what to read
+## Question → function → what to read (1)
 
 | Question | Function | Read |
 |---|---|---|
 | Mean equal to a value? | `t.test(x, mu = 20)` | interval, `p-value` |
 | Two groups differ? | `t.test(y ~ group)` | interval of the difference |
-| Three or more groups? | `summary(aov(y ~ group))`, `TukeyHSD` | `Pr(>F)`, then pairs |
-| *y* against *x* | `lm(y ~ x)` | `Estimate`, `Adjusted R-squared` |
-| …holding others fixed | `lm(y ~ x1 + x2)` | each `Estimate` *ceteris paribus* |
+| Three or more groups? | `aov`, then `TukeyHSD` | `Pr(>F)`, then pairs |
+| *y* against *x* | `lm(y ~ x)` | `Estimate`, adjusted R² |
+| …holding others fixed | `lm(y ~ x1 + x2)` | each `Estimate`, *ceteris paribus* |
 | A curve | `lm(y ~ poly(x, 2))` | CV error, not R² |
-| A yes/no | `glm(y ~ x, family = binomial)` | `exp(coef())` |
-| A count | `glm(y ~ x, family = poisson)` | `exp(coef())` |
+
+: {tbl-colwidths="[32,36,32]"}
+
+## Question → function → what to read (2)
+
+| Question | Function | Read |
+|---|---|---|
+| A yes/no | `glm(…, family = binomial)` | `exp(coef())` |
+| A count | `glm(…, family = poisson)` | `exp(coef())` |
 | A time to event | `survfit`, `survdiff`, `coxph` | median, `exp(coef)` |
 | Too many columns | `cv.glmnet(x, y, alpha = 1)` | which coefficients are 0 |
-| A monthly series | `decompose`, `HoltWinters`, `arima` | seasonal factors, forecast, interval |
+| A monthly series | `decompose`, `HoltWinters`, `arima` | factors, forecast, interval |
+
+: {tbl-colwidths="[32,36,32]"}
