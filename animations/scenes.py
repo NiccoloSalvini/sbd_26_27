@@ -1657,9 +1657,286 @@ class ScreeChoice(Stage):
         self.wait(5.8)
 
 
+# ================================================================ the lab: Module 1 in R
+# Two clips for lectures/lab-module-1-in-r.qmd. Both hardcode an R dataset so
+# the numbers on screen are the numbers the deck prints: mtcars for lm(), and
+# AirPassengers for decompose().
+
+MT_WT = [2.62, 2.875, 2.32, 3.215, 3.44, 3.46, 3.57, 3.19, 3.15, 3.44, 3.44, 4.07, 3.73, 3.78,
+         5.25, 5.424, 5.345, 2.2, 1.615, 1.835, 2.465, 3.52, 3.435, 3.84, 3.845, 1.935, 2.14,
+         1.513, 3.17, 2.77, 3.57, 2.78]
+MT_MPG = [21, 21, 22.8, 21.4, 18.7, 18.1, 14.3, 24.4, 22.8, 19.2, 17.8, 16.4, 17.3, 15.2, 10.4,
+          10.4, 14.7, 32.4, 30.4, 33.9, 21.5, 15.5, 15.2, 13.3, 19.2, 27.3, 26, 30.4, 15.8,
+          19.7, 15, 21.4]
+OLS_A, OLS_B = 37.285, -5.344            # coef(lm(mpg ~ wt, mtcars))
+
+
+class LeastSquares(Stage):
+    """What lm() minimises, watched. The 32 cars of mtcars, a candidate line,
+    and the residuals drawn as the squares they are. The line moves five
+    times; the sum of the squares is read out at every step, falls, rises on
+    an overshoot, and stops at 278.3 — the number no other line beats."""
+
+    WAIT_SCALE = 1.0
+    PLAY_SCALE = 1.0
+
+    def construct(self):
+        ax = Axes(x_range=[1, 6, 1], y_range=[5, 40, 5], x_length=6.6, y_length=4.5,
+                  axis_config={"color": MUTED, "include_tip": False, "stroke_width": 1.4})
+        ax.to_edge(LEFT, buff=0.6).shift(DOWN * 0.1)
+        xl = label("weight, 1 000 lb", 20, MUTED).next_to(ax.x_axis, DOWN, buff=0.15)
+        yl = label("mpg", 20, MUTED).next_to(ax.y_axis.get_top(), RIGHT, buff=0.15)
+        xt = VGroup(*[label(str(v), 16, MUTED).next_to(ax.c2p(v, 5), DOWN, buff=0.1) for v in range(1, 7)])
+        yt = VGroup(*[label(str(v), 16, MUTED).next_to(ax.c2p(1, v), LEFT, buff=0.1) for v in range(10, 41, 10)])
+        self.play(Create(ax), FadeIn(xl), FadeIn(yl), FadeIn(xt), FadeIn(yt), run_time=1.2)
+
+        dots = VGroup(*[Dot(ax.c2p(w, m), radius=0.065, color=SKY) for w, m in zip(MT_WT, MT_MPG)])
+        dots.set_z_index(3)
+        self.play(FadeIn(dots, lag_ratio=0.03), run_time=1.6)
+        title = label("32 cars: what does weight cost in fuel?", 28, CREAM).to_edge(UP, buff=0.35)
+        self.play(FadeIn(title), run_time=0.8)
+        self.wait(2.6)
+
+        # the candidate line and its squares, all driven by two numbers
+        a = ValueTracker(float(np.mean(MT_MPG)))
+        b = ValueTracker(0.0)
+
+        def fitted(w):
+            return a.get_value() + b.get_value() * w
+
+        line = always_redraw(lambda: Line(
+            ax.c2p(1.15, fitted(1.15)), ax.c2p(5.85, fitted(5.85)),
+            color=CREAM, stroke_width=3.5).set_z_index(2))
+
+        def squares():
+            g = VGroup()
+            for w, m in zip(MT_WT, MT_MPG):
+                p, q = ax.c2p(w, m), ax.c2p(w, fitted(w))
+                s = abs(p[1] - q[1])
+                if s < 1e-3:
+                    continue
+                sq = Square(side_length=s, color=GOLD, stroke_width=1.0,
+                            fill_color=GOLD, fill_opacity=0.16)
+                sq.move_to([p[0] + s / 2, min(p[1], q[1]) + s / 2, 0])
+                g.add(sq)
+            return g.set_z_index(1)
+
+        sqs = always_redraw(squares)
+
+        def rss():
+            return float(sum((m - fitted(w)) ** 2 for w, m in zip(MT_WT, MT_MPG)))
+
+        # right panel: the line's equation, then the number
+        eq_l = MathTex(r"\widehat{\text{mpg}} = ", color=CREAM, font_size=32)
+        num_a = DecimalNumber(a.get_value(), num_decimal_places=1, color=CREAM, font_size=32)
+        num_b = DecimalNumber(b.get_value(), num_decimal_places=2, include_sign=True, color=CREAM, font_size=32)
+        eq_r = MathTex(r"\,\text{wt}", color=CREAM, font_size=32)
+        eq = VGroup(eq_l, num_a, num_b, eq_r).arrange(RIGHT, buff=0.12)
+        eq.move_to([1.2, 1.9, 0], aligned_edge=LEFT)
+        num_a.add_updater(lambda m: m.set_value(a.get_value()).next_to(eq_l, RIGHT, buff=0.12))
+        num_b.add_updater(lambda m: m.set_value(b.get_value()).next_to(num_a, RIGHT, buff=0.12))
+        eq_r.add_updater(lambda m: m.next_to(num_b, RIGHT, buff=0.06))
+
+        rss_l = label("sum of squared residuals", 22, MUTED).next_to(eq, DOWN, buff=0.7).align_to(eq, LEFT)
+        rss_n = DecimalNumber(rss(), num_decimal_places=1, color=GOLD, font_size=52, group_with_commas=False)
+        rss_n.next_to(rss_l, DOWN, buff=0.15).align_to(rss_l, LEFT)
+        rss_n.add_updater(lambda m: m.set_value(rss()))
+
+        self.play(Create(line), FadeIn(eq), run_time=1.2)
+        cap = label("1 · ignore weight: a flat line at the mean", 24, CREAM).to_edge(DOWN, buff=0.3)
+        self.play(FadeIn(cap), run_time=0.7)
+        self.wait(2.0)
+
+        # one car first: the residual is a distance, and its square is a square
+        w1, m1 = 2.2, 32.4                      # Fiat 128
+        r1 = m1 - fitted(w1)
+        seg = Line(ax.c2p(w1, fitted(w1)), ax.c2p(w1, m1), color=GOLD, stroke_width=4).set_z_index(2)
+        rtxt = MathTex(rf"{m1} - {fitted(w1):.2f} = {r1:.2f}", color=GOLD, font_size=30)
+        rtxt.next_to(rss_l, DOWN, buff=0.15).align_to(rss_l, LEFT)
+        self.play(Create(seg), FadeIn(rtxt), run_time=1.0)
+        self.wait(2.2)
+        s1 = abs(ax.c2p(w1, m1)[1] - ax.c2p(w1, fitted(w1))[1])
+        sq1 = Square(side_length=s1, color=GOLD, stroke_width=1.5, fill_color=GOLD, fill_opacity=0.25).set_z_index(1)
+        sq1.move_to([ax.c2p(w1, m1)[0] + s1 / 2, ax.c2p(w1, fitted(w1))[1] + s1 / 2, 0])
+        r2txt = MathTex(rf"{r1:.2f}^2 = {r1 ** 2:.1f}", color=GOLD, font_size=30)
+        r2txt.next_to(rtxt, DOWN, buff=0.2).align_to(rss_l, LEFT)
+        self.play(FadeIn(sq1), FadeIn(r2txt), run_time=1.0)
+        self.wait(2.4)
+
+        # now all 32, and their sum
+        self.play(FadeOut(seg), FadeOut(sq1), FadeOut(rtxt), FadeOut(r2txt), run_time=0.5)
+        self.play(FadeIn(sqs), run_time=1.2)
+        self.play(FadeIn(rss_l), FadeIn(rss_n), run_time=0.8)
+        self.wait(3.6)
+
+        steps = [
+            (30.0, -2.0, "2 · tilt it: every square shrinks"),
+            (35.0, -4.5, "3 · steeper still: smaller again"),
+            (44.0, -8.0, "4 · too steep: the sum rises"),
+            (OLS_A, OLS_B, "5 · back to where it is smallest"),
+        ]
+        for av, bv, text in steps:
+            new = label(text, 24, CREAM).to_edge(DOWN, buff=0.3)
+            self.play(a.animate.set_value(av), b.animate.set_value(bv),
+                      FadeTransform(cap, new), run_time=2.4)
+            cap = new
+            self.wait(4.4)
+
+        # the answer: the line lm() returns, and the number nothing beats
+        final = Line(ax.c2p(1.15, fitted(1.15)), ax.c2p(5.85, fitted(5.85)),
+                     color=GOLD, stroke_width=4.5).set_z_index(2)
+        self.play(FadeOut(line), FadeIn(final), run_time=0.8)
+        ans = MathTex(r"\widehat{\text{mpg}} = 37.3 - 5.34\,\text{wt}", color=GOLD, font_size=36)
+        ans.move_to(eq, aligned_edge=LEFT)
+        self.play(FadeOut(eq), FadeIn(ans), run_time=1.0)
+        best = label("no other line does better", 22, GOLD).next_to(rss_n, DOWN, buff=0.3).align_to(rss_l, LEFT)
+        closing = label("that is all lm() does — it is called least squares", 24, CREAM).to_edge(DOWN, buff=0.3)
+        self.play(FadeIn(best), FadeTransform(cap, closing), run_time=1.0)
+        self.wait(5.0)
+
+
+AP = [112, 118, 132, 129, 121, 135, 148, 148, 136, 119, 104, 118,
+      115, 126, 141, 135, 125, 149, 170, 170, 158, 133, 114, 140,
+      145, 150, 178, 163, 172, 178, 199, 199, 184, 162, 146, 166,
+      171, 180, 193, 181, 183, 218, 230, 242, 209, 191, 172, 194,
+      196, 196, 236, 235, 229, 243, 264, 272, 237, 211, 180, 201,
+      204, 188, 235, 227, 234, 264, 302, 293, 259, 229, 203, 229,
+      242, 233, 267, 269, 270, 315, 364, 347, 312, 274, 237, 278,
+      284, 277, 317, 313, 318, 374, 413, 405, 355, 306, 271, 306,
+      315, 301, 356, 348, 355, 422, 465, 467, 404, 347, 305, 336,
+      340, 318, 362, 348, 363, 435, 491, 505, 404, 359, 310, 337,
+      360, 342, 406, 396, 420, 472, 548, 559, 463, 407, 362, 405,
+      417, 391, 419, 461, 472, 535, 622, 606, 508, 461, 390, 432]
+# decompose(AirPassengers, type = "multiplicative")$figure
+AP_SEASON = [0.910, 0.884, 1.007, 0.976, 0.981, 1.113, 1.227, 1.220, 1.060, 0.922, 0.801, 0.899]
+MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+MAUVE = "#c98bb9"
+
+
+def ap_trend():
+    """The 12-month centred moving average decompose() uses: half weight on
+    the two end months so the window is centred on a month, not between two.
+    Matches R's d$trend to the cent; undefined for the first and last six."""
+    x = np.array(AP, float)
+    tr = np.full(len(x), np.nan)
+    for t in range(6, len(x) - 6):
+        tr[t] = (0.5 * x[t - 6] + x[t - 5:t + 6].sum() + 0.5 * x[t + 6]) / 12
+    return tr
+
+
+class Decompose(Stage):
+    """decompose(), one layer at a time. The series is drawn; the trend is a
+    moving average laid over it; the twelve seasonal factors appear month by
+    month with their values; what is left is the remainder, flat within ten
+    percent. The closing line is the model: series = trend × season × remainder."""
+
+    WAIT_SCALE = 1.0
+    PLAY_SCALE = 1.0
+
+    def construct(self):
+        tr = ap_trend()
+        axis_cfg = {"color": MUTED, "include_tip": False, "stroke_width": 1.4}
+
+        # 1 · the series
+        ax = Axes(x_range=[0, 144, 12], y_range=[0, 650, 100], x_length=10.6, y_length=4.4,
+                  axis_config=axis_cfg).shift(DOWN * 0.35)
+        years = VGroup(*[label(str(1949 + i), 16, MUTED).next_to(ax.c2p(12 * i, 0), DOWN, buff=0.12)
+                         for i in range(0, 12, 2)])
+        yt = VGroup(*[label(str(v), 16, MUTED).next_to(ax.c2p(0, v), LEFT, buff=0.1) for v in (200, 400, 600)])
+        title = label("AirPassengers: monthly passengers (thousands), 1949–1960", 26, CREAM).to_edge(UP, buff=0.35)
+        self.play(Create(ax), FadeIn(years), FadeIn(yt), FadeIn(title), run_time=1.2)
+
+        series = ax.plot_line_graph(x_values=list(range(144)), y_values=AP, line_color=SKY,
+                                    add_vertex_dots=False, stroke_width=2.6)
+        self.play(Create(series), run_time=4.5, rate_func=linear)
+        note = label("it climbs, and it breathes once a year", 23, SKY).next_to(ax, DOWN, buff=0.45)
+        self.play(FadeIn(note), run_time=0.8)
+        self.wait(3.0)
+
+        # 2 · the trend: a moving average over the series
+        ts = list(range(6, 138))
+        trend = ax.plot_line_graph(x_values=ts, y_values=[tr[t] for t in ts], line_color=GOLD,
+                                   add_vertex_dots=False, stroke_width=4.0)
+        # the window the average is taken over, sliding as the trend is drawn
+        pos = ValueTracker(6)
+        win = always_redraw(lambda: Rectangle(
+            width=ax.c2p(12, 0)[0] - ax.c2p(0, 0)[0], height=ax.c2p(0, 650)[1] - ax.c2p(0, 0)[1],
+            color=GOLD, stroke_width=0, fill_color=GOLD, fill_opacity=0.18
+        ).move_to(ax.c2p(pos.get_value(), 325)))
+        wdot = always_redraw(lambda: Dot(ax.c2p(pos.get_value(), tr[int(round(pos.get_value()))]),
+                                         radius=0.08, color=GOLD))
+        note2 = label("trend: each month replaced by the average of the twelve around it", 23, GOLD)
+        note2.next_to(ax, DOWN, buff=0.45)
+        self.play(FadeTransform(note, note2), FadeIn(win), FadeIn(wdot), run_time=0.8)
+        self.wait(1.4)
+        self.play(Create(trend), pos.animate.set_value(137), run_time=4.5, rate_func=linear)
+        self.play(FadeOut(win), FadeOut(wdot), run_time=0.5)
+        self.wait(3.2)
+
+        # 3 · make room: series and trend shrink to the top-left
+        top = VGroup(ax, years, yt, series, trend)
+        small_t = label("series and trend", 20, CREAM)
+        self.play(top.animate.scale(0.5).move_to([-3.55, 1.85, 0]),
+                  FadeOut(note2), FadeOut(title), run_time=1.6)
+        small_t.next_to(top, UP, buff=0.15)
+        self.play(FadeIn(small_t), run_time=0.5)
+
+        # 4 · the twelve seasonal factors, one by one
+        sax = Axes(x_range=[0.5, 12.5, 1], y_range=[0.7, 1.3, 0.1], x_length=5.6, y_length=2.4,
+                   axis_config=axis_cfg, x_axis_config={"include_ticks": False}).move_to([3.5, 1.85, 0])
+        one = DashedLine(sax.c2p(0.5, 1), sax.c2p(12.5, 1), color=MUTED, stroke_width=1.5, dash_length=0.08)
+        syt = VGroup(*[label(f"{v:.1f}", 15, MUTED).next_to(sax.c2p(0.5, v), LEFT, buff=0.08) for v in (0.8, 1.0, 1.2)])
+        s_title = label("season: the month's factor over the trend", 20, GOLD).next_to(sax, UP, buff=0.15)
+        self.play(Create(sax), Create(one), FadeIn(syt), FadeIn(s_title), run_time=1.2)
+        self.wait(0.8)
+
+        bars, vals = [], []
+        for i, (mo, f) in enumerate(zip(MONTHS, AP_SEASON), start=1):
+            bar = Line(sax.c2p(i, 1), sax.c2p(i, f), color=GOLD, stroke_width=7)
+            dot = Dot(sax.c2p(i, f), radius=0.06, color=GOLD)
+            val = label(f"{f:.2f}", 14, CREAM).next_to(dot, UP if f >= 1 else DOWN, buff=0.1)
+            mon = label(mo, 13, MUTED).next_to(sax.c2p(i, 0.7), DOWN, buff=0.08)
+            bars.append(VGroup(bar, dot)); vals.append(val)
+            self.play(Create(bar), FadeIn(dot), FadeIn(val), FadeIn(mon), run_time=0.4)
+            self.wait(0.3)
+        self.wait(1.0)
+        s_note = label("July 23% above the trend, November 20% below", 20, CREAM).next_to(sax, DOWN, buff=0.45)
+        self.play(bars[6].animate.set_color(CREAM), bars[10].animate.set_color(CREAM),
+                  vals[6].animate.set_color(CREAM).scale(1.3), vals[10].animate.set_color(CREAM).scale(1.3),
+                  FadeIn(s_note), run_time=1.0)
+        self.wait(4.2)
+
+        # 5 · the remainder: series ÷ (trend × season)
+        rax = Axes(x_range=[0, 144, 12], y_range=[0.85, 1.15, 0.05], x_length=10.6, y_length=1.7,
+                   axis_config=axis_cfg).move_to([0, -1.35, 0])
+        rone = DashedLine(rax.c2p(0, 1), rax.c2p(144, 1), color=MUTED, stroke_width=1.5, dash_length=0.08)
+        ryt = VGroup(*[label(f"{v:.1f}", 15, MUTED).next_to(rax.c2p(0, v), LEFT, buff=0.08) for v in (0.9, 1.0, 1.1)])
+        ryrs = VGroup(label("1949", 15, MUTED).next_to(rax.c2p(0, 0.85), DOWN, buff=0.1),
+                      label("1960", 15, MUTED).next_to(rax.c2p(144, 0.85), DOWN, buff=0.1))
+        r_title = label("remainder: series ÷ (trend × season)", 20, MAUVE).next_to(rax, UP, buff=0.12).align_to(rax, LEFT)
+        self.play(FadeOut(s_note), Create(rax), Create(rone), FadeIn(ryt), FadeIn(ryrs), FadeIn(r_title),
+                  run_time=1.2)
+        rem = [AP[t] / (tr[t] * AP_SEASON[t % 12]) for t in ts]
+        rline = rax.plot_line_graph(x_values=ts, y_values=rem, line_color=MAUVE,
+                                    add_vertex_dots=False, stroke_width=2.4)
+        self.play(Create(rline), run_time=3.0, rate_func=linear)
+        r_note = label("what neither trend nor season explains: within ±10%, no pattern left", 20, CREAM)
+        r_note.next_to(rax, DOWN, buff=0.4)
+        self.play(FadeIn(r_note), run_time=0.8)
+        self.wait(4.4)
+
+        # 6 · the model
+        formula = MathTex(r"\text{series} = \text{trend} \times \text{season} \times \text{remainder}",
+                          color=GOLD, font_size=40).to_edge(DOWN, buff=0.35)
+        self.play(FadeTransform(r_note, formula), run_time=1.2)
+        self.wait(5.5)
+
+
+LAB = ["LeastSquares", "Decompose"]
+
 L14 = ["Rotation", "PCAByHand", "ScreeChoice"]
 L11 = ["Lloyd", "KmeansByHand", "ScaleBreaks", "ShapeBreaks", "ElbowLie"]
 L18 = ["Boundary", "PerceptronByHand", "Perceptron", "GradientDescent", "Sigmoid", "HiddenLayer", "Overfitting"]
 L19 = ["DataSplit", "ValidationCurve", "ModelRace", "DeepScale", "AutoencoderPCA"]
-SCENES = L11 + L12 + L14 + L18 + L19
+SCENES = L11 + L12 + L14 + L18 + L19 + LAB
 

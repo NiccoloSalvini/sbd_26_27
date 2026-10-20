@@ -257,6 +257,12 @@ Multiple R-squared:  0.753,   Adjusted R-squared:  0.745
 
 **Each extra 1 000 lb costs 5.3 mpg**, give or take 0.6. Weight alone explains **75%** of the variation in consumption. The intercept, 37 mpg for a weightless car, is a number nobody should quote.
 
+## Least squares, watched
+
+{{< video media/LeastSquares.mp4 width="1000" height="562" >}}
+
+[The line moves, the squares change size, and one number is read out each time: `lm()` returns the line where that sum is smallest, and nothing else.]{.muted}
+
 ## Multiple: weight *and* power
 
 ```{.r}
@@ -466,6 +472,12 @@ round(d$figure, 2)                 # the twelve seasonal factors
 ```
 
 **July runs 23% above the trend, November 20% below.** That is the sentence a planner needs: how much capacity to add in summer, as a share.
+
+## Decomposition, watched
+
+{{< video media/Decompose.mp4 width="1000" height="562" >}}
+
+[One layer at a time: the moving average is the trend, the twelve factors are the season, and what is left over is the remainder `plot(d)` draws at the bottom.]{.muted}
 
 ## Smoothing: Holt–Winters
 
