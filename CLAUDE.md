@@ -146,9 +146,12 @@ Getting the same thing at another institution is documented in
 
 Course IDs: 26/27 is `_170037_1`, 25/26 is `_158385_1`.
 
-What the public API can and cannot do on this build (4000.21.0): content,
+What the public API can and cannot do on this build (4001.2.0 in October 2026;
+`/v1/system/version` says, and the matching swagger is
+`https://devportal-docstore.s3.amazonaws.com/learn-swagger-<version>.json`): content,
 folders, test *shells*, gradebook columns, attempts and grades all work.
-**Question content does not** — verified on 22 October 2026: `POST …/questions`
+**Question content does not** — verified on 22 October 2026 and written in the
+swagger (every `questionHandler.type` but `Presentation` is *Read Only*): `POST …/questions`
 answers *"Creating non-presentation questions is not supported"* for every
 scored type and creates only `Presentation` text blocks; reads come back as
 opaque `QuestionBlock` handles. So tests are authored in the Ultra UI or
