@@ -148,8 +148,12 @@ Course IDs: 26/27 is `_170037_1`, 25/26 is `_158385_1`.
 
 What the public API can and cannot do on this build (4000.21.0): content,
 folders, test *shells*, gradebook columns, attempts and grades all work.
-**Question content does not** — questions come back as opaque `QuestionBlock`
-handles, so tests are authored in the Ultra UI (or imported), and the API reads
+**Question content does not** — verified on 22 October 2026: `POST …/questions`
+answers *"Creating non-presentation questions is not supported"* for every
+scored type and creates only `Presentation` text blocks; reads come back as
+opaque `QuestionBlock` handles. So tests are authored in the Ultra UI or
+imported with Upload Questions, and the API does the rest: title, release date
+(`bb_release_by_date`), points after the upload (`bb_set_question_points`), and
 the gradebook side. Time limit, attempts and results-release settings are not
 exposed on any route.
 
