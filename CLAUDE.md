@@ -155,6 +155,37 @@ exposed on any route.
 
 Writes are off by default; grade writes have a second switch of their own.
 
+## Intermediate exams on Blackboard
+
+Both intermediates are Blackboard tests sat on the lab machines. The settings,
+fixed on the first one (October 2026), are the same every time:
+
+| Setting | Value |
+|---|---|
+| Questions | **20, 1.5 points each, 30 in total**; pass mark 18 |
+| Mix | 8 multiple choice · 4 true/false · 5 open medium · 3 open challenging |
+| Language | English, like the syllabus |
+| Time limit | **90 minutes, automatic submission** |
+| Attempts | 1 |
+| Due date | exam day 23:59; prohibit late submissions and new attempts after it |
+| Location restriction | `Aula + WIFI (tutte le sedi)` |
+| Mark category | Test; marks posted automatically |
+| Visibility | hidden until the exam starts; the date is announced on Blackboard and on the site |
+
+Open questions are answered in the text box: the R code, the numbers, and one
+sentence that reads them. They are marked by hand, 0 to 1.5 in steps of 0.25:
+right code, numbers and sentence = 1.5; right code and numbers, vague sentence
+= 1; right function, wrong reading = 0.75; a relevant attempt = 0.25.
+
+**Authoring.** Questions live in `private/exams.py` (git-ignored: the repo is
+public) with the key; `python3 private/exams.py` writes one *Upload Questions*
+file per paper plus a `.qmd` with the key, rendered with typst. In Ultra: open
+the test, **+ → Upload Questions**, pick the file, then set every question to
+1.5 points (points do not travel in the file). Every number in a key comes from
+`private/mock-exam-1-key.R`, run; a question whose answer moves with the seed
+says so in its key. The mock before each intermediate uses the same settings,
+different questions, and is not graded.
+
 ## Slides: one Beamer theme for every lecture
 
 `latex/beamer/` holds `beamerthemeCattolica.sty`, `template.tex` and the logo.

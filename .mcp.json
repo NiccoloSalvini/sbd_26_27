@@ -9,7 +9,7 @@
       "env": {
         "PYTHONPATH": "/Users/niccolo/dev/mcp-blackboard-ucsc/src",
         "BB_BASE_URL": "https://blackboard.unicatt.it",
-        "BB_ALLOW_WRITES": "0",
+        "BB_ALLOW_WRITES": "1",
         "BB_ALLOW_GRADE_WRITES": "0"
       }
     },
