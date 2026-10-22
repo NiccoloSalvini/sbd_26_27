@@ -193,8 +193,14 @@ intermediate from pool 1, the second from pool 2, the full exam half from
 each — with a seed, excluding every id in earlier manifests, and writes the
 *Upload Questions* file, the key (`<name>-key.qmd`, rendered with typst from
 a copy outside this project, or `_site/` would serve it) and the manifest
-`<name>.json`. In Ultra: open the test, **+ → Upload Questions**, pick the
-file, then `bb_set_question_points` (or Ultra) for the 1.5 points. Every
+`<name>.json`. **Into Blackboard: `bb_test_fill(course, test_id,
+"private/<name>.json", replace=True)`** after `bb_ultra_connect` — it writes the
+manifest's questions straight into the test, in order, at its points, through
+the Ultra interface's own API (a test is an assessment on the same route as a
+bank). `bb_assessment_questions` reads the test back to check it against the
+pool; the mock of 23 Oct 2026 went in this way and was verified question by
+question. The Upload Questions file is the fallback (then
+`bb_set_question_points` for the 1.5 points). Every
 number in a key comes from `private/mock-exam-1-key.R`, run; a question whose
 answer moves with the seed says so in its key. The mock before each
 intermediate uses the same settings, different questions, and is not graded.
@@ -208,8 +214,10 @@ questions, but the MCP's `bb_banks_from_pool` does it through the Ultra
 interface's own API, using the lecturer's signed-in browser session (a
 Chrome started with `--remote-debugging-port=9223`, then `bb_ultra_connect`;
 details in the MCP README). The step that is still manual, or to be recorded
-next, is adding the question pools to a test. Until then, a paper goes in as
-the Upload Questions file.
+next, is adding the question pools to a test: a pool reads back as a
+`questionBlock`, and `bb_assessment_clear` deletes one, but the request that
+creates one was never captured. Until then, a paper is a fixed list of
+questions, `bb_test_fill`.
 
 ## Slides: one Beamer theme for every lecture
 
