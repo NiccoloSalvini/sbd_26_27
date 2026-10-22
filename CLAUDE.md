@@ -174,7 +174,7 @@ fixed on the first one (October 2026), are the same every time:
 | Language | English, like the syllabus |
 | Time limit | **90 minutes, automatic submission** |
 | Attempts | 1 |
-| Due date | exam day 23:59; prohibit late submissions and new attempts after it |
+| Due date | **none**: the time limit and the visibility window do the job; a due date only adds a "late" flag and blocks the settings page |
 | Location restriction | `Aula + WIFI (tutte le sedi)` |
 | Mark category | Test; marks posted automatically |
 | Visibility | hidden until the exam starts; the date is announced on Blackboard and on the site |
