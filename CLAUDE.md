@@ -200,6 +200,17 @@ answer moves with the seed says so in its key. The mock before each
 intermediate uses the same settings, different questions, and is not graded.
 Manifests so far: `mock-exam-1.json` (23 Oct 2026), `midterm-1.json` (draft).
 
+**Question banks, the next step.** Ultra tests can draw *question pools*
+(k questions at random) from the course's *question banks*; the plan is one
+bank per topic, filled from the pool files, and exams built as lists of
+pools, so every student gets a different paper. The public API cannot write
+questions, but the MCP's `bb_banks_from_pool` does it through the Ultra
+interface's own API, using the lecturer's signed-in browser session (a
+Chrome started with `--remote-debugging-port=9223`, then `bb_ultra_connect`;
+details in the MCP README). The step that is still manual, or to be recorded
+next, is adding the question pools to a test. Until then, a paper goes in as
+the Upload Questions file.
+
 ## Slides: one Beamer theme for every lecture
 
 `latex/beamer/` holds `beamerthemeCattolica.sty`, `template.tex` and the logo.
