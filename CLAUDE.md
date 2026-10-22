@@ -184,14 +184,21 @@ sentence that reads them. They are marked by hand, 0 to 1.5 in steps of 0.25:
 right code, numbers and sentence = 1.5; right code and numbers, vague sentence
 = 1; right function, wrong reading = 0.75; a relevant attempt = 0.25.
 
-**Authoring.** Questions live in `private/exams.py` (git-ignored: the repo is
-public) with the key; `python3 private/exams.py` writes one *Upload Questions*
-file per paper plus a `.qmd` with the key, rendered with typst. In Ultra: open
-the test, **+ → Upload Questions**, pick the file, then set every question to
-1.5 points (points do not travel in the file). Every number in a key comes from
-`private/mock-exam-1-key.R`, run; a question whose answer moves with the seed
-says so in its key. The mock before each intermediate uses the same settings,
-different questions, and is not graded.
+**Authoring.** Questions live in **pools**, one per module, as JSON in
+`private/` (git-ignored: the repo is public): `private/pool-module-1.json` is
+the model, `private/pool-module-2.json` is to be written from lectures 10–21.
+The format and the tools are in the MCP (`bb_mcp.exams`): `bb_pool_check`
+validates and counts a pool; `bb_build_exam` draws a paper — the first
+intermediate from pool 1, the second from pool 2, the full exam half from
+each — with a seed, excluding every id in earlier manifests, and writes the
+*Upload Questions* file, the key (`<name>-key.qmd`, rendered with typst from
+a copy outside this project, or `_site/` would serve it) and the manifest
+`<name>.json`. In Ultra: open the test, **+ → Upload Questions**, pick the
+file, then `bb_set_question_points` (or Ultra) for the 1.5 points. Every
+number in a key comes from `private/mock-exam-1-key.R`, run; a question whose
+answer moves with the seed says so in its key. The mock before each
+intermediate uses the same settings, different questions, and is not graded.
+Manifests so far: `mock-exam-1.json` (23 Oct 2026), `midterm-1.json` (draft).
 
 ## Slides: one Beamer theme for every lecture
 
