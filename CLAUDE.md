@@ -169,7 +169,7 @@ fixed on the first one (October 2026), are the same every time:
 
 | Setting | Value |
 |---|---|
-| Questions | **15, 2 points each, 30 in total**; pass mark 18. (The *full exam* is different: 20 questions, 1.5 points each, 90 minutes) |
+| Questions | **15, 2 points each, 30 in total**; pass mark 18. (The *full exam*: 20 questions, 2 points each, 40 in total, 60 minutes) |
 | Mix | 6 multiple choice · 3 true/false · 4 open medium · 2 open challenging |
 | Language | English, like the syllabus |
 | Time limit | **60 minutes, automatic submission** |
@@ -184,8 +184,8 @@ sentence that reads them. They are marked by hand, 0 to 2 in steps of 0.5:
 right code, numbers and sentence = 2; right code and numbers, vague sentence
 = 1.5; right function, wrong reading = 1; a relevant attempt = 0.5. The
 mock of 23 Oct 2026 was sat as 20 questions at 1.5 (a mistake, corrected the
-same day): the pool's `points` is 2, and `bb_build_exam` takes `points`
-explicitly, 2 for an intermediate and 1.5 for the final.
+same day): the pool's `points` is 2 for every exam; `bb_build_exam` takes `points`
+explicitly all the same.
 
 **Authoring.** Questions live in **pools**, one per module, as JSON in
 `private/` (git-ignored: the repo is public): `private/pool-module-1.json` is
