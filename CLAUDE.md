@@ -222,6 +222,18 @@ columns are independent by construction and the lab never opened it). The
 `private/*.qmd` keys are excluded from the render (`"!private/"` in
 `_quarto.yml`), or `make deploy` would publish them.
 
+**Marking.** Blackboard marks the closed questions itself. For the open ones:
+`bb_test_answers(course, column_id, pool_path="private/pool-module-1.json")`
+returns every submission with each open answer next to the model answer, the
+pool's marking notes and a proposal (key numbers found, functions used, a
+sentence or not, points on the question's scale with the reason);
+`bb_question_answers` does one question across the class, the way to keep
+one question's marking consistent. The proposal is read, corrected where the
+sentence says more or less than the numbers, then written with
+`bb_grade_answers`; posting to the students is the column's Post in Ultra.
+A review file (`private/<exam>-review.md`, one block per student) is the
+working document; the mock's is `private/mock-review.md`.
+
 **Question banks, the next step.** Ultra tests can draw *question pools*
 (k questions at random) from the course's *question banks*; the plan is one
 bank per topic, filled from the pool files, and exams built as lists of
