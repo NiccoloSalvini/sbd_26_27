@@ -5,6 +5,7 @@ project:
     - "*.qmd"
     - "lectures/*.qmd"
     - "homework/*.qmd"
+    - "!private/"
   resources:
     - slides/
     - materials/

@@ -204,7 +204,16 @@ question. The Upload Questions file is the fallback (then
 number in a key comes from `private/mock-exam-1-key.R`, run; a question whose
 answer moves with the seed says so in its key. The mock before each
 intermediate uses the same settings, different questions, and is not graded.
-Manifests so far: `mock-exam-1.json` (23 Oct 2026), `midterm-1.json` (draft).
+Manifests so far: `mock-exam-1.json` (23 Oct 2026), `practice-1.json` (the
+practice paper on the site, `homework/m1-practice.qmd`, drawn 23 Oct 2026 and
+removed from the midterm banks), `midterm-1.json` (draft). An open question's
+`example` is the model answer and goes to Blackboard as the question's answer
+text; notes for the marker ("half marks if…") go in `marking`, which only the
+key prints. Open questions use mtcars, cars, PlantGrowth, warpbreaks, lung and
+`churn.csv`; `customers.csv` was dropped from the pool on 23 Oct 2026 (its
+columns are independent by construction and the lab never opened it). The
+`private/*.qmd` keys are excluded from the render (`"!private/"` in
+`_quarto.yml`), or `make deploy` would publish them.
 
 **Question banks, the next step.** Ultra tests can draw *question pools*
 (k questions at random) from the course's *question banks*; the plan is one
@@ -248,6 +257,10 @@ visual option; a lecture file sets title, subtitle (`Lecture n · room`), author
 `## [Section n]{.section-kicker} Title {.section-slide background-color="#002f57"}`;
 a one-line slide is `## Text {.statement}`. Math is KaTeX — MathJax dropped
 `\mathcal` glyphs. Rendered to `_site/lectures/`, so `make deploy` publishes it.
+
+The lab deck `lectures/lab-module-1-in-r.qmd` ends with an appendix, one slide
+per mock question with the answer, generated from the pool and the Blackboard
+order; regenerate it rather than editing those slides by hand.
 
 **Module 2 is twelve decks, `lectures/10-*.qmd` to `21-*.qmd`, one per row of
 the schedule**, all in this format; Module 1 (Prof. Arbia) is PDFs in `slides/`.

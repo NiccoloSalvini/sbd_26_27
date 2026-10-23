@@ -915,3 +915,254 @@ mean(churn$churn[-idx][p >= quantile(p, 0.9)] == "yes")  # 0.595
 | A monthly series | `decompose`, `HoltWinters`, `arima` | factors, forecast, interval |
 
 : {tbl-colwidths="[32,36,32]"}
+
+## [Appendix]{.section-kicker} The mock exam, answered {.section-slide background-color="#002f57"}
+
+## How to read these slides
+
+- One slide per question, in the order of the Blackboard test: **20 questions, 1.5 points each**
+- Closed questions: the right option and the one line that justifies it
+- Open questions: the code, the numbers, and the sentence that reads them. The sentence is the part that earns the marks
+- The intermediate has the same shape: same mix, same marking, different questions
+
+## 1 · Adjusted R² and parsimony
+
+A linear model has adjusted R-squared 0.412 (n = 109); a cubic model has R-squared 0.604 and adjusted R-squared 0.414. Which model do you keep?
+
+a. **the linear one: the adjusted R-squared values are practically equal, and the simpler model wins** ✓
+b. the cubic one: its R-squared is much higher
+c. neither: the data are not significant
+d. both, averaged
+
+::: {.callout-tip appearance="simple"}
+The deck's own example. R² always rises with flexibility; adjusted R² corrects for degrees of freedom, and when two models tie you pick the more parsimonious.
+:::
+
+## 2 · Censoring
+
+A patient still alive when a five-year study ends:
+
+a. is removed from the data
+b. **is kept, with status 0 and time = 5 years: a censored observation, 'survived at least five years'** ✓
+c. is given the median survival time
+d. is counted as a death at five years
+
+::: {.callout-tip appearance="simple"}
+Y = min(T, C), status δ = 1 if the true survival time is observed, 0 if the censoring time is. Discarding survivors is what the naïve estimators get wrong.
+:::
+
+## 3 · Why Poisson for counts
+
+Linear regression is not the right model for a count, such as the number of patients arriving at the ER in an hour, because:
+
+a. counts cannot be averaged
+b. **it may predict negative values and assumes a constant variance, while for a count the variance grows with the mean** ✓
+c. counts are always normally distributed
+d. R has no function for it
+
+::: {.callout-tip appearance="simple"}
+The Poisson model has E(Y) = Var(Y) = λ, fitted values eᵝ⁰⁺ᵝ¹ˣ that are never negative, and multiplicative effects eᵝ.
+:::
+
+## 4 · Dummy variables
+
+A regression includes season, with four categories. How many dummy variables enter the model, and why?
+
+a. four: one per season
+b. **three: one category is the reference, otherwise the dummies are perfectly collinear with the intercept** ✓
+c. one: 1 for summer, 0 otherwise
+d. two: spring and autumn are similar
+
+::: {.callout-tip appearance="simple"}
+The coefficient of each dummy is the difference from the reference season; the intercept is the reference mean. `lm(casual ~ mnth)` in the deck does this automatically with 11 dummies for 12 months.
+:::
+
+## 5 · Matched or unmatched?
+
+To compare the weight of the same 30 people before and after a diet, the right test is:
+
+a. one-way ANOVA
+b. the two-sample t-test with var.equal = TRUE
+c. the Welch two-sample t-test
+d. **the paired t-test, t.test(before, after, paired = TRUE)** ✓
+
+::: {.callout-tip appearance="simple"}
+Two measurements on the same individuals are a matched sample: one sample of differences. It removes between-individual variation and so has a smaller sampling error than the unmatched design.
+:::
+
+## 6 · Flexibility
+
+As a model is made more flexible (a higher polynomial degree, more predictors), which of the following is ALWAYS true?
+
+a. the variance falls
+b. the test error falls
+c. **the training error falls** ✓
+d. the bias rises
+
+::: {.callout-tip appearance="simple"}
+Adding regressors cannot increase the training RSS; test error falls then rises (the U), bias falls, variance rises.
+:::
+
+## 7 · The p-value
+
+A test returns p = 0.03. This means that:
+
+a. there is a 3% probability that the null hypothesis is true
+b. **if the null hypothesis were true, a test statistic at least as extreme as the observed one would occur about 3% of the time** ✓
+c. there is a 97% probability that the alternative hypothesis is true
+d. the effect is large
+
+::: {.callout-tip appearance="simple"}
+Deck 4, slide "What a p-value does not tell us": it is not the probability that H0 is true, not the chance the result is a fluke, not an effect size.
+:::
+
+## 8 · The two errors
+
+In a trial the null hypothesis is that the defendant is innocent. Convicting an innocent person is:
+
+a. **a type I error** ✓
+b. the power of the test
+c. a type II error
+d. the level of confidence
+
+::: {.callout-tip appearance="simple"}
+Rejecting H0 when it is true is a type I error; letting a guilty person go is type II. The deck's own example.
+:::
+
+## 9 · Not rejecting
+
+If the data do not allow us to reject H0, we have proved that H0 is true.
+
+::: {.callout-tip appearance="simple"}
+**False.** We only lack the evidence to reject it; H0 is retained, not proved (the defendant is acquitted for lack of evidence).
+:::
+
+## 10 · Training error
+
+The model with the smallest training error is the one that will predict new data best.
+
+::: {.callout-tip appearance="simple"}
+**False.** Training fit is optimistic; a flexible model can fit the noise; the best model minimises the expected prediction error on observations not used for fitting.
+:::
+
+## 11 · ANOVA's conclusion
+
+Rejecting H0 in a one-way ANOVA means that all the population means are different from one another.
+
+::: {.callout-tip appearance="simple"}
+**False.** It only means that at least two means differ; which ones is a separate question (pairwise comparisons).
+:::
+
+## 12 · Poisson coefficients
+
+In a Poisson regression the coefficients are read as additive effects on the expected count.
+
+::: {.callout-tip appearance="simple"}
+**False.** The model is on the log scale: a one-unit increase in Xj multiplies E(Y) = lambda by exp(beta_j).
+:::
+
+## 13 · Do leavers pay more?
+
+On churn.csv, compare the monthly charge of customers who churned and customers who stayed. How big is the gap, and how sure are we? Code, result, sentence.
+
+```{.r}
+t.test(monthly_charge ~ churn, data = churn): means 63.54 (no) vs 70.04 (yes)
+95% CI of the difference 5.2 to 7.8
+p < 2e-16
+```
+
+::: {.callout-tip appearance="simple"}
+Leavers pay about 6.5 euros more a month, between 5 and 8. With 7 000 customers the p-value is tiny whatever the gap: the interval is the informative part.
+:::
+
+## 14 · A dummy in interaction
+
+On mtcars, regress mpg on wt, on the dummy am and on their interaction: lm(mpg ~ wt * am). (a) Write the two fitted lines, for automatics and for manuals. (b) Is the slope different in the two groups? (c) What does a manual gearbox do to consumption, in words, now that the interaction is in?
+
+```{.r}
+fit <- lm(mpg ~ wt * am, data = mtcars): intercept 31.42, wt -3.79, am 14.88 (p = 0.0016), wt:am -5.30 (p = 0.001)
+```
+
+::: {.callout-tip appearance="simple"}
+(a) Automatics mpg = 31.4 - 3.79 wt; manuals mpg = 46.3 - 9.08 wt. (b) Yes: interaction -5.3, p = 0.001; manuals lose 9.1 mpg per 1 000 lb against 3.8. (c) A manual is an advantage for light cars (+4.3 mpg at 2 000 lb) and the advantage vanishes around 2 800 lb, where the lines cross.
+:::
+
+## 15 · Two means, unmatched
+
+In mtcars, do cars with a manual gearbox (am = 1) use less fuel than automatics (am = 0)? The two groups are different cars. Write the R code, report the estimate and its 95% interval, and answer in one sentence.
+
+```{.r}
+t.test(mpg ~ am, data = mtcars)
+```
+
+::: {.callout-tip appearance="simple"}
+Means 17.15 (automatic) vs 24.39 (manual); difference 7.2 mpg; 95% CI of the difference 3.2 to 11.3; p = 0.001. Manual cars do about 7 mpg more, at least 3.
+:::
+
+## 16 · Multiple regression and prediction
+
+Fit mpg ~ wt + hp on mtcars (wt in thousands of pounds). (a) What does the coefficient of hp mean, in words? (b) Predict the consumption of a 3 000 lb, 150 hp car, with the range a single such car could fall in. Code, result, sentences.
+
+```{.r}
+fit <- lm(mpg ~ wt + hp, data = mtcars)
+summary(fit)
+predict(fit, data.frame(wt = 3, hp = 150), interval = 'prediction'). wt -3.88, hp -0.032 (p = 0.0015), adjusted R-squared 0.815
+```
+
+::: {.callout-tip appearance="simple"}
+(a) Holding weight fixed, each horsepower costs 0.032 mpg (100 hp about 3 mpg). (b) 20.8 mpg, a single car between 15.4 and 26.2.
+:::
+
+## 17 · A yes/no outcome
+
+On churn.csv: how does the churn rate depend on the contract type? Give the churn rates by contract, fit a logistic regression of churn on contract, and say what a two-year contract does to the odds of leaving. Code, result, sentence.
+
+```{.r}
+prop.table(table(churn$contract, churn$churn), 1): 40.8% month-to-month, 18.2% one-year, 8.1% two-year. fit <- glm(churn ~ contract, family = binomial, data = churn)
+exp(coef(fit)): intercept 0.689, one-year 0.323, two-year 0.129
+```
+
+::: {.callout-tip appearance="simple"}
+A two-year contract multiplies the odds of leaving by 0.13 (divides them by about 8) relative to month-to-month.
+:::
+
+## 18 · A count
+
+warpbreaks (54 looms): breaks is the number of warp breaks per loom, tension the yarn tension (L, M, H). Fit a Poisson regression of breaks on tension. How many breaks does a low-tension loom suffer on average, and by what factor does high tension change it?
+
+```{.r}
+fit <- glm(breaks ~ tension, family = poisson, data = warpbreaks)
+exp(coef(fit)): intercept 36.39, tensionM 0.725, tensionH 0.595
+```
+
+::: {.callout-tip appearance="simple"}
+A low-tension loom averages 36.4 breaks; high tension multiplies the count by 0.60 (about 40% fewer, 21.7 on average); both p < 0.001.
+:::
+
+## 19 · Train, test, and a retention list
+
+On churn.csv, with set.seed(1), split the customers 70/30 into train and test (hold-out). Fit churn ~ tenure_months + contract + monthly_charge (logistic) on train only. Predict the churn probability of every test customer. (a) Among the 10% of test customers with the highest predicted probability, what share actually churned, and how does it compare with the overall test churn rate? (b) Why must this number be computed on test and not on train?
+
+```{.r}
+set.seed(1)
+idx <- sample(nrow(churn), 0.7 * nrow(churn))
+train <- churn[idx, ]
+test <- churn[-idx, ]
+fit <- glm(churn ~ tenure_months + contract + monthly_charge, family = binomial, data = train)
+p <- predict(fit, test, type = 'response')
+top <- p >= quantile(p, 0.9)
+mean(test$churn[top] == 'yes') = 0.562
+mean(test$churn == 'yes') = 0.281
+```
+
+::: {.callout-tip appearance="simple"}
+(a) 56% of the riskiest tenth churn against 28% overall: twice the hit rate. (b) On train the model has already seen the outcomes it is scored on: its hit rate is optimistic.
+:::
+
+## 20 · mtcars: a sign that flips
+
+On mtcars, regress mpg on disp (engine displacement) alone, then on disp + cyl + hp + wt. (a) Report the coefficient of disp in both models, with its p-value. (b) Explain, using the correlation matrix of the four predictors, why it changes so much. (c) Is collinearity a problem in the larger model? Use the VIFs (car::vif) and the rule of the lecture, and say what you would do.
+
+::: {.callout-tip appearance="simple"}
+lm(mpg ~ disp, mtcars): disp -0.041 (p = 1e-09). lm(mpg ~ disp + cyl + hp + wt): disp +0.012 (p = 0.33): the sign flips and the effect vanishes. (b) cor(mtcars[, c('disp', 'cyl', 'hp', 'wt')]): disp is correlated 0.90 with cyl, 0.89 with wt, 0.79 with hp; alone, disp stands in for all of them, together they share the same information. (c) vif(): disp 10.4, cyl 6.7, hp 3.4, wt 4.9. disp is above 10, so it is discarded, one variable at a time starting from the most collinear; refit: VIFs 4.8, 3.3, 2.6, adjusted R-squared unchanged (0.826), wt the only clearly significant predictor.
+:::

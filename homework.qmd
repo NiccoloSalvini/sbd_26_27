@@ -59,7 +59,8 @@ Past intermediate exams and mock papers appear here before each session.
 
 | | Session | Paper | Solutions |
 |---|---|---|---|
-| Mock — Module 1 | before first intermediate | — | — |
+| Mock — Module 1 | 23 Oct · on Blackboard, in Aula 1 | — | [answered, slide by slide](lectures/lab-module-1-in-r.html#/appendix-the-mock-exam-answered) |
+| Practice paper — Module 1 | before the first intermediate | [paper](homework/m1-practice.qmd) | [solutions](homework/m1-practice-solutions.qmd) |
 | Mock — Module 2 | before second intermediate | — | — |
 
 : {tbl-colwidths="[24,26,25,25]"}

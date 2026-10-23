@@ -1,0 +1,143 @@
+---
+title: "Practice paper — Module 1"
+subtitle: "Same shape as the first intermediate · about 90 minutes · not graded"
+---
+
+::: {.callout-important appearance="simple"}
+**This is the shape of the first intermediate**: 20 questions, 1.5 points each, 30 in total; 8 multiple choice, 4 true/false, 8 open questions answered with R code, the numbers and one sentence that reads them. 90 minutes. The intermediate has different questions on the same topics.
+:::
+
+Data: `mtcars`, `cars`, `PlantGrowth`, `warpbreaks` and `lung` ship with R (`library(survival)` for `lung`); [`churn.csv`](../materials/churn.csv) is the course dataset. Work in RStudio with the script of the lab open: every function needed is in it. Check yourself against the [solutions](m1-practice-solutions.qmd) only after writing your own sentence.
+
+
+## A · Multiple choice
+
+One option is right.
+
+### 1
+
+In R, after model1 <- lm(y ~ x), the command abline(model1):
+
+a. tests H0: b = 0
+b. draws the fitted line on the scatter plot
+c. prints the residuals
+d. standardises x
+
+### 2
+
+In summary(model1) the row for x shows Pr(>|t|) = 0.41. The conclusion is:
+
+a. we cannot reject H0: b = 0, so x does not explain y significantly
+b. the slope is 0.41
+c. the model is accepted
+d. R-squared is 0.41
+
+### 3
+
+In baltimore, lm(PRICE ~ AGE + AC) gives intercept 44.8, AGE -0.17 and AC 19.7 (AC = 1 if the house has air conditioning). The predicted price of a 10-year-old house with air conditioning is:
+
+a. 44.8 - 0.17 * 10 + 19.7 = 62.8
+b. 44.8 + 19.7 = 64.5
+c. 19.7 * 10 = 197
+d. 44.8 - 0.17 * 10 = 43.1
+
+### 4
+
+The degrees of freedom of a regression are:
+
+a. R-squared times n
+b. always n - 1
+c. the number of predictors
+d. the number of observations minus the number of parameters, n - p
+
+### 5
+
+In the BrainCancer Cox model the coefficient of the Karnofsky index ki is negative and significant. This means:
+
+a. the survival curve rises with time
+b. a higher Karnofsky index raises the probability of death
+c. a higher Karnofsky index lowers the hazard: patients in better condition die later
+d. the baseline hazard is negative
+
+### 6
+
+vif(model) returns 1.33 for both predictors. According to the rule seen in the lecture:
+
+a. the model is refitted without the intercept
+b. both variables are retained: the threshold is VIF > 10 (tolerance < 0.1)
+c. both variables are discarded
+d. the one with the higher VIF is discarded first
+
+### 7
+
+A linear fit gives R-squared 0.391, a quadratic fit on the same data 0.469. Before preferring the parabola, by the lectures you should check:
+
+a. that the residuals of the line are positive
+b. that the sample has more than 30 observations
+c. that the quadratic term is significant and that the adjusted R-squared, not the R-squared, is higher
+d. nothing: 0.469 is higher than 0.391
+
+### 8
+
+Two models are compared: M1: Y ~ X1 and M2: Y ~ X1 + X2. For X2 the p-value is 0.002; training RMSE 5.12 (M1) vs 5.05 (M2); cross-validated RMSE 5.30 (M1) vs 5.29 (M2). The reading is:
+
+a. X2 improves prediction substantially, since the p-value is small
+b. X2 is statistically significant, but the predictive improvement is negligible
+c. M2 overfits, because its training RMSE is lower
+d. the two RMSEs contradict the p-value, so one of the computations is wrong
+
+## B · True or false
+
+Say which, and why, in one line.
+
+### 9
+
+Leave-one-out cross-validation is K-fold cross-validation with K equal to the number of observations.
+
+### 10
+
+A multiple R-squared of 0.65 means that 65% of the observations are predicted correctly by the regression.
+
+### 11
+
+The R-squared of a logistic regression is read like the R-squared of a linear regression.
+
+### 12
+
+In a two-tailed test (H1: mu different from mu0) the rejection region is split between the two tails of the sampling distribution, alpha/2 on each side.
+
+## C · Open questions
+
+Code, result, one sentence. The sentence is the part that is marked.
+
+### 13
+
+In mtcars, regress mpg on hp. How many mpg does a car lose per 10 hp, and what share of the variation in consumption does power explain? Predict the consumption of a 120 hp car with the range a single car could fall in.
+
+### 14
+
+On churn.csv, fit churn ~ tenure_months + contract + monthly_charge (logistic). A new customer has been with us 3 months, is on a month-to-month contract and pays 90 euros a month: what is the probability that they churn? And the same customer on a two-year contract after 36 months? Code, numbers, sentence.
+
+### 15
+
+On churn.csv, fit churn ~ tenure_months + contract + monthly_charge (logistic). Build the classification table at the 0.5 threshold and compute the percentage of correctly classified customers. Is it a good model? Compare with the naive rule 'nobody churns'.
+
+### 16
+
+On mtcars, with set.seed(1), split the cars 70/30 into train and test (hold-out), as in the lab. Fit mpg ~ wt on train and compute the RMSE on train and on test; then fit mpg ~ wt + hp and do the same. (a) Report the four RMSEs. (b) Does hp improve prediction? Why is the test RMSE the number to compare, and what is the weakness of a single split here?
+
+### 17
+
+lung: 228 patients, time in days, status (2 = died). Fit the Kaplan-Meier curve of the whole sample. (a) Report the median survival with its 95% interval. (b) Report the probability of surviving one year (365 days) with its interval, from summary(fit, times = 365). (c) Why is the raw share of patients with time > 365, 28.5%, the wrong number?
+
+### 18
+
+On mtcars, fit mpg ~ hp and then the quadratic model mpg ~ hp + hp2, where hp2 <- mtcars$hp^2, as in the Auto example of the lecture (poly(hp, 2) gives the same numbers). (a) Is the quadratic term significant? (b) Compare the two adjusted R-squared values and say which model you keep. (c) Predict mpg at 100 hp and at 300 hp with both models and explain why they differ so much at 300.
+
+### 19
+
+PlantGrowth: the dried weight of 30 plants under a control and two treatments. Does the treatment matter, and if so WHICH treatments differ from which? Code, result, one sentence.
+
+### 20
+
+On mtcars, compare mpg ~ wt and mpg ~ wt + hp with 5-fold cross-validation, set.seed(123), using the SAME folds for both. Report the two cross-validated RMSE. Does hp improve prediction, and does the answer agree with its p-value?
