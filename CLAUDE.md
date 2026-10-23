@@ -206,7 +206,11 @@ question. The Upload Questions file is the fallback (then
 `bb_set_question_points` for the points). Every
 number in a key comes from `private/mock-exam-1-key.R`, run; a question whose
 answer moves with the seed says so in its key. The mock before each
-intermediate uses the same settings, different questions, and is not graded.
+intermediate uses the same settings, different questions, and **counts for
+nothing**: the course has no overall-grade column (marks go to the SVE file),
+so a mock score enters no calculation; the "Formative assessment" switch in
+the test settings is the label for it, and it is UI-only (every API write of
+`isFormative` is ignored or refused, tried 23 Oct 2026).
 Manifests so far: `mock-exam-1.json` (23 Oct 2026), `practice-1.json` (the
 practice paper on the site, `homework/m1-practice.qmd`, drawn 23 Oct 2026 and
 removed from the midterm banks), `midterm-1.json` (draft). An open question's
