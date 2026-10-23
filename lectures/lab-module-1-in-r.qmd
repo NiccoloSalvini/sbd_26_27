@@ -920,10 +920,10 @@ mean(churn$churn[-idx][p >= quantile(p, 0.9)] == "yes")  # 0.595
 
 ## How to read these slides
 
-- One slide per question, in the order of the Blackboard test: **20 questions, 1.5 points each**
+- One slide per question, in the order of the Blackboard test. The mock had **20 questions at 1.5 points**; the intermediate has **15 questions at 2 points, in 60 minutes**, the same kinds of questions
 - Closed questions: the right option and the one line that justifies it
 - Open questions: the code, the numbers, and the sentence that reads them. The sentence is the part that earns the marks
-- The intermediate has the same shape: same mix, same marking, different questions
+- Open questions are marked 0 to 2 in steps of 0.5: code and numbers alone are not full marks; the sentence is
 
 ## 1 · Adjusted R² and parsimony
 
