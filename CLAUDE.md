@@ -234,6 +234,17 @@ sentence says more or less than the numbers, then written with
 A review file (`private/<exam>-review.md`, one block per student) is the
 working document; the mock's is `private/mock-review.md`.
 
+**Students will use AI tools to cheat, and marking must catch it.** Every
+proposal carries `ai_signals`: LaTeX or markdown in a typed answer, sentences
+addressed to "your lectures", hedges about "the dataset version",
+approximate numbers where R prints exact ones, and above all numbers given as
+output that the data do not produce. One weak signal, usually explained by a
+wrong model, is marked on the merit. Several strong signals across a
+student's answers is a serious case: the feedback says so plainly, without
+insult, the marks stay on the merit, and the case goes to Niccolò with the
+evidence. Wrong numbers are the evidence; style alone never is. The mock of
+23 Oct 2026 had one such case.
+
 **Question banks, the next step.** Ultra tests can draw *question pools*
 (k questions at random) from the course's *question banks*; the plan is one
 bank per topic, filled from the pool files, and exams built as lists of
