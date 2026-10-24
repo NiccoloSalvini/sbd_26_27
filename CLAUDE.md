@@ -213,12 +213,25 @@ the test settings is the label for it, and it is UI-only (every API write of
 `isFormative` is ignored or refused, tried 23 Oct 2026).
 Manifests so far: `mock-exam-1.json` (23 Oct 2026), `practice-1.json` (the
 practice paper on the site, `homework/m1-practice.qmd`, drawn 23 Oct 2026 and
-removed from the midterm banks), `midterm-1.json` (draft). An open question's
+removed from the midterm banks), `midterm-1.json` (draft, redrawn 24 Oct 2026:
+15 × 2, closed questions by seed 1, the six open ones fixed by hand with `ids`,
+one lab method each). An open question's
 `example` is the model answer and goes to Blackboard as the question's answer
 text; notes for the marker ("half marks if…") go in `marking`, which only the
 key prints. Open questions use mtcars, cars, PlantGrowth, warpbreaks, lung and
 `churn.csv`; `customers.csv` was dropped from the pool on 23 Oct 2026 (its
-columns are independent by construction and the lab never opened it). The
+columns are independent by construction and the lab never opened it).
+
+**An exam on the lab machines uses only data that ship with R** — `datasets`
+or a recommended package such as `survival` — never a CSV, and no package the
+machines may lack (`car`). In the mock of 23 Oct 2026 the three `churn.csv`
+questions were left blank by 34–38 of 41 students, including those who reached
+the last question: nobody could load the file on those machines. The churn
+questions stay in the pool; `private/not-on-lab-machines.json` lists them (and
+the `car::vif` ones) in manifest form, so it goes in every `exclude_manifests`.
+The same holds for `pool-module-2.json`, although the Module 2 labs run on
+`customers.csv`, `brands.csv` and `churn.csv`: its open questions need built-in
+data (USArrests, iris, …). The
 `private/*.qmd` keys are excluded from the render (`"!private/"` in
 `_quarto.yml`), or `make deploy` would publish them.
 
