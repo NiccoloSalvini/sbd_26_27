@@ -14,7 +14,7 @@ RStudio: four panes, a project, a script. The working directory. Reading an erro
 :::
 
 - You open **RStudio**, never R. The script is what you keep; the console is a scratchpad
-- A **project** is the folder R opens in: `here("data", "file.csv")` works on your laptop and on the exam machines
+- A **project** is the folder R opens in: `here("data", "file.csv")` finds the file inside it, wherever the folder sits on disk
 - `Cmd/Ctrl + Enter` runs the line. Red text is R talking, not R breaking
 - The one-line setup: `source("https://sbd-26-27.netlify.app/materials/setup.R")`
 
@@ -109,7 +109,7 @@ Today we use all of it, on every method Prof. Arbia has covered.
 - Run **every method of Module 1** once, on a dataset that ships with R — no download, no setup
 - Learn the one habit that carries the exam: **question → one line → read the output → write the sentence**
 - Get a dataset from the course site into R, and answer business questions on it
-- Leave with a script that reruns, top to bottom, on Friday's lab machines
+- Leave with a script that reruns, top to bottom, on any computer with the course packages
 
 ## How a lab works
 
@@ -688,7 +688,7 @@ churn <- read_csv(here("data", "churn.csv"))               # file → data frame
 glimpse(churn)                                   # 7 000 rows, 20 columns, types
 ```
 
-- `download.file` fetches once and keeps a copy in `data/`: the script works **offline, and on Friday's machines**
+- `download.file` keeps a copy in this project's `data/`: the script then works offline, **on this computer only**. Another machine has no `data/`: download again there, or pass the URL straight to `read_csv`
 - `read_csv` guesses each column's type; `glimpse` shows the guess. **Check it before anything else**
 - The same two lines read any CSV on the site: `customers.csv`, `brands.csv`
 
