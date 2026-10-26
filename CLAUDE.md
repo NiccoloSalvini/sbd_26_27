@@ -170,12 +170,13 @@ fixed on the first one (October 2026), are the same every time:
 | Setting | Value |
 |---|---|
 | Questions | **15, 2 points each, 30 in total**; pass mark 18. (The *full exam*, both modules: 20 questions, 1.5 points each, 30 in total, 90 minutes) |
-| Mix | 6 multiple choice · 3 true/false · 4 open medium · 2 open challenging |
+| Mix | 6 multiple choice · 3 true/false · 5 open medium · 1 open challenging, drawn per student from question pools: MC easy 4 · MC medium 2 · TF easy 2 · TF medium 1 · open medium 5 · open challenging 1. Six easy, eight medium, **one challenging**: Niccolò wants about 5% hard questions in the paper (26 Oct 2026); the banks keep more for variety |
 | Language | English, like the syllabus |
 | Time limit | **60 minutes, automatic submission** |
 | Attempts | 1 |
 | Due date | **none**: the time limit and the visibility window do the job; a due date only adds a "late" flag and blocks the settings page |
 | Location restriction | `Aula + WIFI (tutte le sedi)` |
+| Results | submission, question feedback and question scores visible **after all marks have been posted**; **correct answers never shown**, because the banks are drawn from again |
 | Mark category | Test; marks posted automatically |
 | Visibility | hidden until the exam starts; the date is announced on Blackboard and on the site |
 
@@ -213,9 +214,10 @@ the test settings is the label for it, and it is UI-only (every API write of
 `isFormative` is ignored or refused, tried 23 Oct 2026).
 Manifests so far: `mock-exam-1.json` (23 Oct 2026), `practice-1.json` (the
 practice paper on the site, `homework/m1-practice.qmd`, drawn 23 Oct 2026 and
-removed from the midterm banks), `midterm-1.json` (draft, redrawn 24 Oct 2026:
-15 × 2, closed questions by seed 1, the six open ones fixed by hand with `ids`,
-one lab method each). An open question's
+removed from the midterm banks), `midterm-1.json` (26 Oct 2026: not one paper
+but the 113 questions the intermediate's pools can draw, in pool order, so a
+later exam can exclude them; its key, `midterm-1-paper.pdf`, prints them all).
+An open question's
 `example` is the model answer and goes to Blackboard as the question's answer
 text; notes for the marker ("half marks if…") go in `marking`, which only the
 key prints. Open questions use mtcars, cars, PlantGrowth, warpbreaks, lung and
@@ -227,11 +229,19 @@ or a recommended package such as `survival` — never a CSV, and no package the
 machines may lack (`car`). In the mock of 23 Oct 2026 the three `churn.csv`
 questions were left blank by 34–38 of 41 students, including those who reached
 the last question: nobody could load the file on those machines. The churn
-questions stay in the pool; `private/not-on-lab-machines.json` lists them (and
-the `car::vif` ones) in manifest form, so it goes in every `exclude_manifests`.
+questions already sat (mock, practice) stay in the pool, the others were
+deleted; `private/not-on-lab-machines.json` lists what is left (and D4, on
+`car::vif`) in manifest form, so it goes in every `exclude_manifests`.
 The same holds for `pool-module-2.json`, although the Module 2 labs run on
 `customers.csv`, `brands.csv` and `churn.csv`: its open questions need built-in
-data (USArrests, iris, …). The
+data (USArrests, iris, …).
+
+**Ridge, LASSO and time series are never examined**, neither in an
+intermediate nor in the full exam. The calendar lists them (lectures 7 and 8),
+but Prof. Arbia's nine decks end at survival, and the lab of 20 Oct 2026
+stopped before its sections 4 and 5: nobody taught them. The pool has no
+question on them; the eight written (H1–H8) wait in
+`private/mock-exam-1-draft.qmd`, *Held back*, and stay there. The
 `private/*.qmd` keys are excluded from the render (`"!private/"` in
 `_quarto.yml`), or `make deploy` would publish them.
 
@@ -258,18 +268,28 @@ insult, the marks stay on the merit, and the case goes to Niccolò with the
 evidence. Wrong numbers are the evidence; style alone never is. The mock of
 23 Oct 2026 had one such case.
 
-**Question banks, the next step.** Ultra tests can draw *question pools*
-(k questions at random) from the course's *question banks*; the plan is one
-bank per topic, filled from the pool files, and exams built as lists of
-pools, so every student gets a different paper. The public API cannot write
-questions, but the MCP's `bb_banks_from_pool` does it through the Ultra
-interface's own API, using the lecturer's signed-in browser session (a
-Chrome started with `--remote-debugging-port=9223`, then `bb_ultra_connect`;
-details in the MCP README). The step that is still manual, or to be recorded
-next, is adding the question pools to a test: a pool reads back as a
-`questionBlock`, and `bb_assessment_clear` deletes one, but the request that
-creates one was never captured. Until then, a paper is a fixed list of
-questions, `bb_test_fill`.
+**Intermediates draw from question banks, mocks do not.** Every student gets a
+different paper of the same shape: the test is a list of *question pools*
+(Ultra's random blocks), one per line of the Mix row above, each drawing from
+the banks' questions of that type and difficulty, across topics. The mock is a
+fixed list (`bb_test_fill`); an intermediate, the first and the second, is
+built with `bb_test_pools(course, test_id, pool_path, groups, points=2,
+exclude_manifests=[mock, practice, not-on-lab-machines], bank_prefix="M1 · ")`
+after `bb_ultra_connect`; `bb_assessment_questions` reads the pools back. The
+MCP writes questions and pools through the Ultra interface's own API, with the
+lecturer's signed-in browser session (a Chrome started with
+`--remote-debugging-port=9223`); the pool request was read from the
+interface's bundle on 26 Oct 2026 (MCP README). The session lasts 3 hours:
+when a tool fails with a 401, sign in again in that Chrome and reconnect.
+
+Module 1's banks, `M1 · <topic>`, one per pool topic, hold **120 usable
+questions at 2 points, 30% easy, 50% medium, 20% challenging** (26 Oct 2026,
+from 65): 59 new ones, T201–T906 (deck in the id), written to the perimeter
+above and verified in `private/pool-keys/deckN.R`, and D5. The practice
+paper's 15 and the mock's 20 are not in them (the mock has its own bank);
+the five churn/`car` questions were deleted. A pool should hold at least four
+questions per question it draws. Prof. Arbia's deck 6 writes VIF =
+R²/(1−R²), against its own VIF = 1/tolerance: questions state 1/(1−R²).
 
 ## Slides: one Beamer theme for every lecture
 
