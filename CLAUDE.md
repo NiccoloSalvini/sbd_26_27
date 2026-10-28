@@ -274,7 +274,7 @@ different paper of the same shape: the test is a list of *question pools*
 the banks' questions of that type and difficulty, across topics. The mock is a
 fixed list (`bb_test_fill`); an intermediate, the first and the second, is
 built with `bb_test_pools(course, test_id, pool_path, groups, points=2,
-exclude_manifests=[mock, practice, not-on-lab-machines], bank_prefix="M1 · ")`
+exclude_manifests=[mock, practice, not-on-lab-machines, not-taught], bank_prefix="M1 · ")`
 after `bb_ultra_connect`; `bb_assessment_questions` reads the pools back. The
 MCP writes questions and pools through the Ultra interface's own API, with the
 lecturer's signed-in browser session (a Chrome started with
@@ -288,8 +288,28 @@ from 65): 59 new ones, T201–T906 (deck in the id), written to the perimeter
 above and verified in `private/pool-keys/deckN.R`, and D5. The practice
 paper's 15 and the mock's 20 are not in them (the mock has its own bank);
 the five churn/`car` questions were deleted. A pool should hold at least four
-questions per question it draws. Prof. Arbia's deck 6 writes VIF =
-R²/(1−R²), against its own VIF = 1/tolerance: questions state 1/(1−R²).
+questions per question it draws.
+
+**Every question stays inside what was taught, checked, not assumed.** On 28 Oct
+2026 four independent reviewers checked the 120 bank questions page by page
+against Arbia's decks (`~/Downloads/Big_Data_2026-lecture1…9.pdf`; 3 and 8 are
+mostly images) and the lab deck up to section 3 (lines 1–498, its exercise
+solutions and the cheat sheet): 3 needed concepts never taught, 14 more put
+points on something untaught or contradicted a slide. All 17 are listed in
+`private/not-taught.json` (a manifest for `exclude_manifests`) and replaced by
+R201–R902, same type, difficulty and topic. The R a question may ask for is
+what was shown: `t.test` (`mu`, `alternative`, `paired`, `var.equal`), `aov`,
+`TukeyHSD`, `lm`, `summary`, `coef`, `exp`, `predict` (`interval`, `type`),
+`poly` and squares built as `x2 <- x^2`, `glm`, `factor`, `table`, `mean`,
+`boxplot`, the lab's cross-validation loop, `Surv`, `survfit`, `coxph`.
+Never `sd`, `var`, `cor`, `tapply`, `I()`, `relevel`, `confint`,
+`summary(coxph)`, nor the log-rank's meaning, extrapolation, overdispersion,
+standardised effects or causation: a number they would give goes in the text.
+Arbia's slides have errors a question must not depend on: deck 6 p.20 VIF =
+R²/(1−R²) (questions state 1/(1−R²)), deck 6 p.14 adjusted R² (0.414 should be
+0.597, which made the mock's question 1 key wrong), deck 7 pp.7–8 code the
+dummy both ways, deck 9 p.35 reads the sex effect backwards, deck 5 p.31
+"known" for "unknown".
 
 ## Slides: one Beamer theme for every lecture
 
