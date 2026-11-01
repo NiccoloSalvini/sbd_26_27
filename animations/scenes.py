@@ -1002,8 +1002,9 @@ class Lloyd(Stage):
 
 
 class KmeansByHand(Stage):
-    """The six customers of the slide, with the distances written out. The deck
-    asserts W = 5.3; here it is computed in front of them."""
+    """The six customers of the slide, with the distances written out: assign,
+    update, then every squared distance to the new centroids and their sum.
+    In fractions, so the sums on screen add up exactly: W = 8/3."""
 
     WAIT_SCALE = 1.0
     PLAY_SCALE = 1.0
@@ -1027,25 +1028,28 @@ class KmeansByHand(Stage):
         cA = Star(n=5, outer_radius=0.16, color=GOLD, fill_opacity=1).move_to(ax.c2p(1, 1))
         cD = Star(n=5, outer_radius=0.16, color=SKY, fill_opacity=1).move_to(ax.c2p(8, 8))
         self.play(FadeIn(cA, scale=1.6), FadeIn(cD, scale=1.6), run_time=1.0)
-        self.play(FadeIn(label("centroids start at A and D", 24, CREAM).next_to(ax, UP, buff=0.3)), run_time=0.8)
+        top = label("centroids start at A and D", 24, CREAM).next_to(ax, UP, buff=0.3)
+        self.play(FadeIn(top), run_time=0.8)
         self.wait(2.8)
 
-        rows = VGroup().to_edge(RIGHT, buff=0.9).shift(UP * 1.9)
+        # the right-hand column: every line starts at COL, clear of the axes
+        COL = np.array([0.5, 0, 0])
         head = MathTex(r"\text{point} \quad d^2(\cdot,A) \quad d^2(\cdot,D)", color=MUTED, font_size=28)
-        head.to_edge(RIGHT, buff=0.7).shift(UP * 2.4)
+        head.align_to(COL, LEFT).set_y(2.7)
         self.play(FadeIn(head), run_time=0.7)
 
-        prev = head
+        table, prev = VGroup(head), head
         for n in ("B", "C", "E", "F"):
             x, y = KM_PTS[n]
             dA = (x - 1) ** 2 + (y - 1) ** 2
             dD = (x - 8) ** 2 + (y - 8) ** 2
             winner = GOLD if dA < dD else SKY
             line = MathTex(rf"{n} \quad\; {dA} \quad\; {dD}", color=CREAM, font_size=30)
-            line.next_to(prev, DOWN, buff=0.38).align_to(head, LEFT)
+            line.next_to(prev, DOWN, buff=0.32).align_to(COL, LEFT)
             self.play(FadeIn(line, shift=RIGHT * 0.15), run_time=0.7)
             self.play(dots[n].animate.set_color(winner), line.animate.set_color(winner), run_time=0.7)
             self.wait(2.1)
+            table.add(line)
             prev = line
         self.play(dots["A"].animate.set_color(GOLD), dots["D"].animate.set_color(SKY), run_time=0.6)
         self.wait(2.2)
@@ -1053,18 +1057,37 @@ class KmeansByHand(Stage):
         # update the centroids to the group means, with the arithmetic
         m1 = MathTex(r"\bar x_1 = \tfrac{1+2+1}{3},\ \tfrac{1+1+2}{3} = (1.33,\ 1.33)", color=GOLD, font_size=28)
         m2 = MathTex(r"\bar x_2 = \tfrac{8+9+8}{3},\ \tfrac{8+8+9}{3} = (8.33,\ 8.33)", color=SKY, font_size=28)
-        VGroup(m1, m2).arrange(DOWN, buff=0.3, aligned_edge=LEFT).next_to(prev, DOWN, buff=0.6).align_to(head, LEFT)
+        VGroup(m1, m2).arrange(DOWN, buff=0.3, aligned_edge=LEFT).next_to(prev, DOWN, buff=0.5).align_to(COL, LEFT)
         self.play(FadeIn(m1), cA.animate.move_to(ax.c2p(1.333, 1.333)), run_time=1.3)
         self.wait(2.0)
         self.play(FadeIn(m2), cD.animate.move_to(ax.c2p(8.333, 8.333)), run_time=1.3)
         self.wait(2.8)
 
-        again = label("assign again: nothing changes", 24, CREAM).next_to(ax, UP, buff=0.3)
-        self.play(FadeIn(again), run_time=0.9)
+        again = label("assign again: nothing changes", 24, CREAM).move_to(top)
+        self.play(FadeOut(top), FadeIn(again), run_time=0.9)
         self.wait(2.8)
 
-        w = MathTex(r"W = 2.67 + 2.67 = 5.33", color=GOLD, font_size=36)
-        w.next_to(m2, DOWN, buff=0.7).align_to(head, LEFT)
+        # W at the final centroids: each squared distance, then the sum
+        self.play(FadeOut(table), VGroup(m1, m2).animate.align_to(head, UP), run_time=1.0)
+        self.wait(1.0)
+        prev = m2
+        for n, dx, dy, d2 in (("A", 1, 1, 2), ("B", 2, 1, 5), ("C", 1, 2, 5)):
+            line = MathTex(rf"d^2({n},\bar x_1) = (\tfrac{{{dx}}}{{3}})^2 + (\tfrac{{{dy}}}{{3}})^2 = \tfrac{{{d2}}}{{9}}",
+                           color=GOLD, font_size=28)
+            line.next_to(prev, DOWN, buff=0.3).align_to(COL, LEFT)
+            self.play(FadeIn(line, shift=RIGHT * 0.15), Indicate(dots[n], color=GOLD, scale_factor=1.8), run_time=0.9)
+            self.wait(2.2)
+            prev = line
+        w1 = MathTex(r"W_1 = \tfrac{2}{9} + \tfrac{5}{9} + \tfrac{5}{9} = \tfrac{12}{9} = 1.33", color=GOLD, font_size=30)
+        w1.next_to(prev, DOWN, buff=0.4).align_to(COL, LEFT)
+        self.play(FadeIn(w1), run_time=0.8)
+        self.wait(2.6)
+        w2 = MathTex(r"W_2 = \tfrac{12}{9} \quad \text{the mirror image}", color=SKY, font_size=30)
+        w2.next_to(w1, DOWN, buff=0.3).align_to(COL, LEFT)
+        self.play(FadeIn(w2), *[Indicate(dots[n], color=SKY, scale_factor=1.8) for n in ("D", "E", "F")], run_time=1.0)
+        self.wait(2.6)
+        w = MathTex(r"W = \tfrac{4}{3} + \tfrac{4}{3} = \tfrac{8}{3} = 2.67", color=GOLD, font_size=36)
+        w.next_to(w2, DOWN, buff=0.5).align_to(COL, LEFT)
         self.play(Write(w), run_time=1.4)
         self.wait(4.5)
 
