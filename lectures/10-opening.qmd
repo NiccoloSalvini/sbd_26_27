@@ -90,10 +90,10 @@ Nobody? Perfect, we start from zero. Everybody? Better still: this semester you 
 Every method so far had a $y$
 :::
 
+- Tests and ANOVA: does $y$ differ between groups?
 - Regression: a number to predict — sales, length of stay, cost
 - Logistic and Poisson: a class or a count
-- Time series: tomorrow, from yesterday
-- Ridge, LASSO: the same, with too many predictors
+- Survival: how long until an event — a customer leaving, a patient discharged
 
 In every case the data came with **the answer attached**. The model's job was to reproduce it.
 
@@ -102,8 +102,8 @@ In every case the data came with **the answer attached**. The model's job was to
 | Weeks | Question | Has a $y$? |
 |---|---|---|
 | 1–3 | *Which customers resemble each other?* — clustering, PCA, correspondence analysis | **No** |
-| 4–6 | *Which will churn, default, be readmitted?* — trees, forests, boosting, neural networks | Yes |
-| 7 | *Why did the model say that, and how do I tell the board?* | — |
+| 4–5 | *Which will churn, default, be readmitted?* — trees, forests, boosting, neural networks | Yes |
+| 6 | *Why did the model say that, and how do I tell the board?* | — |
 
 The second half is supervised, like Module 1 — with **algorithms** in place of **equations**.
 
@@ -526,7 +526,7 @@ A dataset can grow in two directions, and each breaks something different
   <text x="620" y="74">80 behaviours per customer, 20 000 genes</text>
   <text x="620" y="216" fill="#5f6b75">breaks: distances, coefficients, and the eye —</text>
   <text x="620" y="242" fill="#5f6b75">when p &gt; n, least squares has no single answer</text>
-  <text x="620" y="280" font-weight="600">→ fewer columns: LASSO, then PCA in week 2</text>
+  <text x="620" y="280" font-weight="600">→ fewer columns: PCA, in week 3</text>
 </svg>
 </div>
 
@@ -544,14 +544,15 @@ Big data usually lives in a **database**. What you analyse is still a **dataset*
 
 The type decides what you may do. `churn.csv`: **7 numeric, 13 categorical** columns — and clustering and PCA want numbers.
 
-## Five lines you need on Tuesday
+## Six lines you need on Tuesday
 
 ```{.r}
-library(tidyverse)                     # load the toolbox, once per session
-cust <- read_csv("customers.csv")      # file → data frame; <- means "call it"
-glimpse(cust)                          # every column, its type, first values
-cust$monetary                          # one column: data frame $ column name
-summary(cust$monetary)                 # a function applied to that column
+library(tidyverse)                               # the toolbox, once per session
+library(here)                                    # paths from the project folder
+cust <- read_csv(here("data", "customers.csv"))  # file → data frame, named cust
+glimpse(cust)                                    # columns, types, first values
+cust$monetary                                    # one column: data $ column
+summary(cust$monetary)                           # a function applied to it
 ```
 
 ```{.text code-line-numbers="false"}
@@ -577,11 +578,11 @@ Raw, the distance *is* spending. After `scale()` every column counts in standard
 ## Train and test, on real customers
 
 ```{.r}
-churn <- read_csv("churn.csv")          # 7 000 customers, 28.5% churned
-set.seed(1)                             # same random split for everyone
+churn <- read_csv(here("data", "churn.csv"))  # 7 000 customers, 28.5% churned
+set.seed(1)                                   # same random split for everyone
 idx   <- sample(nrow(churn), 0.7 * nrow(churn))
-train <- churn[idx, ]                   # 4 900 rows: the model learns here
-test  <- churn[-idx, ]                  # 2 100 rows: locked until the end
+train <- churn[idx, ]                         # 4 900 rows: the model learns here
+test  <- churn[-idx, ]                        # 2 100 rows: locked until the end
 ```
 
 | | Rows | Churn rate |
