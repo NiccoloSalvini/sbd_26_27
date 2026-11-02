@@ -205,8 +205,8 @@ the Ultra interface's own API (a test is an assessment on the same route as a
 bank). `bb_assessment_questions` reads the test back to check it against the
 pool; the mock of 23 Oct 2026 went in this way and was verified question by
 question. Until 2 Nov 2026 the MCP posted every MC with `positionAfter:
-"start"`, so a manifest of MCs went in reversed; fixed by the MCP's PR 1
-(branch `impostazioni-test`, `bb_test_settings` with it; `private/set-10-fill.json` is the reversed workaround used
+"start"`, so a manifest of MCs went in reversed; fixed in the MCP the same day
+(PR 1, merged with `bb_test_settings`; `private/set-10-fill.json` is the reversed workaround used
 for Set 10). Read the order back either way. Shuffle the answer options in the pool file too: Ultra keeps them
 as written, and a pool written correct-first gives the answer away. The
 practice-set tests (Set 10 onwards) are 1 point a question, MC and TF only:
