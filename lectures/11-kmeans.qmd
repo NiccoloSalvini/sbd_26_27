@@ -90,26 +90,28 @@ It stops at *a* minimum, not *the* minimum. Different starting points give diffe
 
 {{< video media/Lloyd.mp4 width="880" height="495" >}}
 
-Deliberately bad starting centroids, so the first update is large. Watch the column of $W$: it falls at every half-step, which is *why* the algorithm is guaranteed to stop.
+66 customers, bad starting centroids on purpose. Watch the column of $W$: it only falls, which is *why* the algorithm has to stop.
 
 ## By hand: six customers, two variables
 
 ::: {.subtitle-frame}
-Visits per month and average basket, already scaled
+How often they come, and how much they spend each time · both on a 0–10 score
 :::
 
 | | A | B | C | D | E | F |
 |---|---|---|---|---|---|---|
-| visits | 1 | 2 | 1 | 8 | 9 | 8 |
-| basket | 1 | 1 | 2 | 8 | 8 | 9 |
+| visits per month | 1 | 2 | 1 | 8 | 9 | 8 |
+| spend per visit | 1 | 1 | 2 | 8 | 8 | 9 |
 
-$k = 2$. Start with centroids at **A** and **D**.
+: {tbl-colwidths="[28,12,12,12,12,12,12]"}
 
-- **Assign**: B, C nearer A; E, F nearer D → $\{A,B,C\}$, $\{D,E,F\}$
-- **Update**: $\bar x_1 = (1.33, 1.33)$, $\bar x_2 = (8.33, 8.33)$
-- **Assign again**: nothing changes. Done in one round.
+$k = 2$, starting centres **A** and **D**.
 
-$W = \tfrac{4}{3} + \tfrac{4}{3} = \tfrac{8}{3} \approx 2.67$ — in each group, $\tfrac{2}{9} + \tfrac{5}{9} + \tfrac{5}{9}$. Any other split of these six gives a larger $W$ — try $\{A,B,C,D\}$ vs $\{E,F\}$ and see.
+1. **Assign**: every customer joins the nearer centre. B and C are close to A; E and F close to D
+2. **Update**: each centre moves to the average of its group: $(1.33, 1.33)$ and $(8.33, 8.33)$
+3. **Assign again**: nobody changes group, so it stops. One round was enough
+
+$W$ adds up each customer's squared distance from its centre: $\tfrac{8}{3} \approx 2.67$. Any other split of the six gives more.
 
 ## By hand, watched
 
@@ -215,20 +217,20 @@ The algorithm gives you `1, 2, 3, 4`. Nobody in marketing can act on `3`.
 
 **Profile** each cluster: the mean of every variable, per cluster, back in the original units.
 
-| Segment | Visits / month | Basket (€) | Tenure (yrs) | Share |
+| Segment | Visits / month | Spend per visit (€) | Tenure (yrs) | Share |
 |---|---|---|---|---|
 | 1 | 0.8 | 62 | 1.1 | 41% |
 | 2 | 6.4 | 28 | 4.8 | 22% |
 | 3 | 2.1 | 140 | 3.9 | 19% |
 | 4 | 4.0 | 55 | 0.4 | 18% |
 
-Then **name** them from the numbers — *occasional big-basket*, *frequent small-basket loyalists*, … — and only then hand them over.
+Then **name** them from the numbers — *occasional big spenders*, *frequent small spenders*, … — and only then hand them over.
 
 ## What "act on it" looks like
 
-- **Segment 1** · *the quiet majority* (0.8 visits, 1.1 years, 41%): the biggest group and the least attached — give them a reason to come back, not a bigger basket
-- **Segment 2** · *loyalists* (6.4 visits, €28): cross-sell, not discount — they already come; raise the basket
-- **Segment 3** · *big-basket* (€140, 2.1 visits): the opposite — they spend when they come; one more visit a quarter beats any upsell
+- **Segment 1** · *the quiet majority* (0.8 visits, 1.1 years, 41%): the biggest group and the least attached — give them a reason to come back, not a bigger bill
+- **Segment 2** · *loyalists* (6.4 visits, €28): cross-sell, not discount — they already come; raise what they spend
+- **Segment 3** · *big spenders* (€140, 2.1 visits): the opposite — they spend when they come; one more visit a quarter beats any upsell
 - **Segment 4** · *new regulars* (0.4 years, 4 visits): the retention window is now; a churn model (week 4) will tell you *which* of them
 
 ::: {.callout-important title="Attention"}

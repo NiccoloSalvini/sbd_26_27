@@ -178,15 +178,17 @@ class Lloyd(Stage):
 
     def construct(self):
         rng = np.random.default_rng(4)
-        ax = km_axes(x=(-1, 11, 3), y=(-1, 11, 3), xl=6.4, yl=5.2).to_edge(LEFT, buff=0.7).shift(UP * 0.4)
-        self.play(Create(ax), run_time=1.0)
+        ax = km_axes(x=(-1, 11, 3), y=(-1, 11, 3), xl=6.4, yl=5.2).to_edge(LEFT, buff=0.9).shift(UP * 0.5)
+        xl = label("visits per month", 22, MUTED).next_to(ax, DOWN, buff=0.2)
+        yl = label("spend per visit", 22, MUTED).rotate(PI / 2).next_to(ax, LEFT, buff=0.15)
+        self.play(Create(ax), FadeIn(xl), FadeIn(yl), run_time=1.0)
 
         centres = np.array([[2.5, 2.5], [8.0, 3.0], [5.5, 8.5]])
         pts = np.vstack([c + rng.normal(0, 1.05, size=(22, 2)) for c in centres])
         dots = VGroup(*[Dot(ax.c2p(*p), radius=0.06, color=MUTED) for p in pts])
         self.play(FadeIn(dots, lag_ratio=0.02), run_time=1.4)
-        slot = np.array([0, ax.get_bottom()[1] - 0.6, 0])
-        self.caption(label("66 points, k = 3", 26).move_to(slot))
+        slot = np.array([0, xl.get_bottom()[1] - 0.45, 0])
+        self.caption(label("66 customers, k = 3", 26).move_to(slot))
         self.wait(2.0)
 
         cols = [GOLD, SKY, "#c98bb9"]
@@ -263,8 +265,8 @@ class KmeansByHand(Stage):
     def construct(self):
         ax = km_axes(x=(0, 10, 2), y=(0, 10, 2), xl=5.6, yl=4.8).to_edge(LEFT, buff=0.8).shift(DOWN * 0.3)
         self.play(Create(ax), run_time=0.9)
-        self.play(FadeIn(label("visits", 22, MUTED).next_to(ax, DOWN, buff=0.25)),
-                  FadeIn(label("basket", 22, MUTED).next_to(ax, LEFT, buff=0.2).rotate(PI / 2)), run_time=0.7)
+        self.play(FadeIn(label("visits per month", 22, MUTED).next_to(ax, DOWN, buff=0.25)),
+                  FadeIn(label("spend per visit", 22, MUTED).rotate(PI / 2).next_to(ax, LEFT, buff=0.2)), run_time=0.7)
 
         dots, names = {}, VGroup()
         for n, (x, y) in KM_PTS.items():
