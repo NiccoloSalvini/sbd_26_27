@@ -25,7 +25,7 @@ clean:
 ## render every manim scene at deck quality, remux moov-first, copy where the site serves them
 # scenes.py holds the helpers, lecture 11 and the Module 1 lab; lectures 12, 14, 18
 # and 19 have a file each, which imports scenes.py. One group per file.
-SCENES_11 := Lloyd KmeansByHand ScaleBreaks ShapeBreaks ElbowLie
+SCENES_11 := Lloyd KmeansByHand ScaleBreaks ShapeBreaks ElbowLie Silhouette
 SCENES_LAB := TwoMeans LeastSquares LogitCurve ShrinkPath Decompose
 SCENES_scenes := $(SCENES_11) $(SCENES_LAB)
 SCENES_scenes_12 := Dendrogram LinkageFour DendrogramRead

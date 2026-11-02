@@ -203,7 +203,16 @@ manifest's questions straight into the test, in order, at its points, through
 the Ultra interface's own API (a test is an assessment on the same route as a
 bank). `bb_assessment_questions` reads the test back to check it against the
 pool; the mock of 23 Oct 2026 went in this way and was verified question by
-question. The Upload Questions file is the fallback (then
+question. **"In order" is not quite true**: the MCP posts every MC with
+`positionAfter: "start"` (each lands first) and a TF at the end, so a manifest
+of MCs comes out reversed. Until the MCP is fixed, fill from a manifest in
+reverse with the TF last (`private/set-10-fill.json`, 2 Nov 2026) and read the
+order back. Shuffle the answer options in the pool file too: Ultra keeps them
+as written, and a pool written correct-first gives the answer away. The
+practice-set tests (Set 10 onwards) are 1 point a question, MC and TF only:
+the Ultra route takes no numeric type, so a number to check is an MC whose
+distractors are the neighbouring results (the next k, a bad start). Attempts,
+feedback and when answers show are UI-only. The Upload Questions file is the fallback (then
 `bb_set_question_points` for the points). Every
 number in a key comes from `private/mock-exam-1-key.R`, run; a question whose
 answer moves with the seed says so in its key. The mock before each

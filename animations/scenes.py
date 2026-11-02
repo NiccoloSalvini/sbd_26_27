@@ -606,6 +606,253 @@ class ElbowLie(Stage):
         self.wait(4.0)
 
 
+def silhouette_parts(P, lab):
+    """a, b, s and the nearest other cluster for every point, as cluster::silhouette()
+    computes them: a = mean distance to the rest of its own cluster, b = the smallest
+    mean distance to another cluster, s = (b - a) / max(a, b); 0 for a singleton."""
+    D = np.sqrt(((P[:, None] - P[None]) ** 2).sum(-1))
+    k, n = lab.max() + 1, len(P)
+    a, b, near = np.zeros(n), np.zeros(n), np.zeros(n, int)
+    for i in range(n):
+        own = lab == lab[i]
+        own[i] = False
+        if not own.any():
+            continue
+        a[i] = D[i, own].mean()
+        others = [D[i, lab == j].mean() if j != lab[i] else np.inf for j in range(k)]
+        near[i] = int(np.argmin(others))
+        b[i] = others[near[i]]
+    s = np.where(a > 0, (b - a) / np.maximum(np.maximum(a, b), 1e-12), 0.0)
+    return a, b, s, near
+
+
+class Silhouette(Stage):
+    """The 66 customers of the Lloyd clip, in their k = 3 groups. The customer with
+    the lowest s: lines to its own group give a, lines to the nearest other group
+    give b, s = (b - a) / max(a, b). Then every customer's s as a silhouette plot
+    with its average, and the average for k = 2 to 6: the highest is the k to pick.
+    Every number on screen is computed here."""
+
+    WAIT_SCALE = 1.0
+    PLAY_SCALE = 1.0
+
+    def construct(self):
+        rng = np.random.default_rng(4)                      # the Lloyd clip's customers
+        centres = np.array([[2.5, 2.5], [8.0, 3.0], [5.5, 8.5]])
+        pts = np.vstack([c + rng.normal(0, 1.05, size=(22, 2)) for c in centres])
+        n = len(pts)
+        lab, _, _ = kmeans_best(pts, 3)
+        # the Lloyd clip's colours: its run from the bad start ends in this same partition
+        ref, _, _ = lloyd(pts, np.array([[1.0, 5.0], [3.0, 5.5], [2.0, 7.0]]))
+        lloyd_cols = [GOLD, SKY, "#c98bb9"]
+        col = [lloyd_cols[np.bincount(ref[lab == g]).argmax()] for g in range(3)]
+        a, b, s, near = silhouette_parts(pts, lab)
+
+        ax = km_axes(x=(-1, 11, 3), y=(-1, 11, 3), xl=6.4, yl=5.2).to_edge(LEFT, buff=0.9).shift(UP * 0.5)
+        xl = label("visits per month", 22, MUTED).next_to(ax, DOWN, buff=0.2)
+        yl = label("spend per visit", 22, MUTED).rotate(PI / 2).next_to(ax, LEFT, buff=0.15)
+        self.play(Create(ax), FadeIn(xl), FadeIn(yl), run_time=1.0)
+        dots = VGroup(*[Dot(ax.c2p(*p), radius=0.06, color=col[l]) for p, l in zip(pts, lab)]).set_z_index(2)
+        self.play(FadeIn(dots, lag_ratio=0.02), run_time=1.4)
+        slot = np.array([0, xl.get_bottom()[1] - 0.45, 0])
+        self.caption(label("the 66 customers of the Lloyd clip, in their k = 3 groups", 26).move_to(slot))
+        self.wait(2.2)
+
+        # the customer with the lowest s: the one nearest a border
+        i = int(s.argmin())
+        g, h = lab[i], near[i]
+        third = ({0, 1, 2} - {g, h}).pop()
+        d_third = np.linalg.norm(pts[lab == third] - pts[i], axis=1).mean()
+        ring = Circle(radius=0.17, color=CREAM, stroke_width=3).move_to(dots[i]).set_z_index(3)
+        self.play(Create(ring), dots[i].animate.scale(1.4), run_time=0.8)
+        self.caption(label("one customer, close to the border between two groups", 26).move_to(slot))
+        self.wait(1.8)
+
+        def spokes(members, color):
+            return VGroup(*[Line(dots[i].get_center(), dots[j].get_center(), color=color,
+                                 stroke_width=1.3, stroke_opacity=0.75) for j in members]).set_z_index(1)
+
+        COL, TAG = 1.0, 3.0
+        head = label("the customer in the ring", 24, MUTED).move_to([0, 2.95, 0]).align_to([COL, 0, 0], LEFT)
+        self.play(FadeIn(head), run_time=0.5)
+
+        own = [j for j in range(n) if lab[j] == g and j != i]
+        sp_a = spokes(own, col[g])
+        self.caption(label(f"a: its mean distance to the {len(own)} others in its own group", 26).move_to(slot))
+        self.play(Create(sp_a, lag_ratio=0.04), run_time=1.6)
+        ra = MathTex(rf"a = {a[i]:.2f}", color=col[g], font_size=38).move_to([0, 2.2, 0]).align_to([COL, 0, 0], LEFT)
+        ta = label(f"own group: {len(own)} customers", 22, MUTED).move_to([0, 2.2, 0]).align_to([TAG, 0, 0], LEFT)
+        self.play(FadeIn(VGroup(ra, ta), shift=RIGHT * 0.15), run_time=0.7)
+        self.wait(2.0)
+
+        nearest = [j for j in range(n) if lab[j] == h]
+        sp_b = spokes(nearest, col[h])
+        self.play(FadeOut(sp_a), run_time=0.5)
+        self.caption(label("b: its mean distance to the nearest other group", 26).move_to(slot))
+        self.play(Create(sp_b, lag_ratio=0.04), run_time=1.6)
+        rb = MathTex(rf"b = {b[i]:.2f}", color=col[h], font_size=38).move_to([0, 1.45, 0]).align_to([COL, 0, 0], LEFT)
+        tb = label(f"nearest other group: {len(nearest)}", 22, MUTED).move_to([0, 1.45, 0]).align_to([TAG, 0, 0], LEFT)
+        tc = label(f"third group: {d_third:.2f}, farther", 22, MUTED).move_to([0, 0.95, 0]).align_to([TAG, 0, 0], LEFT)
+        self.play(FadeIn(VGroup(rb, tb, tc), shift=RIGHT * 0.15), run_time=0.7)
+        self.wait(2.2)
+
+        self.play(FadeOut(sp_b), run_time=0.5)
+        f1 = MathTex(r"s = \frac{b - a}{\max(a,\, b)}", color=CREAM, font_size=40).move_to([0, 0.0, 0]).align_to([COL, 0, 0], LEFT)
+        f2 = MathTex(rf"= \frac{{{b[i]:.2f} - {a[i]:.2f}}}{{{max(a[i], b[i]):.2f}}} = {s[i]:.2f}",
+                     color=GOLD, font_size=40).move_to([0, -1.1, 0]).align_to([COL, 0, 0], LEFT)
+        self.play(FadeIn(f1, shift=RIGHT * 0.15), run_time=0.8)
+        self.wait(0.8)
+        self.play(FadeIn(f2, shift=RIGHT * 0.15), run_time=0.8)
+        self.caption(label(f"its own group is {100 * s[i]:.0f}% closer than the next one: s = {s[i]:.2f}", 26).move_to(slot))
+        self.wait(2.6)
+
+        # what s says, on its scale from -1 to 1
+        cmp_i = MathTex(rf"a = {a[i]:.2f},\ b = {b[i]:.2f},\ s = {s[i]:.2f}", color=col[g], font_size=32)
+        cmp_i.move_to([0, 2.2, 0]).align_to([COL, 0, 0], LEFT)
+        head2 = label("what s says", 24, MUTED).move_to(head).align_to([COL, 0, 0], LEFT)
+        self.play(FadeOut(VGroup(ra, ta, rb, tb, tc, f1)), ReplacementTransform(f2, cmp_i),
+                  ReplacementTransform(head, head2), run_time=1.0)
+        nl = NumberLine(x_range=[-1, 1, 0.5], length=5.6, color=MUTED, stroke_width=2).move_to([3.9, 0.3, 0])
+        ends = VGroup(*[MathTex(t, color=MUTED, font_size=28).next_to(nl.n2p(v), DOWN, buff=0.15)
+                        for v, t in ((-1, "-1"), (0, "0"), (1, "1"))])
+        wy = ends.get_bottom()[1] - 0.25
+        w_neg = label("wrong group", 20, MUTED).move_to([0, wy, 0]).align_to(nl.n2p(-1), LEFT)
+        w_mid = label("on the border", 20, MUTED).move_to([nl.n2p(0)[0], wy, 0])
+        w_pos = label("deep inside", 20, MUTED).move_to([0, wy, 0]).align_to(nl.n2p(1), RIGHT)
+        for w in (w_neg, w_mid, w_pos):                     # one baseline: the first letters sit on it
+            w.shift(UP * (wy - 0.1 - w[0].get_bottom()[1]))
+        self.play(Create(nl), FadeIn(ends), FadeIn(VGroup(w_neg, w_mid, w_pos)), run_time=1.0)
+
+        def marker(v, color):
+            tri = Triangle(color=color, fill_opacity=1, stroke_width=0).scale(0.1).rotate(PI)
+            tri.next_to(nl.n2p(v), UP, buff=0.06)
+            return VGroup(tri, MathTex(f"{v:.2f}", color=color, font_size=26).next_to(tri, UP, buff=0.08))
+
+        self.play(FadeIn(marker(s[i], col[g]), shift=DOWN * 0.15), run_time=0.6)
+        self.caption(label("near 1: deep inside its group. Near 0: on the border", 26).move_to(slot))
+        self.wait(2.4)
+
+        d = int(s.argmax())
+        ring2 = Circle(radius=0.17, color=CREAM, stroke_width=3).move_to(dots[d]).set_z_index(3)
+        cmp_d = MathTex(rf"a = {a[d]:.2f},\ b = {b[d]:.2f},\ s = {s[d]:.2f}", color=col[lab[d]], font_size=32)
+        cmp_d.move_to([0, 1.6, 0]).align_to([COL, 0, 0], LEFT)
+        self.play(Create(ring2), dots[d].animate.scale(1.4), FadeIn(cmp_d, shift=RIGHT * 0.15),
+                  FadeIn(marker(s[d], col[lab[d]]), shift=DOWN * 0.15), run_time=0.9)
+        self.caption(label(f"the customer deepest inside its group: s = {s[d]:.2f}", 26).move_to(slot))
+        self.wait(2.4)
+        self.play(Indicate(w_neg, color=CREAM), run_time=0.6)
+        self.caption(label("below 0: closer to another group than to its own. Here, nobody", 26).move_to(slot))
+        self.wait(2.4)
+
+        # every customer's s: a silhouette plot, sorted within each group
+        keep = (ax, xl, yl, dots, ring, ring2, self._caption)
+        self.play(*[FadeOut(m) for m in self.mobjects if m not in keep], run_time=0.6)
+        X0, SW, PITCH, GAP, TOP = 1.5, 5.0, 0.066, 0.18, 2.85
+        bars, y = [None] * n, TOP
+        for gg in sorted(range(3), key=lambda q: lloyd_cols.index(col[q])):
+            for j in sorted(np.where(lab == gg)[0], key=lambda q: -s[q]):
+                bar = Rectangle(width=max(abs(s[j]), 0.005) * SW, height=0.05, stroke_width=0,
+                                fill_color=col[gg], fill_opacity=1).set_y(y)
+                bars[j] = bar.align_to([X0, 0, 0], LEFT if s[j] >= 0 else RIGHT)
+                y -= PITCH
+            y -= GAP
+        y_axis = y + GAP - 0.1
+        base = Line([X0, TOP + 0.08, 0], [X0, y_axis, 0], color=MUTED, stroke_width=1.4)
+        s_axis = Line([X0, y_axis, 0], [X0 + SW, y_axis, 0], color=MUTED, stroke_width=1.4)
+        s_ticks = VGroup(*[MathTex(f"{v:g}", color=MUTED, font_size=26).next_to([X0 + v * SW, y_axis, 0], DOWN, buff=0.1)
+                           for v in (0, 0.25, 0.5, 0.75, 1)])
+        s_name = MathTex("s", color=MUTED, font_size=28).next_to(s_axis, RIGHT, buff=0.15)
+        head3 = label("s for all 66 customers", 24, MUTED).move_to([0, 3.3, 0]).align_to([COL, 0, 0], LEFT)
+        self.play(FadeIn(head3), Create(base), Create(s_axis), FadeIn(s_ticks), FadeIn(s_name), run_time=0.8)
+        self.caption(label("now every customer's s, sorted within each group", 26).move_to(slot))
+        by_row = sorted(range(n), key=lambda j: -bars[j].get_y())
+        self.play(AnimationGroup(*[ReplacementTransform(dots[j].copy(), bars[j]) for j in by_row], lag_ratio=0.015),
+                  run_time=2.2)
+        self.wait(1.0)
+        boxes = VGroup(*[SurroundingRectangle(bars[j], color=CREAM, buff=0.035, stroke_width=2) for j in (i, d)])
+        self.play(Create(boxes), Indicate(ring, color=CREAM), Indicate(ring2, color=CREAM), run_time=0.9)
+        self.caption(label(f"the two customers we followed: {s[i]:.2f} and {s[d]:.2f}", 26).move_to(slot))
+        self.wait(2.2)
+        avg = s.mean()
+        xa = X0 + avg * SW
+        mean_line = DashedLine([xa, TOP + 0.12, 0], [xa, y_axis + 0.02, 0], color=CREAM, stroke_width=2.5)
+        mean_lab = MathTex(rf"\bar s = {avg:.2f}", color=CREAM, font_size=30).next_to([xa, y_axis, 0], UR, buff=0.12)
+        self.play(Create(mean_line), FadeIn(mean_lab), run_time=1.0)
+        self.caption(label(f"their average, {avg:.2f}, is the silhouette of k = 3", 26, GOLD).move_to(slot))
+        self.wait(2.8)
+
+        # the same average for k = 2 to 6
+        self.play(FadeOut(VGroup(head3, base, s_axis, s_ticks, s_name, *bars, boxes, mean_line, mean_lab)),
+                  FadeOut(ring2), dots[d].animate.scale(1 / 1.4), run_time=0.7)
+        cax = Axes(x_range=[1.5, 6.5, 1], y_range=[0, 0.8, 0.2], x_length=4.8, y_length=3.0,
+                   axis_config={"color": MUTED, "include_tip": False, "stroke_width": 1.4})
+        cax.move_to([4.35, 0.75, 0])
+        yt = VGroup(*[MathTex(f"{v:g}", color=MUTED, font_size=26).next_to(cax.c2p(1.5, v), LEFT, buff=0.12)
+                      for v in (0, 0.2, 0.4, 0.6, 0.8)])
+        k_row_y, s_row_y = cax.get_bottom()[1] - 0.3, cax.get_bottom()[1] - 0.8
+        kt = VGroup(*[MathTex(str(k), color=MUTED, font_size=30).move_to([cax.c2p(k, 0)[0], k_row_y, 0]) for k in range(2, 7)])
+        k_name = MathTex("k", color=MUTED, font_size=30).move_to([COL + 0.15, k_row_y, 0])
+        s_name2 = MathTex(r"\bar s", color=MUTED, font_size=30).move_to([COL + 0.15, s_row_y, 0])
+        head4 = label("average silhouette for each k", 24, MUTED).move_to([0, 3.0, 0]).align_to([COL, 0, 0], LEFT)
+        self.play(FadeIn(head4), Create(cax), FadeIn(yt), FadeIn(kt), FadeIn(k_name), FadeIn(s_name2), run_time=0.9)
+        self.caption(label("same customers, k from 2 to 6: one average for each", 26).move_to(slot))
+        self.wait(0.4)
+
+        EXTRA = ["#7fc8a9", "#e8836b", CREAM]
+
+        def colours_for(lk):
+            """each new cluster takes the colour of the k = 3 group it overlaps most"""
+            k = lk.max() + 1
+            ov = np.array([[np.sum((lk == c) & (lab == q)) for q in range(3)] for c in range(k)])
+            out, used = [None] * k, set()
+            for c, q in sorted(np.ndindex(k, 3), key=lambda cq: -ov[cq]):
+                if out[c] is None and q not in used and ov[c, q] > 0:
+                    out[c] = col[q]
+                    used.add(q)
+            extra = iter(EXTRA)
+            return [o if o is not None else next(extra) for o in out]
+
+        avgs, cdots, vals, prev = {}, {}, {}, None
+        for k in range(2, 7):
+            lk, _, _ = kmeans_best(pts, k)
+            ck = colours_for(lk)
+            sk = silhouette_parts(pts, lk)[2]
+            avgs[k] = sk.mean()
+            self.play(*[dt.animate.set_color(ck[l]) for dt, l in zip(dots, lk)], run_time=0.8)
+            cdots[k] = Dot(cax.c2p(k, avgs[k]), radius=0.07, color=CREAM)
+            vals[k] = MathTex(f"{avgs[k]:.2f}", color=CREAM, font_size=30).move_to([cax.c2p(k, 0)[0], s_row_y, 0])
+            anims = [FadeIn(cdots[k], scale=1.5), FadeIn(vals[k], shift=UP * 0.1)]
+            if prev is not None:
+                anims.append(Create(Line(cdots[prev].get_center(), cdots[k].get_center(), color=CREAM, stroke_width=2.5)))
+            self.play(*anims, run_time=0.7)
+            prev = k
+            if k == 2:
+                self.caption(label(f"k = 2 puts two groups together: {avgs[k]:.2f}", 26).move_to(slot))
+                self.wait(1.8)
+            elif k == 3:
+                self.caption(label(f"k = 3, the groups we just measured: {avgs[k]:.2f}", 26).move_to(slot))
+                self.wait(1.6)
+            elif k == 4:
+                assert sk[i] < 0, "the k = 4 caption says our customer falls below 0"
+                self.play(Indicate(ring, color=CREAM, scale_factor=1.5), run_time=0.6)
+                self.caption(label(f"k = 4 cuts a group in two: our customer drops to s = {sk[i]:.2f}", 26).move_to(slot))
+                self.wait(2.6)
+            elif k == 5:
+                self.caption(label("k = 5 and 6 cut more real groups: the average keeps falling", 26).move_to(slot))
+                self.wait(1.2)
+            else:
+                self.wait(1.4)
+
+        best = max(avgs, key=avgs.get)
+        self.play(*[dt.animate.set_color(col[l]) for dt, l in zip(dots, lab)],
+                  Create(Circle(radius=0.17, color=GOLD, stroke_width=3).move_to(cdots[best])),
+                  cdots[best].animate.set_color(GOLD), vals[best].animate.set_color(GOLD), run_time=1.0)
+        self.caption(label(f"the highest average is at k = {best}: {avgs[best]:.2f}. That is the k to pick", 26, GOLD).move_to(slot))
+        self.wait(2.8)
+        self.caption(label(f"and {avgs[best]:.2f} is above 0.5: the three groups are really there", 26).move_to(slot))
+        self.wait(3.4)
+
+
 # ================================================================ lecture 12 — hierarchical
 # The five patients of the by-hand slide: length of stay, in days.
 STAY = [2, 3, 6, 10, 11]
@@ -1270,7 +1517,7 @@ class ShrinkPath(Stage):
 
 
 LAB = ["TwoMeans", "LeastSquares", "LogitCurve", "ShrinkPath", "Decompose"]
-L11 = ["Lloyd", "KmeansByHand", "ScaleBreaks", "ShapeBreaks", "ElbowLie"]
+L11 = ["Lloyd", "KmeansByHand", "ScaleBreaks", "ShapeBreaks", "ElbowLie", "Silhouette"]
 # Lectures 12, 14, 18 and 19 have a file each, scenes_NN.py, which imports this one.
 SCENES = L11 + LAB
 
