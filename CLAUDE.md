@@ -349,10 +349,23 @@ order; regenerate it rather than editing those slides by hand.
 the schedule**, all in this format; Module 1 (Prof. Arbia) is PDFs in `slides/`.
 Start a new deck from `10-opening.qmd`. Every deck follows one shape, and a
 deck that skips a step should have a reason: Objectives → *Why a manager cares*
-→ sections (intuition, method, a worked example by hand, In R) → an *Attention*
-callout for the trap → one `.statement` slide → *Before the lab* → Reading
-(ISLR chapter, Provost & Fawcett chapter, package reference). Section slides
-carry `[Section n]{.section-kicker}`. Code blocks are display-only (`{.r}`),
+→ sections (intuition, method, a worked example by hand, In R), **a drill
+where a section's explanation ends** → an *Attention* callout for the trap → one
+`.statement` slide → *Before the lab* → Reading (ISLR chapter, Provost & Fawcett
+chapter, package reference). Section slides carry `[Section n]{.section-kicker}`.
+
+A **drill** is the class working, not listening, and it comes once the
+explanation it tests is finished, never forced into the middle of one: a section
+without a natural exercise has none. `## [Drill n]{.drill-kicker} Title` (a gold
+tag, styled by the theme), a subtitle *in pairs · n minutes*, an output table to
+read or a profile to interpret, and a question that ends in a decision and the
+sentence that defends it. **No pen-and-paper arithmetic**: running Lloyd by hand
+on nine points and squaring distances were tried in lecture 11 and cut, the
+worked example and its clip already do that job. The next slide is
+`[Drill n · answer]`. Ten minutes each, and the *Today* table counts them. Every
+number on an answer slide is computed in R first. The students graduate in
+healthcare management (HEMA): where a drill can be about patients, hospitals or
+a health district rather than shop customers, it is (lecture 11's Drill 2). Code blocks are display-only (`{.r}`),
 never executed at render, so the site builds without R.
 
 The three lab datasets — `materials/customers.csv` (L13), `brands.csv` (L15),
@@ -379,7 +392,10 @@ slide need `!important`. Do not "simplify" any of those away.
 **Clips: `animations/scenes.py`.** manim scenes on the course navy, formulas in
 `MathTex`, words in Libre Franklin via `manimpango.register_font`. `make clips-preview`
 (`-ql`) to check frames, `make clips` (`-qm`, then an ffmpeg `+faststart` remux into
-`lectures/media/`) for the deck; embed with `{{< video media/Name.mp4 width="1000" height="562" >}}`.
+`lectures/media/`) for the deck; embed with `{{< video media/Name.mp4 width="880" height="495" >}}`:
+that leaves two lines of caption under it clear of the footer, 1000×562 only one.
+The theme lifts reveal's 95% cap on `<video>`, which inside the player left a
+black band right and below.
 Every clip is spoken over, and that sets the length. **A clip runs 40 to 90
 seconds.** Under 30 it is a gif: it shows the finished object and is over before
 a sentence about it has been said. The first five clips of lecture 18 were 7 to
@@ -390,7 +406,13 @@ squared distance in a by-hand example. If a clip needs stretching to reach 40
 seconds it is missing a step that should be on screen.
 
 New scenes set `WAIT_SCALE`/`PLAY_SCALE` to 1.0 and time their own waits; the
-two scales exist only to stretch the older ones. `make clips-preview` then
+two scales exist only to stretch the older ones. Captions go through
+`self.caption(...)`: one slot per clip, the old caption leaves before the new
+one arrives, and one that would leave the frame stops the render. Lecture 11's
+first clips put each caption in with `FadeIn` and never took the last one out,
+so they piled up on top of each other. `label()` sets text at four times the
+size and scales it down: below about 26 pt Pango hinted Libre Franklin's spaces
+to nothing ("start:three", "whichisw"). `make clips-preview` then
 `ffprobe` the result is how you check a duration — read the number, do not guess
 from the code.
 

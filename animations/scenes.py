@@ -29,7 +29,9 @@ config.background_color = NAVY
 
 
 def label(s, size=28, color=CREAM):
-    return Text(s, font=FONT, font_size=size, color=color)
+    # Set at four times the size and scaled down: below about 26 pt Pango hints
+    # Libre Franklin's spaces to nothing ("whichisw", "start:three").
+    return Text(s, font=FONT, font_size=size * 4, color=color).scale(0.25)
 
 
 class Stage(Scene):
@@ -49,6 +51,20 @@ class Stage(Scene):
         if "run_time" in kw:
             kw["run_time"] = kw["run_time"] * self.PLAY_SCALE
         return super().play(*anims, **kw)
+
+    def caption(self, mob, run_time=0.8):
+        """One caption per clip, in one slot: the last one leaves as this one
+        arrives, so two never sit on top of each other. Refuses one that would
+        leave the frame."""
+        half_w, half_h = config.frame_width / 2 - 0.2, config.frame_height / 2 - 0.1
+        if mob.get_left()[0] < -half_w or mob.get_right()[0] > half_w or mob.get_bottom()[1] < -half_h:
+            raise ValueError(f"caption leaves the frame: {getattr(mob, 'text', mob)}")
+        old = getattr(self, "_caption", None)
+        if old is not None:                      # out, then in: never both on screen
+            self.play(FadeOut(old), run_time=run_time * 0.4)
+        self.play(FadeIn(mob), run_time=run_time * 0.6)
+        self._caption = mob
+        return mob
 
 
 
@@ -930,75 +946,87 @@ def km_axes(x=(0, 10, 2), y=(0, 10, 2), xl=6.0, yl=5.0):
 
 
 class Lloyd(Stage):
-    """Assign, update, repeat — with W falling at every half-step, because the
-    fact that it can only fall is why the algorithm is guaranteed to stop."""
+    """Assign, update, repeat, from a start chosen badly on purpose. Every half-step
+    writes its W in a column on the right, so the claim on the slide can be read
+    off the screen: W only ever falls, which is why the algorithm must stop."""
 
     WAIT_SCALE = 1.0
     PLAY_SCALE = 1.0
 
     def construct(self):
         rng = np.random.default_rng(4)
-        ax = km_axes(x=(-1, 11, 3), y=(-1, 11, 3), xl=7.4, yl=5.4).to_edge(LEFT, buff=0.7)
+        ax = km_axes(x=(-1, 11, 3), y=(-1, 11, 3), xl=6.4, yl=5.2).to_edge(LEFT, buff=0.7).shift(UP * 0.4)
         self.play(Create(ax), run_time=1.0)
 
         centres = np.array([[2.5, 2.5], [8.0, 3.0], [5.5, 8.5]])
         pts = np.vstack([c + rng.normal(0, 1.05, size=(22, 2)) for c in centres])
         dots = VGroup(*[Dot(ax.c2p(*p), radius=0.06, color=MUTED) for p in pts])
         self.play(FadeIn(dots, lag_ratio=0.02), run_time=1.4)
-        self.wait(1.8)
+        slot = np.array([0, ax.get_bottom()[1] - 0.6, 0])
+        self.caption(label("66 points, k = 3", 26).move_to(slot))
+        self.wait(2.0)
 
         cols = [GOLD, SKY, "#c98bb9"]
-        # a deliberately poor start, so the first update is visibly large
-        cent = np.array([[1.5, 9.5], [3.0, 8.0], [7.0, 1.5]])
+        # a deliberately poor start: all three on the left, so the first update is large
+        cent = np.array([[1.0, 5.0], [3.0, 5.5], [2.0, 7.0]])
         marks = VGroup(*[Star(n=5, outer_radius=0.17, color=c, fill_opacity=1).move_to(ax.c2p(*m))
                          for m, c in zip(cent, cols)])
         self.play(FadeIn(marks, scale=1.5), run_time=1.0)
-        self.play(FadeIn(label("start: three centroids, chosen badly on purpose", 24, CREAM)
-                         .next_to(ax, DOWN, buff=0.3)), run_time=0.9)
-        self.wait(2.2)
+        self.caption(label("start: three centroids, all on the left, on purpose", 26).move_to(slot))
+        self.wait(2.6)
 
-        wbox = VGroup(MathTex(r"W =", color=CREAM, font_size=40),
-                      DecimalNumber(0, num_decimal_places=0, color=GOLD, font_size=44)).arrange(RIGHT, buff=0.25)
-        wbox.to_edge(RIGHT, buff=1.3).shift(UP * 1.8)
-        step = label("", 26, MUTED).next_to(wbox, DOWN, buff=0.7)
+        # the log: one row per half-step, newest in gold
+        LEFT_X, W_X, TOP = 1.0, 4.6, 2.9
+        head = label("W after each half-step", 24, MUTED).move_to([0, TOP, 0]).align_to([LEFT_X, 0, 0], LEFT)
+        self.play(FadeIn(head), run_time=0.6)
+        rows = VGroup()
+
+        def log(kind, it, W):
+            y = TOP - 0.56 * (len(rows) + 1)
+            name = label(f"round {it} · {kind}", 26, CREAM).move_to([0, y, 0]).align_to([LEFT_X, 0, 0], LEFT)
+            val = MathTex(rf"W = {W:.0f}", color=GOLD, font_size=38).move_to([0, y, 0]).align_to([W_X, 0, 0], LEFT)
+            anims = [FadeIn(VGroup(name, val), shift=RIGHT * 0.15)]
+            if len(rows):
+                anims.append(rows[-1][1].animate.set_color(CREAM))
+            self.play(*anims, run_time=0.6)
+            rows.add(VGroup(name, val))
 
         def assign(c):
             d = ((pts[:, None, :] - c[None, :, :]) ** 2).sum(-1)
             return d.argmin(1), d.min(1).sum()
 
-        lab_, W = assign(cent)
-        wbox[1].set_value(W)
-        self.play(FadeIn(wbox), run_time=0.8)
-        self.wait(1.4)
-
-        for it in range(4):
-            # assign
+        for it in range(1, 6):
             lab_, W = assign(cent)
-            s1 = label(f"round {it + 1} · assign", 26, CREAM).next_to(wbox, DOWN, buff=0.7)
-            self.play(FadeTransform(step, s1), run_time=0.5); step = s1
-            self.play(*[d.animate.set_color(cols[l]) for d, l in zip(dots, lab_)],
-                      ChangeDecimalToValue(wbox[1], W), run_time=1.3)
-            self.wait(1.8)
-            # update
-            new = np.array([pts[lab_ == j].mean(0) if (lab_ == j).any() else cent[j] for j in range(3)])
-            _, W2 = assign(new)
-            s2 = label(f"round {it + 1} · update", 26, CREAM).next_to(wbox, DOWN, buff=0.7)
-            self.play(FadeTransform(step, s2), run_time=0.5); step = s2
+            if it == 1:
+                W_first = W
+                self.caption(label("assign: every point joins its nearest star", 26).move_to(slot))
+            self.play(*[d.animate.set_color(cols[l]) for d, l in zip(dots, lab_)], run_time=1.3)
+            log("assign", it, W)
+            self.wait(2.0 if it == 1 else 1.2)
+
+            new = np.array([pts[lab_ == j].mean(0) for j in range(3)])
+            W2 = ((pts - new[lab_]) ** 2).sum()
+            if it == 1:
+                self.caption(label("update: every star moves to the mean of its points", 26).move_to(slot))
+            elif it == 2:
+                self.caption(label("and again: assign, update", 26).move_to(slot))
+            self.play(*[m.animate.move_to(ax.c2p(*n)) for m, n in zip(marks, new)], run_time=1.5)
+            log("update", it, W2)
+            self.wait(2.0 if it == 1 else 1.2)
             moved = float(np.abs(new - cent).max())
-            self.play(*[m.animate.move_to(ax.c2p(*n)) for m, n in zip(marks, new)],
-                      ChangeDecimalToValue(wbox[1], W2), run_time=1.5)
             cent = new
-            self.wait(1.6)
             if moved < 0.06:
                 break
 
-        done = label("nothing moved: that is convergence", 26, GOLD).next_to(ax, DOWN, buff=0.3)
-        self.play(FadeIn(done), run_time=1.0)
-        self.wait(2.2)
-        note = label("W fell at every half-step — which is why it must stop", 24, MUTED)
-        note.next_to(wbox, DOWN, buff=2.2)
-        self.play(FadeIn(note), run_time=1.0)
-        self.wait(3.0)
+        self.caption(label(f"round {it}: nothing moved. That is convergence", 26, GOLD).move_to(slot))
+        self.wait(2.6)
+        self.play(rows[0][1].animate.set_color(GOLD), run_time=0.6)
+        self.caption(label(f"{W_first:.0f} down to {W2:.0f}, never up once: so it has to stop", 26).move_to(slot))
+        self.wait(4.0)
+
+
+# the names sit away from where the centroids land, (1.33, 1.33) and (8.33, 8.33)
+KM_NAME_SIDE = {"A": DL, "B": DR, "C": UL, "D": DL, "E": DR, "F": UL}
 
 
 class KmeansByHand(Stage):
@@ -1018,7 +1046,7 @@ class KmeansByHand(Stage):
         dots, names = {}, VGroup()
         for n, (x, y) in KM_PTS.items():
             d = Dot(ax.c2p(x, y), radius=0.085, color=MUTED)
-            t = label(n, 22, CREAM).next_to(d, UR, buff=0.06)
+            t = label(n, 22, CREAM).next_to(d, KM_NAME_SIDE[n], buff=0.06)
             dots[n] = d; names.add(t)
             self.add(d)
         self.play(FadeIn(VGroup(*dots.values()), lag_ratio=0.1), FadeIn(names, lag_ratio=0.1), run_time=1.4)
@@ -1092,66 +1120,125 @@ class KmeansByHand(Stage):
         self.wait(4.5)
 
 
+def lloyd(P, cent, iters=100):
+    """Plain Lloyd from the given centroids: labels, centroids, W."""
+    for _ in range(iters):
+        lab = ((P[:, None] - cent[None]) ** 2).sum(-1).argmin(1)
+        new = np.array([P[lab == j].mean(0) for j in range(len(cent))])
+        if np.allclose(new, cent):
+            break
+        cent = new
+    return lab, cent, ((P - cent[lab]) ** 2).sum()
+
+
+def kmeans_best(P, k, seed=0, nstart=25):
+    """What kmeans(nstart = 25) returns: the lowest W over random starts."""
+    r = np.random.default_rng(seed)
+    runs = [lloyd(P, P[r.choice(len(P), k, replace=False)]) for _ in range(nstart)]
+    return min(runs, key=lambda run: run[2])
+
+
 class ScaleBreaks(Stage):
-    """Income in euros against age in years: the distance is income, and the
-    clusters are income bands. Then the same points, standardised."""
+    """Sixty patients by age and yearly cost of care. Raw, one euro weighs as much
+    as one year: k-means sees a vertical line and cuts it into cost bands, young
+    and old mixed. In standard deviations age counts again, and the two groups
+    the eye saw come back. Every count and share on screen is computed here."""
 
     WAIT_SCALE = 1.0
     PLAY_SCALE = 1.0
 
     def construct(self):
         rng = np.random.default_rng(9)
-        # two genuine groups: young-and-rich, old-and-poor — invisible to raw distance
-        g1 = np.column_stack([rng.normal(30, 4, 30), rng.normal(52000, 7000, 30)])
-        g2 = np.column_stack([rng.normal(58, 4, 30), rng.normal(46000, 7000, 30)])
-        P = np.vstack([g1, g2])
+        P = np.vstack([np.column_stack([rng.normal(36, 5, 30), rng.normal(5200, 650, 30)]),
+                       np.column_stack([rng.normal(72, 5, 30), rng.normal(4600, 650, 30)])])
+        young = np.arange(60) < 30
+        axis = {"color": MUTED, "include_tip": False, "stroke_width": 1.4}
 
-        ax = Axes(x_range=[18, 72, 10], y_range=[25000, 75000, 10000], x_length=5.6, y_length=4.4,
-                  axis_config={"color": MUTED, "include_tip": False, "stroke_width": 1.4},
-                  y_axis_config={"decimal_number_config": {"num_decimal_places": 0, "group_with_commas": False}})
-        ax.to_edge(LEFT, buff=0.75).shift(DOWN * 0.25)
-        self.play(Create(ax), run_time=1.0)
-        self.play(FadeIn(label("age (years)", 20, MUTED).next_to(ax, DOWN, buff=0.28)),
-                  FadeIn(label("income (euro)", 20, MUTED).next_to(ax, LEFT, buff=0.15).rotate(PI / 2)), run_time=0.7)
-        dots = VGroup(*[Dot(ax.c2p(a, i), radius=0.055, color=MUTED) for a, i in P])
+        ax = Axes(x_range=[20, 90, 10], y_range=[2500, 7500, 1000], x_length=6.0, y_length=4.6,
+                  axis_config=axis).to_edge(LEFT, buff=1.0).shift(UP * 0.55)
+        xl = label("age (years)", 22, MUTED).next_to(ax, DOWN, buff=0.25)
+        yl = label("cost of care (€ a year)", 22, MUTED).rotate(PI / 2).next_to(ax, LEFT, buff=0.2)
+        self.play(Create(ax), FadeIn(xl), FadeIn(yl), run_time=1.0)
+        dots = VGroup(*[Dot(ax.c2p(*p), radius=0.06, color=MUTED) for p in P])
         self.play(FadeIn(dots, lag_ratio=0.02), run_time=1.3)
-        self.wait(2.5)
+        slot = np.array([0, -3.2, 0])
+        self.caption(label("60 patients: age, and what they cost the health service in a year", 26).move_to(slot))
+        self.wait(2.8)
+        self.caption(label("your eye sees two groups: young and old", 26).move_to(slot))
+        self.wait(2.6)
 
-        d2 = MathTex(r"d^2 = (\Delta\text{age})^2 + (\Delta\text{income})^2", color=CREAM, font_size=30)
-        d2.to_edge(RIGHT, buff=1.0).shift(UP * 2.0)
-        ex = MathTex(r"= 28^2 + 6000^2", color=CREAM, font_size=30).next_to(d2, DOWN, buff=0.4)
-        ex2 = MathTex(r"= 784 + 36{,}000{,}000", color=GOLD, font_size=30).next_to(ex, DOWN, buff=0.35)
-        self.play(FadeIn(d2), run_time=0.9); self.wait(2.0)
-        self.play(FadeIn(ex), run_time=0.9); self.wait(2.2)
-        self.play(FadeIn(ex2), run_time=0.9)
-        self.wait(3.4)
-        verdict = label("age contributes nothing", 26, GOLD).next_to(ex2, DOWN, buff=0.55)
-        self.play(FadeIn(verdict), run_time=0.9)
-        self.wait(3.1)
+        # what k-means sees: one euro on the same footing as one year
+        cx = ax.c2p(55, 5000)[0]
+        f = (70 / 5000) * (4.6 / 6.0)
+        self.caption(label("k-means sees this: one euro counts as much as one year", 26).move_to(slot))
+        self.play(*[d.animate.set_x(cx + (d.get_x() - cx) * f) for d in dots], run_time=2.0)
+        self.wait(1.4)
 
-        # k-means on raw units: a horizontal cut, i.e. income bands
-        cut = DashedLine(ax.c2p(18, 49500), ax.c2p(72, 49500), color=CREAM, stroke_width=3)
-        self.play(Create(cut), run_time=1.2)
-        self.play(*[d.animate.set_color(GOLD if P[i, 1] > 49500 else SKY) for i, d in enumerate(dots)], run_time=1.2)
-        self.play(FadeIn(label("clusters = income bands, nothing more", 24, CREAM).next_to(ax, UP, buff=0.3)), run_time=0.9)
-        self.wait(4.2)
+        COL = [1.0, 0, 0]
+        who = label("two patients, aged 36 and 73, €600 apart", 22, MUTED)
+        d2 = MathTex(r"d^2 = (\Delta\,\text{age})^2 + (\Delta\,\text{cost})^2", color=CREAM, font_size=30)
+        ex = MathTex(r"= 37^2 + 600^2 = 1\,369 + 360\,000", color=CREAM, font_size=30)
+        share = label(f"age: {100 * 37**2 / (37**2 + 600**2):.1f}% of the distance", 26, GOLD)
+        panel = VGroup(who, d2, ex, share).arrange(DOWN, buff=0.35, aligned_edge=LEFT)
+        panel.move_to([0, 1.5, 0]).align_to(COL, LEFT)
+        for m in panel:
+            self.play(FadeIn(m, shift=RIGHT * 0.15), run_time=0.7)
+            self.wait(1.4)
 
-        # standardised: the real groups appear
-        Z = (P - P.mean(0)) / P.std(0)
-        az = Axes(x_range=[-3, 3, 1], y_range=[-3, 3, 1], x_length=5.6, y_length=4.4,
-                  axis_config={"color": MUTED, "include_tip": False, "stroke_width": 1.4})
-        az.move_to(ax)
-        self.play(FadeOut(cut), FadeOut(VGroup(d2, ex, ex2, verdict)), run_time=0.8)
-        self.play(Transform(ax, az),
-                  *[d.animate.move_to(az.c2p(*z)).set_color(GOLD if i < 30 else SKY) for i, (d, z) in enumerate(zip(dots, Z))],
-                  run_time=2.4)
-        self.play(FadeIn(label("scale() first, and the real groups are there", 26, GOLD).next_to(az, UP, buff=0.3)), run_time=1.0)
-        self.wait(4.5)
+        lab_, _, _ = kmeans_best(P, 2)
+        cols = [GOLD, SKY]
+        self.play(*[d.animate.set_color(cols[l]) for d, l in zip(dots, lab_)], run_time=1.2)
+        self.caption(label("so it cuts by cost: two bands", 26).move_to(slot))
+        self.play(*[d.animate.move_to(ax.c2p(*p)) for d, p in zip(dots, P)], run_time=2.0)
+        mix = VGroup(*[label(f"cluster {j + 1}: {(young & (lab_ == j)).sum()} young, "
+                             f"{(~young & (lab_ == j)).sum()} old", 26, cols[j]) for j in range(2)])
+        mix.arrange(DOWN, buff=0.3, aligned_edge=LEFT).next_to(panel, DOWN, buff=0.55).align_to(COL, LEFT)
+        self.play(FadeIn(mix, lag_ratio=0.4), run_time=1.0)
+        self.caption(label("young and old mixed in both: cost bands, not segments", 26, GOLD).move_to(slot))
+        self.wait(3.6)
+
+        # scale(): every column in standard deviations from its mean
+        s = P.std(0, ddof=1)
+        s_age, s_cost = round(s[0], 1), round(s[1])          # as printed, so the sum on screen adds up
+        a2, c2 = (37 / s_age) ** 2, (600 / s_cost) ** 2
+        z1 = MathTex(r"z = \frac{x - \bar x}{s}", color=CREAM, font_size=32)
+        z2 = MathTex(rf"s_{{\text{{age}}}} = {s_age:g}\ \text{{years}}, \quad s_{{\text{{cost}}}} = {s_cost}\ \text{{euro}}",
+                     color=CREAM, font_size=28)
+        z3 = MathTex(rf"d^2 = \left(\tfrac{{37}}{{{s_age:g}}}\right)^2 + \left(\tfrac{{600}}{{{s_cost}}}\right)^2"
+                     rf"= {a2:.2f} + {c2:.2f}", color=CREAM, font_size=30)
+        share2 = label(f"age: {100 * a2 / (a2 + c2):.0f}% of the distance", 26, GOLD)
+        panel2 = VGroup(z1, z2, z3, share2).arrange(DOWN, buff=0.35, aligned_edge=LEFT)
+        panel2.move_to([0, 1.3, 0]).align_to(COL, LEFT)
+        self.play(FadeOut(VGroup(panel, mix)), dots.animate.set_color(MUTED), run_time=0.8)
+        self.caption(label("scale(): each column in standard deviations from its mean", 26).move_to(slot))
+        for m in panel2:
+            self.play(FadeIn(m, shift=RIGHT * 0.15), run_time=0.7)
+            self.wait(1.4)
+
+        Z = (P - P.mean(0)) / s
+        az = Axes(x_range=[-2.5, 2.5, 1], y_range=[-3, 3, 1], x_length=6.0, y_length=4.6,
+                  axis_config=axis).move_to(ax)
+        xl2 = label("age (sd)", 22, MUTED).move_to(xl)
+        yl2 = label("cost (sd)", 22, MUTED).rotate(PI / 2).move_to(yl)
+        self.play(Transform(ax, az), Transform(xl, xl2), Transform(yl, yl2),
+                  *[d.animate.move_to(az.c2p(*z)) for d, z in zip(dots, Z)], run_time=2.2)
+        self.caption(label("the picture hardly changes. The distance does", 26).move_to(slot))
+        self.wait(2.2)
+
+        labz, _, _ = kmeans_best(Z, 2)
+        self.play(*[d.animate.set_color(cols[l]) for d, l in zip(dots, labz)], run_time=1.2)
+        mix2 = VGroup(*[label(f"cluster {j + 1}: {(young & (labz == j)).sum()} young, "
+                              f"{(~young & (labz == j)).sum()} old", 26, cols[j]) for j in range(2)])
+        mix2.arrange(DOWN, buff=0.3, aligned_edge=LEFT).next_to(panel2, DOWN, buff=0.55).align_to(COL, LEFT)
+        self.play(FadeIn(mix2, lag_ratio=0.4), run_time=1.0)
+        self.caption(label("same patients, same algorithm: now it finds the groups you saw", 26, GOLD).move_to(slot))
+        self.wait(4.0)
 
 
 class ShapeBreaks(Stage):
-    """Two crescents. k-means cuts them straight down the middle and reports a
-    perfectly respectable W — the failure that never raises an error."""
+    """Two crescents. k-means converges, draws the straight line two centroids
+    always draw, and its W is less than half the crescents' own: more starts
+    cannot help, because the objective itself prefers the cut."""
 
     WAIT_SCALE = 1.0
     PLAY_SCALE = 1.0
@@ -1162,84 +1249,137 @@ class ShapeBreaks(Stage):
         c1 = np.column_stack([np.cos(t1) * 2.4, np.sin(t1) * 1.5]) + rng.normal(0, 0.12, (70, 2))
         t2 = rng.uniform(0, np.pi, 70)
         c2 = np.column_stack([np.cos(t2) * 2.4 + 1.6, -np.sin(t2) * 1.5 + 0.6]) + rng.normal(0, 0.12, (70, 2))
+        S = np.vstack([c1, c2])
+        truth = np.repeat([0, 1], 70)
+        cols = [GOLD, SKY]
 
-        ax = km_axes(x=(-4, 5, 2), y=(-2.6, 2.6, 1), xl=8.4, yl=4.6).shift(UP * 0.2)
+        ax = km_axes(x=(-3, 5, 1), y=(-2, 2.5, 1), xl=7.0, yl=4.2).to_edge(LEFT, buff=0.6).shift(UP * 0.6)
         self.play(Create(ax), run_time=0.9)
-        d1 = VGroup(*[Dot(ax.c2p(*p), radius=0.05, color=MUTED) for p in c1])
-        d2 = VGroup(*[Dot(ax.c2p(*p), radius=0.05, color=MUTED) for p in c2])
-        self.play(FadeIn(d1, lag_ratio=0.02), FadeIn(d2, lag_ratio=0.02), run_time=1.6)
-        self.play(FadeIn(label("two crescents — any eye sees them", 26, CREAM).next_to(ax, DOWN, buff=0.35)), run_time=0.9)
-        self.wait(5.8)
+        dots = VGroup(*[Dot(ax.c2p(*p), radius=0.05, color=MUTED) for p in S])
+        self.play(FadeIn(dots, lag_ratio=0.01), run_time=1.6)
+        slot = np.array([0, -3.0, 0])
+        self.caption(label("two crescents: any eye separates them", 26).move_to(slot))
+        self.wait(2.4)
+        self.play(*[d.animate.set_color(cols[t]) for d, t in zip(dots, truth)], run_time=1.0)
+        self.caption(label("these are the two groups", 26).move_to(slot))
+        self.wait(2.4)
+        self.play(dots.animate.set_color(MUTED), run_time=0.7)
 
-        # what k-means does: a straight boundary between two centroids
-        allp = np.vstack([c1, c2])
-        cent = np.array([[-1.4, 0.35], [2.4, 0.35]])
+        # k-means from a start on the left, round by round until nothing moves
+        cent = np.array([[-2.0, 1.6], [-0.8, 1.8]])
         marks = VGroup(*[Star(n=5, outer_radius=0.16, color=c, fill_opacity=1).move_to(ax.c2p(*m))
-                         for m, c in zip(cent, (GOLD, SKY))])
-        self.play(FadeIn(marks, scale=1.4), run_time=0.9)
-        lab_ = (((allp[:, None, :] - cent[None, :, :]) ** 2).sum(-1)).argmin(1)
-        alld = VGroup(*d1, *d2)
-        self.play(*[d.animate.set_color((GOLD, SKY)[l]) for d, l in zip(alld, lab_)], run_time=1.6)
-        cut = DashedLine(ax.c2p(0.5, -2.6), ax.c2p(0.5, 2.6), color=CREAM, stroke_width=3)
-        self.play(Create(cut), run_time=1.2)
-        self.wait(5.4)
+                         for m, c in zip(cent, cols)])
+        self.play(FadeIn(marks, scale=1.4), run_time=0.8)
+        self.caption(label("k-means, k = 2: assign, update, until nothing moves", 26).move_to(slot))
+        for it in range(12):
+            lab_ = ((S[:, None] - cent[None]) ** 2).sum(-1).argmin(1)
+            self.play(*[d.animate.set_color(cols[l]) for d, l in zip(dots, lab_)], run_time=0.9)
+            new = np.array([S[lab_ == j].mean(0) for j in range(2)])
+            self.play(*[m.animate.move_to(ax.c2p(*n)) for m, n in zip(marks, new)], run_time=0.9)
+            done = np.abs(new - cent).max() < 0.05
+            cent = new
+            if done:
+                break
+        lab_ = ((S[:, None] - cent[None]) ** 2).sum(-1).argmin(1)
+        self.wait(1.4)
 
-        verdict = label("k-means draws straight boundaries. It cut both crescents in half.",
-                        25, GOLD).next_to(ax, DOWN, buff=0.35)
-        self.play(FadeIn(verdict), run_time=1.0)
-        self.wait(6.2)
-        w = label("and W = 96.4, which looks entirely fine in the output", 24, MUTED).next_to(verdict, DOWN, buff=0.35)
-        self.play(FadeIn(w), run_time=1.0)
-        self.wait(7.2)
+        # the boundary: every point equidistant from the two centroids, a straight line
+        mid, dv = cent.mean(0), cent[1] - cent[0]
+        perp = np.array([-dv[1], dv[0]]) / np.linalg.norm(dv)
+        ts = sorted(t for t in ((-2 - mid[1]) / perp[1], (2.5 - mid[1]) / perp[1]))
+        cut = DashedLine(ax.c2p(*(mid + ts[0] * perp)), ax.c2p(*(mid + ts[1] * perp)),
+                         color=CREAM, stroke_width=3)
+        self.play(Create(cut), run_time=1.2)
+        self.caption(label("between two centroids the boundary is always a straight line", 26).move_to(slot))
+        self.wait(3.0)
+
+        W_cut = ((S - cent[lab_]) ** 2).sum()
+        W_true = sum(((S[truth == j] - S[truth == j].mean(0)) ** 2).sum() for j in range(2))
+        COL = [2.2, 0, 0]
+        r1 = VGroup(label("the straight cut", 24, MUTED), MathTex(rf"W = {W_cut:.0f}", color=GOLD, font_size=40))
+        r2 = VGroup(label("the two crescents", 24, MUTED), MathTex(rf"W = {W_true:.0f}", color=SKY, font_size=40))
+        for r in (r1, r2):
+            r.arrange(DOWN, buff=0.15, aligned_edge=LEFT)
+        VGroup(r1, r2).arrange(DOWN, buff=0.6, aligned_edge=LEFT).move_to([0, 0.9, 0]).align_to(COL, LEFT)
+        self.play(FadeIn(r1, shift=RIGHT * 0.15), run_time=0.8)
+        self.wait(1.6)
+        self.play(FadeIn(r2, shift=RIGHT * 0.15), run_time=0.8)
+        self.caption(label("the cut has the smaller W: k-means did exactly its job", 26).move_to(slot))
+        self.wait(3.4)
+        self.caption(label("so more starts cannot fix it: W itself prefers round groups", 26, GOLD).move_to(slot))
+        self.wait(4.0)
 
 
 class ElbowLie(Stage):
-    """W falls for every k, all the way to zero. The curve cannot choose k; at
-    best it hints, and on real data the hint is often unreadable."""
+    """W against k, twice: the textbook curve with its corner, then the curve most
+    data give. The drop at each step is written next to the plot, so the elbow is
+    a number you can see collapse, or fail to."""
 
     WAIT_SCALE = 1.0
     PLAY_SCALE = 1.0
 
     def construct(self):
-        ax = Axes(x_range=[0, 11, 2], y_range=[0, 100, 25], x_length=8.0, y_length=4.4,
-                  axis_config={"color": MUTED, "include_tip": False, "stroke_width": 1.4}).shift(DOWN * 0.2)
-        self.play(Create(ax), run_time=1.0)
-        self.play(FadeIn(label("k", 24, MUTED).next_to(ax, DOWN, buff=0.28)),
-                  FadeIn(MathTex("W", color=MUTED, font_size=30).next_to(ax, LEFT, buff=0.22)), run_time=0.7)
+        ax = Axes(x_range=[0, 10.5, 1], y_range=[0, 100, 25], x_length=7.0, y_length=4.4,
+                  axis_config={"color": MUTED, "include_tip": False, "stroke_width": 1.4})
+        ax.to_edge(LEFT, buff=1.0).shift(UP * 0.55)
+        ticks = VGroup(*[label(str(k), 20, MUTED).next_to(ax.c2p(k, 0), DOWN, buff=0.15) for k in range(1, 11)])
+        kl = label("k", 24, MUTED).next_to(ticks, DOWN, buff=0.15)
+        wl = MathTex("W", color=MUTED, font_size=32).next_to(ax, LEFT, buff=0.25)
+        self.play(Create(ax), FadeIn(ticks), FadeIn(kl), FadeIn(wl), run_time=1.0)
 
         ks = np.arange(1, 11)
         W = np.array([92, 44, 22, 18.5, 16, 14, 12.2, 10.6, 9.2, 8.0])
         pts = [ax.c2p(k, w) for k, w in zip(ks, W)]
         curve = VMobject(color=GOLD, stroke_width=4).set_points_as_corners(pts)
         dots = VGroup(*[Dot(p, radius=0.07, color=GOLD) for p in pts])
-        self.play(Create(curve), run_time=2.4)
-        self.play(FadeIn(dots, lag_ratio=0.1), run_time=1.0)
-        self.wait(2.8)
+        slot = np.array([0, -3.2, 0])
+        self.caption(label("W against k: the curve the textbook shows", 26).move_to(slot))
+        self.play(Create(curve), run_time=2.2)
+        self.play(FadeIn(dots, lag_ratio=0.1), run_time=0.9)
+        self.wait(1.6)
+        self.caption(label("k = 1: W is all the variance. k = n: W is zero", 26).move_to(slot))
+        self.wait(3.0)
+        self.caption(label("it falls at every k: it always votes for more", 26).move_to(slot))
+        self.wait(2.6)
 
-        n1 = label("k = 1: W is the total variance", 24, CREAM).next_to(ax.c2p(1, 92), RIGHT, buff=0.4)
-        self.play(FadeIn(n1), Flash(pts[0], color=CREAM, line_length=0.3, num_lines=12), run_time=1.1)
-        self.wait(3.1)
-        n2 = label("k = n: W = 0, every point its own cluster", 24, CREAM).next_to(ax.c2p(10, 8), UR, buff=0.25)
-        self.play(FadeTransform(n1, n2), run_time=1.0)
-        self.wait(3.4)
+        # the drops, written out: the elbow is where they collapse
+        COL = [1.6, 0, 0]
+        head = label("how much W falls", 24, MUTED).move_to([0, 2.6, 0]).align_to(COL, LEFT)
+        self.play(FadeIn(head), run_time=0.6)
 
-        clear = label("it falls for every k. It always votes for more.", 26, GOLD).next_to(ax, DOWN, buff=0.75)
-        self.play(FadeTransform(n2, clear), run_time=1.0)
+        def drop_rows(w, color):
+            rows = VGroup()
+            for i in range(6):
+                rows.add(MathTex(rf"{i + 1} \to {i + 2}", r"\quad", rf"{w[i] - w[i + 1]:g}",
+                                 color=color, font_size=32))
+            rows.arrange(DOWN, buff=0.22, aligned_edge=LEFT).next_to(head, DOWN, buff=0.35).align_to(COL, LEFT)
+            return rows
+
+        rows = drop_rows(W, CREAM)
+        for r in rows:
+            self.play(FadeIn(r, shift=RIGHT * 0.15), run_time=0.45)
+        self.wait(1.2)
+        el = Circle(radius=0.3, color=CREAM, stroke_width=3).move_to(pts[2])
+        self.play(Create(el), rows[1].animate.set_color(GOLD), rows[2].animate.set_color(GOLD), run_time=1.0)
+        self.caption(label("22, then 3.5: the drop collapses after k = 3. That is the elbow", 26).move_to(slot))
         self.wait(3.6)
-
-        # the elbow you are told to find — and the one you actually get
-        el = Circle(radius=0.28, color=CREAM, stroke_width=3).move_to(pts[2])
-        self.play(Create(el), FadeIn(label("the elbow, when you are lucky", 24, CREAM)
-                                     .next_to(el, UP, buff=0.3)), run_time=1.2)
-        self.wait(3.4)
 
         smooth = np.array([92, 61, 47, 39, 33, 29, 25.5, 23, 21, 19.5])
         pts2 = [ax.c2p(k, w) for k, w in zip(ks, smooth)]
         curve2 = VMobject(color=SKY, stroke_width=4).set_points_as_corners(pts2)
-        self.play(FadeOut(el), FadeOut(dots), Transform(curve, curve2), run_time=2.0)
-        self.play(FadeIn(label("and this is most real data: no elbow at all", 26, SKY)
-                         .next_to(ax, DOWN, buff=1.25)), run_time=1.0)
-        self.wait(4.8)
+        dots2 = VGroup(*[Dot(p, radius=0.07, color=SKY) for p in pts2])
+        rows2 = drop_rows(smooth, SKY)
+        self.caption(label("and this is the curve most real data give", 26).move_to(slot))
+        self.play(FadeOut(el), Transform(curve, curve2), Transform(dots, dots2),
+                  Transform(rows, rows2), run_time=2.0)
+        self.wait(2.4)
+        self.caption(label("31, 14, 8, 6, 4: it shrinks a little at every step. No corner", 26).move_to(slot))
+        self.wait(3.6)
+        self.caption(label("the elbow you find here is the one you went looking for", 26).move_to(slot))
+        self.wait(3.0)
+        self.caption(label("bring a second criterion: silhouette, stability, what a team can act on", 26, GOLD).move_to(slot))
+        self.wait(4.0)
+
 
 
 

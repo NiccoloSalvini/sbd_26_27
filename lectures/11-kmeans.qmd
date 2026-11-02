@@ -25,9 +25,9 @@ Lecture 10 · Learning without a label
 | 09:10 | The algorithm: Lloyd's four lines, by hand | 60' |
 | 10:10 | Two silent failures: scale and shape | 20' |
 | 10:30 | [**Break**]{.gold} | [15']{.gold} |
-| 10:45 | Choosing $k$: the elbow, and the elbow you get | 35' |
-| 11:20 | From clusters to segments | 25' |
-| 11:45 | In R · Set 10 | 15' |
+| 10:45 | Choosing $k$: the elbow, and the elbow you get · **Drill 1** | 40' |
+| 11:25 | From clusters to segments · **Drill 2** | 25' |
+| 11:50 | In R · Set 10 | 10' |
 
 : {tbl-colwidths="[14,76,10]"}
 
@@ -36,18 +36,23 @@ Lecture 10 · Learning without a label
 - Run the k-means algorithm by hand once, so it is never a black box again
 - Understand what it minimises, and why that makes it fast and fallible
 - Choose $k$ with a method you can defend to a colleague
-- Turn clusters into **segments**: profiles a marketing team can use
+- Turn clusters into **segments**: profiles a marketing team, or a care manager, can use
 
 ## Why a manager cares
 
 ::: {.subtitle-frame}
-One offer for everyone, or one for each customer? Neither.
+One plan for everyone, or one for each person? Neither.
 :::
 
-- Mass marketing wastes budget on people who would never respond
-- One-to-one is a fantasy at 400 000 customers
-- **Segmentation** is the working compromise: a handful of groups, each with its own offer, message, and channel
-- Every CRM system you will ever use has a segmentation inside it — usually a k-means, usually run once in 2019 and never revisited
+| | One for everyone | One for each | The compromise |
+|---|---|---|---|
+| **Retailer** | mass marketing, paid for people who never respond | one-to-one, for 400 000 customers | **segments**: a few offers |
+| **Health authority** | one pathway, for an average patient nobody is | one plan each, for 400 000 residents | **patient groups**: a few pathways |
+
+: {tbl-colwidths="[19,33,26,22]"}
+
+- Every CRM has a segmentation inside — usually a k-means, run once in 2019 and never revisited
+- Population health management groups patients the same way: healthy, chronic, complex and frail
 
 By the end of today you can build one, and you know what is wrong with the one you inherit.
 
@@ -62,10 +67,10 @@ W(C) \;=\; \sum_{j=1}^{k} \;\sum_{i \in C_j} \lVert x_i - \bar{x}_j \rVert^2
 $$
 
 - $\bar x_j$ is the **centroid** of cluster $j$: the mean of its points
-- Small $W$: each point is close to its own centroid — the within-group variance ANOVA puts in its denominator
+- Small $W$: every point close to its own centroid — ANOVA's within-group variance
 
 ::: {.callout-note}
-The true minimum over all partitions is out of reach: $n = 100$ customers split into $k = 3$ groups about $10^{47}$ ways, into $k = 10$ about $10^{93}$ — more than the atoms in the universe. k-means finds a *good* one, fast.
+The true minimum is out of reach: 100 customers split into 3 groups about $10^{47}$ ways, into 10 about $10^{93}$ — more than the atoms in the universe. k-means finds a *good* one, fast.
 :::
 
 ## Lloyd's algorithm, four lines
@@ -83,9 +88,9 @@ It stops at *a* minimum, not *the* minimum. Different starting points give diffe
 
 ## Assign, update, repeat
 
-{{< video media/Lloyd.mp4 width="1000" height="562" >}}
+{{< video media/Lloyd.mp4 width="880" height="495" >}}
 
-Deliberately bad starting centroids, so the first update is large. Watch $W$: it falls at every half-step, which is *why* the algorithm is guaranteed to stop — it cannot go back up.
+Deliberately bad starting centroids, so the first update is large. Watch the column of $W$: it falls at every half-step, which is *why* the algorithm is guaranteed to stop.
 
 ## By hand: six customers, two variables
 
@@ -108,7 +113,7 @@ $W = \tfrac{4}{3} + \tfrac{4}{3} = \tfrac{8}{3} \approx 2.67$ — in each group,
 
 ## By hand, watched
 
-{{< video media/KmeansByHand.mp4 width="1000" height="562" >}}
+{{< video media/KmeansByHand.mp4 width="880" height="495" >}}
 
 Every squared distance, both centroid updates, and $W$ at the end. Six points is small enough to check the algorithm's arithmetic against your own.
 
@@ -118,25 +123,25 @@ Every squared distance, both centroid updates, and $W$ at the end. Six points is
 Both happen in every real dataset
 :::
 
-**Scale.** Income in euros and age in years: income dominates the distance entirely, age is noise. k-means sees only geometry. **Standardise first** — `scale()` — unless you have a reason not to.
-
-## Scale: the distance is income
-
-{{< video media/ScaleBreaks.mp4 width="1000" height="562" >}}
-
-Twenty-eight years against six thousand euro, both squared: $784$ against $36$ million. Age is not weighted lightly, it is absent. The clusters you get back are income bands wearing a segmentation's clothes.
+**Scale.** Cost of care in euros and age in years: cost dominates the distance entirely, age is noise. k-means sees only geometry. **Standardise first** — `scale()` — unless you have a reason not to.
 
 **Shape.** k-means draws straight boundaries between centroids. It finds round, similar-sized blobs. Give it two crescents, or one dense core inside a diffuse halo, and it will cut them wrongly and report a fine $W$.
-
-## Shape: the failure with no error message
-
-{{< video media/ShapeBreaks.mp4 width="1000" height="562" >}}
-
-Two crescents any eye separates instantly. k-means cuts straight down the middle, splits both, and reports a $W$ that looks perfectly reasonable in the output.
 
 ::: {.callout-note}
 Neither failure produces an error message. The output looks like any other segmentation. This is why you *look at the plot* before you trust the numbers.
 :::
+
+## Scale: the distance is cost
+
+{{< video media/ScaleBreaks.mp4 width="880" height="495" >}}
+
+$37^2 = 1\,369$ against $600^2 = 360\,000$: age is 0.4% of the distance. The clusters are cost bands, young and old mixed in both — until `scale()`.
+
+## Shape: the failure with no error message
+
+{{< video media/ShapeBreaks.mp4 width="880" height="495" >}}
+
+Two crescents any eye separates. k-means cuts them with a straight line, and that cut has *less than half* the $W$ of the true groups: more starts cannot help.
 
 ## [Section 2]{.section-kicker} Choosing k {.section-slide background-color="#002f57"}
 
@@ -148,14 +153,16 @@ Neither failure produces an error message. The output looks like any other segme
 
 ## The elbow, and the elbow you actually get
 
-{{< video media/ElbowLie.mp4 width="1000" height="562" >}}
+{{< video media/ElbowLie.mp4 width="880" height="495" >}}
 
-Textbook curves have a corner. Most real ones bend smoothly, and the elbow you *find* is the elbow you went looking for. Bring a second criterion — silhouette, stability, or a business constraint on how many segments a team can act on.
+Textbook curves have a corner. Most real ones bend smoothly, and the elbow you *find* is the elbow you went looking for.
 
-Two honest tools:
+## Two honest tools
 
 - **Elbow**: plot $W$ against $k$; take $k$ where the curve stops bending. Crude, quick, often enough.
 - **Silhouette**: for each point, *how much closer is it to its own cluster than to the next one?* Average it; pick the $k$ that maximises. Ranges $-1$ to $1$; above $0.5$ is a real structure, below $0.25$ is not.
+
+When they disagree, bring a third: stability across seeds, or how many segments a team can actually act on.
 
 ## In R
 
@@ -174,6 +181,30 @@ fviz_cluster(km, data = X)                 # the picture you show a colleague
 
 ::: {.callout-note}
 `set.seed()` makes the random starts reproducible. Without it, your colleague reruns your script and gets different segment numbers — the same segments, relabelled — and a meeting is lost to confusion.
+:::
+
+## [Drill 1]{.drill-kicker} Pick $k$, and say why
+
+::: {.subtitle-frame}
+In pairs · 10 minutes · what the block above gives on `USArrests`
+:::
+
+| $k$ | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 |
+|---|---|---|---|---|---|---|---|---|
+| $W$ | 196.0 | 102.9 | 78.3 | 56.4 | 48.9 | 42.8 | 38.3 | 34.4 |
+| Silhouette | — | 0.41 | 0.31 | 0.34 | 0.30 | 0.29 | 0.29 | 0.26 |
+
+1. Which $k$ does the elbow suggest? And the silhouette?
+2. Which $k$ do you take to your manager? Write the **one sentence** you say when they ask why.
+
+## [Drill 1 · answer]{.drill-kicker} Two criteria, one decision
+
+- **Elbow**: $W$ falls by 93, then 25, 22, then 7.5 — the curve stops bending after $k = 4$
+- **Silhouette**: best at $k = 2$ (0.41), second best at $k = 4$ (0.34). Nothing reaches 0.5: the structure is moderate, not sharp
+- $k = 2$ is *high crime against low crime*: true, and no news. $k = 4$ also splits urban from rural states, and the same four groups come back from every seed tried
+
+::: {.callout-tip title="A sentence that defends it"}
+"Four: the gain in $W$ collapses after four, the silhouette's second peak is at four, and only four groups separate the rural states with the most murders from the urban ones with the most assaults."
 :::
 
 ## [Section 3]{.section-kicker} From clusters to segments {.section-slide background-color="#002f57"}
@@ -195,13 +226,40 @@ Then **name** them from the numbers — *occasional big-basket*, *frequent small
 
 ## What "act on it" looks like
 
-- **Segment 2** (frequent, small basket, long tenure): cross-sell, not discount — they already come; raise the basket
-- **Segment 4** (new, mid-frequency): the retention window is now; a churn model (week 4) will tell you *which* of them
-- **Segment 1** (rare, big basket): the campaign question is *reach*, not *offer*
+- **Segment 1** · *the quiet majority* (0.8 visits, 1.1 years, 41%): the biggest group and the least attached — give them a reason to come back, not a bigger basket
+- **Segment 2** · *loyalists* (6.4 visits, €28): cross-sell, not discount — they already come; raise the basket
+- **Segment 3** · *big-basket* (€140, 2.1 visits): the opposite — they spend when they come; one more visit a quarter beats any upsell
+- **Segment 4** · *new regulars* (0.4 years, 4 visits): the retention window is now; a churn model (week 4) will tell you *which* of them
 
 ::: {.callout-important title="Attention"}
 The segmentation is only as good as the variables you fed it. Cluster on demographics and you get demographic segments, which rarely predict behaviour. Cluster on **behaviour** — recency, frequency, monetary value — and the segments are things a company can move.
 :::
+
+## [Drill 2]{.drill-kicker} Now the patients
+
+::: {.subtitle-frame}
+In pairs · 10 minutes · a health district, $k = 4$ on scaled columns · means per patient, per year
+:::
+
+| Group | Age | Conditions | ED visits | Admissions | Cost (€) | Share |
+|---|---|---|---|---|---|---|
+| 1 | 34 | 0.2 | 0.3 | 0.02 | 310 | 58% |
+| 2 | 67 | 2.1 | 0.6 | 0.10 | 2 400 | 27% |
+| 3 | 81 | 4.3 | 2.8 | 1.30 | 14 800 | 6% |
+| 4 | 45 | 1.0 | 4.1 | 0.15 | 1 900 | 9% |
+
+1. A **name** for each group, from the numbers — one a care manager would use
+2. Which group gets a case manager first? Back it with **one number computed** from the table
+3. Group 4 visits the emergency department (ED) four times a year and is rarely admitted. Why, and what would you change?
+
+## [Drill 2 · answer]{.drill-kicker} Four groups, four pathways
+
+- **1 · healthy, low users** (34 years, €310): prevention and screening, nothing more
+- **2 · chronic and stable** (2.1 conditions, rarely admitted): a disease pathway run by the GP — diabetes, heart failure
+- **3 · complex and frail** (81 years, 1.3 admissions): **6% of patients, 47% of the spending** — case management and care at home, to prevent the next admission
+- **4 · the ED as their GP** (4.1 visits, 0.15 admissions): not sick enough to stay, so not an emergency — open primary care in the evening, not more beds
+
+[Per 100 patients: $6 \times 14\,800 = 88\,800$ out of $58 \times 310 + 27 \times 2\,400 + 6 \times 14\,800 + 9 \times 1\,900 = 188\,680$ euro.]{.muted}
 
 ## k-means answers "how many groups?" with "as many as you asked for." {.statement}
 
@@ -209,9 +267,9 @@ The segmentation is only as good as the variables you fed it. Cluster on demogra
 
 ## Before the lab
 
-Friday is clustering end to end, on a real customer table. Come having run today's R block on `USArrests`, and with an answer to:
+The lab on Fri 13 Nov is clustering end to end, on a real customer table. Come having run today's R block on `USArrests`, and with an answer to:
 
-- What is the elbow $k$? The silhouette $k$? Do they agree?
+- Do you get Drill 1's table? $W$ is `km$tot.withinss`, for $k$ from 1 to 8
 - Rerun `kmeans` with `nstart = 1` three times. Do the clusters change?
 - Profile the clusters. Write one sentence naming each.
 
