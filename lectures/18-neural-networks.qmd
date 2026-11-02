@@ -22,12 +22,12 @@ Lecture 17 · Random forests and boosting · Fri 27 Nov
 | Time | | Min |
 |---|---|---|
 | 17:00 | Last time · Set 15, the [In class]{.gold} questions | 10' |
-| 17:10 | From linear to nonlinear · the perceptron, by hand | 40' |
+| 17:10 | From linear to nonlinear · the perceptron, by hand · **Drill 1** | 40' |
 | 17:50 | Gradient descent | 10' |
 | 18:00 | [**Break**]{.gold} | [10']{.gold} |
 | 18:10 | One neuron is a GLM | 15' |
-| 18:25 | Hidden layers | 25' |
-| 18:50 | Set 16 · in Python | 10' |
+| 18:25 | Hidden layers · **Drill 2** | 30' |
+| 18:55 | Set 16 · in Python | 5' |
 
 : {tbl-colwidths="[14,76,10]"}
 
@@ -42,24 +42,26 @@ Lecture 17 · Random forests and boosting · Fri 27 Nov
 ## Why a manager cares
 
 ::: {.subtitle-frame}
-The most over-sold and under-understood model in business
+The most over-sold and under-understood model in business, and in hospitals
 :::
 
-- Every vendor deck says *AI*. Underneath, on a table of customers, it is usually a neural network — or a gradient-boosted tree pretending to be one
-- You will be asked to approve, fund, or trust one. You should know what it is: a regression that learned to bend
-- And you should know when it is the *wrong* tool — which, on tabular data, is most of the time. Friday is about that.
+| | What the vendor sells | What you ask first |
+|---|---|---|
+| **Retailer** | "AI predicts which customers will leave" | does it beat a logistic regression on the same table? |
+| **Hospital** | "AI reads the vitals and flags who will deteriorate" | does it beat the early-warning score the nurses already compute? |
+
+: {tbl-colwidths="[16,42,42]"}
+
+- Underneath the word *AI*, on a table of customers or patients, there is usually a neural network: a regression that learned to bend
+- You will be asked to approve, fund, or trust one. Today: what it is. Friday: when it is the *wrong* tool, which on tabular data is most of the time
 
 ## [Section 1]{.section-kicker} From linear to nonlinear {.section-slide background-color="#002f57"}
 
 ## The motivation, in one picture
 
-{{< video media/Boundary.mp4 width="1000" height="562" >}}
+{{< video media/Boundary.mp4 width="880" height="495" >}}
 
-A **linear** boundary — logistic regression — cannot follow a curve. Neural networks exist to draw the second kind. That is the whole motivation; everything else is machinery.
-
-::: {.callout-note}
-They were inspired by the brain, in the 1940s. The inspiration is real and the analogy is thin: *inputs* arrive like signals at dendrites, the *body* sums them, the *axon* fires or does not. Keep the picture; do not lean on it.
-:::
+Invented ward patients: danger on every side of normal vitals. The best straight line, the kind logistic regression draws, misses 15; three hidden neurons, blended, miss 3.
 
 ## Two dialects, revisited
 
@@ -90,6 +92,10 @@ $$
 In general: $\hat y = g\big[\phi(X; W)\big]$ — a **linear combination** $\phi$, then an **activation** $g$.
 
 Now make both linear: $g(z) = z$. You have $\hat y = W_0 + \sum_j W_j X_j$. **That is linear regression.** The simplest possible neural network is the model you started the course with.
+
+::: {.callout-note}
+Inspired by the brain: *inputs* arrive like signals at dendrites, the *body* sums them, the *axon* fires or does not. The inspiration is real and the analogy is thin. Keep the picture; do not lean on it.
+:::
 
 ## The difference that is not in the formula
 
@@ -134,52 +140,82 @@ End of epoch 1: $W = (0.3, 0.0)$, two mistakes. Epoch 2: two more. Epoch 3: one.
 
 ## By hand, watched
 
-{{< video media/PerceptronByHand.mp4 width="1000" height="562" >}}
+{{< video media/PerceptronByHand.mp4 width="880" height="495" >}}
 
-Every row, every number. $W$ moves only on the rows marked *wrong*, and only along that row's $X$.
+The AND table, filled row by row: every product in epoch 1, then epochs 2–4 until one has no mistake. $W$ moves only on wrong rows, and only along that row's $X$.
 
 ## The same thing, as geometry
 
-{{< video media/Perceptron.mp4 width="1000" height="562" >}}
+{{< video media/Perceptron.mp4 width="880" height="495" >}}
 
-Each mistake turns the boundary toward the point it got wrong. An epoch with no mistake means nothing will ever change again — that *is* convergence.
+The shaded side is where it says 1, so a wrong row is a point on the wrong side. The line separates the gate in epoch 3; only epoch 4, with no mistake, proves it.
+
+## [Drill 1]{.drill-kicker} Which alerts can one perceptron learn?
+
+::: {.subtitle-frame}
+In pairs · 10 minutes · four alert rules for a medical ward
+:::
+
+| Rule | Inputs | Alert when |
+|---|---|---|
+| A | fever, heart rate over 100 (each 0 or 1) | both |
+| B | fever, heart rate over 100 (each 0 or 1) | at least one |
+| C | fever, heart rate over 100 (each 0 or 1) | exactly one: the two disagree |
+| D | temperature, in °C | below 35.5 or above 38 |
+
+: {tbl-colwidths="[10,50,40]"}
+
+1. Sketch each rule: the four corners of the square for A–C, a line of temperatures for D. Which can a single perceptron learn?
+2. The ward wants D, and a vendor offers a perceptron on temperature alone. What do you answer, and what one change makes it learnable?
+
+## [Drill 1 · answer]{.drill-kicker} One perceptron, one straight line
+
+- **A and B: yes.** A line cuts $(1, 1)$ off from the rest (A, the AND gate), or $(0, 0)$ off from the rest (B)
+- **C: no.** No line puts $(0, 1)$, $(1, 0)$ on one side and $(0, 0)$, $(1, 1)$ on the other
+- **D: no.** On one input a perceptron is one threshold, *above t* or *below t*; this alert has two ends
+- **The fix for D**: two inputs, *below 35.5* and *above 38*. Then D is rule B, and B is learnable
+
+::: {.callout-tip title="A sentence that defends it"}
+"One perceptron draws one straight line, and 'too cold or too hot' needs two cuts: give it the two flags as inputs, or a hidden layer that builds them."
+:::
+
+[Run in R from $W = (0.3, -0.1)$: A stops after 4 epochs, B after 5; C still makes 3 mistakes in epoch 100.]{.muted}
 
 ## [Section 3]{.section-kicker} Gradient descent {.section-slide background-color="#002f57"}
 
 ## The general engine
 
-The perceptron rule is a special case of something universal. Given a **loss** $L(W)$ — say mean squared error — move the weights *downhill*:
+The perceptron rule is a special case. Given a **loss** $L(W)$, say mean squared error, move the weights *downhill*:
 
 $$
 W_j(t+1) \;=\; W_j(t) - \eta\,\frac{\partial L(W)}{\partial W_j}
 $$
 
-- Derivative positive: $L$ rises with $W_j$, so decrease it. Negative: increase it. The minus sign is the whole idea.
-- Repeat until the gradient is (near) zero: a minimum
-- For a network, computing $\partial L / \partial W$ layer by layer is called **backpropagation**. It is the chain rule, applied carefully, and nothing more.
+- Derivative positive: decrease $W_j$; negative: increase it. The minus sign is the whole idea. Repeat until the gradient is near zero
+- For a network, computing $\partial L / \partial W$ layer by layer is **backpropagation**: the chain rule, applied carefully
 
 ::: {.callout-important title="Attention"}
-A convex loss is a bowl: you reach *the* minimum. A network's loss is not. You find *a* valley, which depends on where you started — as with k-means, run it more than once.
+A network's loss is no bowl: you find *a* valley, which depends on the start. As with k-means, run it more than once.
 :::
 
 ## The learning rate, and what it does to you
 
-{{< video media/GradientDescent.mp4 width="1000" height="562" >}}
+{{< video media/GradientDescent.mp4 width="880" height="495" >}}
 
-**Too small**: it creeps — thousands of steps. **Too large**: it overshoots the valley and oscillates. **Right**: a smooth, decelerating descent. Practical variants: shrink $\eta$ over time (*annealing*), or add inertia (*momentum*, $\mu \approx 0.9$) — each one more hyperparameter.
+From $W = 4$: $\eta = 0.3$ lands in 8 steps, $0.03$ is still short after 26, $1.05$ overshoots more at each step. Software shrinks $\eta$ as it goes (*annealing*) or adds *momentum*.
 
 ## Gradient descent on linear regression
 
 Apply the update to $\hat y = XW$ with squared loss: $W(t+1) = W(t) + \eta\, X^\top(y - XW)$.
 
-It converges to $\hat W = (X^\top X)^{-1} X^\top y$. **Exactly OLS.** The network, trained by gradient descent, arrives where the formula was already standing.
+It converges to $\hat W = (X^\top X)^{-1} X^\top y$. **Exactly OLS.** On 189 births (`MASS::birthwt`), birth weight in kg, predictors standardised, 100 steps of $\eta = 0.1$:
 
-| | OLS | NN, identity activation |
+| | OLS, `lm()` | NN, identity activation |
 |---|---|---|
-| Intercept | 1.01 | $W_0$ = 1.01 |
-| $X_1$ | −0.02 | $W_1$ = −0.02 |
-| $X_2$ | −0.35 | $W_2$ = −0.35 |
-| $X_3$ | −0.52 | $W_3$ = −0.52 |
+| Intercept | 2.945 | $W_0$ = 2.945 |
+| Mother's weight | 0.123 | $W_1$ = 0.123 |
+| Mother's age | 0.038 | $W_2$ = 0.038 |
+| Smoker | −0.132 | $W_3$ = −0.132 |
 
 Identical coefficients, identical predictions. Nothing was gained — yet.
 
@@ -198,14 +234,14 @@ Train a network on the **negative log-likelihood** and gradient descent finds th
 | Categorical | Multinomial | $\log \frac{\mu_k}{1-\mu_k}$ | softmax |
 
 ::: {.callout-note}
-Take the link function, invert it, and you have the activation. Take the activation, invert it, and you have the link. You already know every model in this table from Module 1.
+Invert the link and you have the activation, and back. You know every model in this table from Module 1.
 :::
 
 ## The sigmoid, since it is everywhere
 
-{{< video media/Sigmoid.mp4 width="1000" height="562" >}}
+{{< video media/Sigmoid.mp4 width="880" height="495" >}}
 
-Soften the step into $\sigma(\lambda) = 1/(1+e^{-\lambda})$ and the output is a probability. One sigmoid neuron with cross-entropy loss **is logistic regression**, weights and all: cross-entropy is the Bernoulli negative log-likelihood under another name.
+On the step the slope is 0: gradient descent has no direction. The sigmoid's is $\sigma(1-\sigma)$, 0.25 at $\lambda = 0$. One sigmoid neuron with cross-entropy **is logistic regression**.
 
 ## [Section 5]{.section-kicker} Hidden layers {.section-slide background-color="#002f57"}
 
@@ -226,9 +262,9 @@ $$
 
 ## What a hidden layer buys
 
-{{< video media/HiddenLayer.mp4 width="1000" height="562" >}}
+{{< video media/HiddenLayer.mp4 width="880" height="495" >}}
 
-One hidden neuron: still a line. Two: one bend. Five: the boundary follows the data. Each neuron is a line; the output layer blends them.
+200 invented patients, at risk outside a safe BMI and blood-pressure oval. Each hidden neuron adds a line: 1, 2, 3, 4 neurons get 155, 174, 192, 197 of 200 right.
 
 ## Why the activations must bend
 
@@ -247,13 +283,9 @@ A hidden layer with linear activations is over-parameterised linear regression. 
 
 ## More flexibility, and what it costs
 
-::: {.subtitle-frame}
-Ten inputs, one hidden layer of five sigmoid neurons, 90/10 split
-:::
+{{< video media/Overfitting.mp4 width="880" height="495" >}}
 
-{{< video media/Overfitting.mp4 width="1000" height="562" >}}
-
-**Training error** keeps falling. **Test error** falls, reaches a minimum, then **rises**: past that point the network is learning the noise of the training set. Overfitting, drawn.
+40 hidden neurons, 161 weights, 50 training patients (6 labels flipped), 100 test. Test loss is lowest at iteration 85; at 385 training is perfect, test 32 of 100 wrong.
 
 ## Three ways to stop it
 
@@ -283,12 +315,42 @@ mean((p > 0.5) == d$default[-tr])                                    # held-out 
 
 `size` is $L$. `decay` is $\lambda$. Both are hyperparameters, and Friday's lab is about choosing them without lying to yourself.
 
+## [Drill 2]{.drill-kicker} How many neurons for the diabetes clinic?
+
+::: {.subtitle-frame}
+In pairs · 10 minutes · `nnet` on `MASS::Pima.tr` (200 women) · errors on `Pima.te` (332 others)
+:::
+
+| Model | Weights | Training error | Test error |
+|---|---|---|---|
+| Logistic regression, `glm` | 8 | 22.5% | 19.9% |
+| Network, 1 hidden neuron | 10 | 22.0% | 22.7% |
+| Network, 2 hidden | 19 | 17.9% | 24.8% |
+| Network, 5 hidden | 46 | 9.2% | 27.8% |
+| Network, 20 hidden | 181 | 0.1% | 28.8% |
+
+1. Which model fits the 200 training women best? Which predicts new women best?
+2. A vendor shows you the 20-neuron network: "99.9% accurate". Your answer, in one sentence?
+3. Which model goes into the clinic? Defend it in one sentence.
+
+## [Drill 2 · answer]{.drill-kicker} More neurons, worse predictions
+
+- **Training error** falls with every neuron, 22.5% → 0.1%: 181 weights for 200 women is enough to memorise them
+- **Test error** rises, 22.7% → 28.8%, and the logistic regression beats every network: 19.9%
+- **To the vendor**: 99.9% is measured on the women it learned from; on 332 it never saw, it misses 28.8%, more than a `glm`
+
+::: {.callout-tip title="A sentence that defends it"}
+"The logistic regression: it misclassifies fewer new patients than any network, 19.9% against 22.7% at best, and a clinician can read its eight coefficients as odds ratios."
+:::
+
+[Mean of ten seeds per row, `decay = 0`, `maxit = 2000`, inputs scaled with the training means. With `decay = 0.01` the best network reaches 20.6%: still behind.]{.muted}
+
 ## A neural network is a regression that learned to bend. Whether it needed to is the question you must answer before you fit one.  {.statement}
 
 ## Before the lab
 
-- Run the block. Change `size` to 1. Compare with `glm(family = binomial)` on the same rows: are the coefficients close? (They should be — why?)
-- `size = 20, decay = 0`. Training accuracy? Test accuracy? Draw the curve you saw on slide 17 in your head.
+- Run the block. Change `size` to 1 and compare its predicted probabilities with `glm(family = binomial)` on the same rows: how close are they, and why?
+- Rerun one row of Drill 2 on `Pima.tr` with your own seed, then the same row with `decay = 0.01`. Does the test error move?
 - Reread lecture 14, last section: *autoencoders*. Friday we make the connection.
 
 ## Practice: Set 16

@@ -22,12 +22,12 @@ Lecture 19 · Lab: neural networks · Fri 4 Dec
 | Time | | Min |
 |---|---|---|
 | 17:00 | Last time · questions | 10' |
-| 17:10 | The trade-off: accuracy against interpretability | 20' |
-| 17:30 | Global tools: importance, partial dependence | 30' |
+| 17:10 | The trade-off: accuracy against interpretability | 15' |
+| 17:25 | Global tools: importance, partial dependence · **Drill 1** | 35' |
 | 18:00 | [**Break**]{.gold} | [10']{.gold} |
-| 18:10 | Local tools: Shapley values, LIME | 25' |
-| 18:35 | Deciding where to stand | 15' |
-| 18:50 | Set 17 | 10' |
+| 18:10 | Local tools: Shapley values, LIME · **Drill 2** | 25' |
+| 18:35 | Deciding: where to stand, who pays · **Drill 3** | 20' |
+| 18:55 | Set 17 | 5' |
 
 : {tbl-colwidths="[14,76,10]"}
 
@@ -35,18 +35,25 @@ Lecture 19 · Lab: neural networks · Fri 4 Dec
 
 - Name the trade-off precisely: what you give up when accuracy goes up, and who pays
 - Open a black box with three tools — importance, partial dependence, local explanations — and know what each one *cannot* tell you
-- Decide, for a real business case, where on the accuracy–interpretability line to stand
+- Decide, for a business or a clinical case, where on the accuracy–interpretability line to stand — and check which patients the model shortchanges
 - Say it to a non-technical decision-maker without either lying or losing them
 
 ## Why a manager cares
 
 ::: {.subtitle-frame}
-"The model declined her loan. Why?" — and you must answer.
+"The model said no. Why?" — and you must answer.
 :::
 
-- **Regulation**: credit, insurance, hiring, healthcare — in the EU you owe an explanation for an automated decision that affects a person
-- **Trust**: a clinician will not act on a readmission score they cannot interrogate; a sales director will not restructure territories on a number from a box
-- **Debugging**: the boosting model that wins by 3 points of AUC may have learned that customers with `id > 5000` churn — because those were the ones onboarded during a bad quarter
+| | The model decides | Who asks why |
+|---|---|---|
+| **Bank, retailer** | a declined loan · the 2 000 customers to call | the customer, the regulator, the sales director |
+| **Health authority** | a readmission flag · who gets a case manager | the clinician who must act on it, the patient, the auditor |
+
+: {tbl-colwidths="[20,42,38]"}
+
+- **Regulation**: in the EU you owe an explanation for an automated decision that affects a person
+- **Trust**: nobody acts on a score they cannot interrogate — a clinician least of all
+- **Debugging**: the model that wins by 3 AUC points may have learned that `id > 5000` churns
 
 Accuracy without interpretability is a liability you have not priced yet.
 
@@ -69,9 +76,9 @@ Flexibility and interpretability are traded, not combined. Every model on the ri
 ## Two kinds of question
 
 - **Global**: *what does the model do, overall?* Which variables matter, and how does the prediction move with each?
-- **Local**: *why this prediction, for this customer?* What pushed her score above the threshold?
+- **Local**: *why this prediction, for this customer — or this patient?* What pushed her score above the threshold?
 
-They need different tools, and a good explanation to a board is global; to a customer, local.
+They need different tools. A good explanation to a board or a health authority is global; to a customer, a patient, or the clinician treating her, local.
 
 ## [Section 2]{.section-kicker} Global tools {.section-slide background-color="#002f57"}
 
@@ -116,13 +123,43 @@ FeatureEffect$new(pred, feature = c("monthly_charge", "contract"), method = "pdp
 
 The last line: a two-way partial dependence. If the surface is not additive, the one-way plot was hiding something.
 
+## [Drill 1]{.drill-kicker} What the diabetes score relies on
+
+::: {.subtitle-frame}
+In pairs · 10 minutes · 500 bagged trees on `MASS::Pima.tr`, scored on 332 test women · test AUC 0.828
+:::
+
+| Shuffled | `glu` | `age` | `bmi` | `ped` | `npreg` | `skin` | `bp` |
+|---|---|---|---|---|---|---|---|
+| AUC points lost | 14.6 | 3.8 | 1.9 | 0.9 | 0.1 | −0.2 | −0.4 |
+
+| Glucose at 2 h (mg/dl) | 80 | 100 | 120 | 140 | 160 | 180 | 200 |
+|---|---|---|---|---|---|---|---|
+| Partial dependence | 17% | 20% | 23% | 46% | 52% | 63% | 63% |
+
+[`ped` family-history score · `skin` triceps skin fold · `bp` diastolic pressure · `npreg` pregnancies]{.muted}
+
+1. Skin fold scores nothing, yet it correlates 0.66 with BMI. Is it irrelevant to diabetes?
+2. Where does the glucose curve jump, and what does that tell the diabetologist?
+3. The screening nurse has five minutes per woman. Which measurement leaves the form? One sentence.
+
+## [Drill 1 · answer]{.drill-kicker} Read the model, then the medicine
+
+- **Skin fold** is not irrelevant: it measures much of what BMI measures, and the trees took that information from BMI. Correlated variables share importance — here one took it all. Importance describes *this model, given the others*, not the disease
+- **Glucose** doubles the risk between 120 and 140 mg/dl, from 23% to 46%: 140 at two hours is where guidelines start to call glucose tolerance impaired. The forest found the clinical threshold by itself — a model that agrees with what a diabetologist knows is one she will use
+- **Skin fold and blood pressure** add nothing here (−0.2 and −0.4 are zero with noise). Refitted without them, the forest scores AUC 0.837 on the same test women
+
+::: {.callout-tip title="A sentence that defends it"}
+"Drop the skin fold: the score loses nothing without it, because BMI — ten seconds on a scale — already carries what the caliper measures."
+:::
+
 ## [Section 3]{.section-kicker} Local tools {.section-slide background-color="#002f57"}
 
 ## Explaining one prediction
 
-**LIME**: perturb the inputs around *this* customer, fit a small **linear model** to the model's answers. Its coefficients are the explanation.
+**LIME**: perturb the inputs around *this* patient, fit a small **linear model** to the answers; its coefficients explain.
 
-**Shapley values**: each variable's average marginal contribution over all orderings. They **sum exactly** to this prediction minus the average one — an accounting identity, which is why regulators like them.
+**Shapley values**: each variable's average contribution over all orderings. They **sum exactly** to this prediction minus the average one, which is why regulators like them.
 
 | | LIME | Shapley (SHAP) |
 |---|---|---|
@@ -155,18 +192,59 @@ The Shapley plot reads: *average churn probability 27%; this customer 71%; month
 The failure mode is *explanation theatre*: a SHAP plot next to a model nobody validated, to make an audience stop asking questions. The tools here are for finding out what the model does, not for making it look understood.
 :::
 
+## [Drill 2]{.drill-kicker} One patient, one explanation
+
+::: {.subtitle-frame}
+In pairs · 10 minutes · exact Shapley values, Drill 1's forest, test woman no. 101, aged 23
+:::
+
+Average risk in the training data **34.0%** · her risk **82.2%**
+
+| | `glu` | `bmi` | `ped` | `skin` | `bp` | `npreg` | `age` |
+|---|---|---|---|---|---|---|---|
+| Her value | 179 | 44.1 | 0.686 | 27 | 90 | 0 | 23 |
+| Points of risk | +35.0 | +8.2 | +7.9 | +1.4 | +0.9 | −0.1 | −5.1 |
+
+1. Do the seven contributions account for her score?
+2. Write two lines for her GP, and one sentence for her
+3. She asks: *"If I bring my BMI down to 30, does my risk fall by those 8.2 points?"* Answer in one sentence
+
+## [Drill 2 · answer]{.drill-kicker} An accounting identity, not a promise
+
+- **Yes, exactly**: 34.0 + 35.0 + 8.2 + 7.9 + 1.4 + 0.9 − 0.1 − 5.1 = 82.2. Every point between the average woman and her goes to a variable; glucose alone is 35 of the 48.2
+- **For the GP**: *82% against 34% on average; glucose 179 at two hours adds 35 points, BMI 44 and family history (above 4 women in 5) about 8 each; being 23 takes 5 off*
+- **For her**: *your glucose test is the main reason: about 8 women in 10 with results like yours have diabetes, so the next step is a confirmation test*
+
+::: {.callout-tip title="A sentence that defends it — the BMI question"}
+"Those points describe how the model scored you, not what losing weight would do: that answer comes from clinical trials, and your doctor will give it to you with the confirmation test."
+:::
+
+[The model's own what-if — BMI 30, the rest unchanged — gives 70.5%: a fall of 11.7, not 8.2. And that too is an association, not an effect.]{.muted}
+
 ## [Section 4]{.section-kicker} Deciding {.section-slide background-color="#002f57"}
 
 ## Where to stand, case by case
 
 | Decision | Cost of a wrong prediction | Cost of no explanation | Stand |
 |---|---|---|---|
-| Which customers get the catalogue | low | none | far right: boosting, and move on |
-| Whom to call first for retention | medium | low | forest + importance |
-| Credit limit | high | high — regulated | left, or right with SHAP in every letter |
-| Readmission risk flag on a chart | high | very high — a clinician acts on it | GAM or tree; a network only with PDPs a doctor signed off |
+| Who gets the catalogue | low | none | boosting, and move on |
+| Whom to call for retention | medium | low | forest + importance |
+| Credit limit | high | high, regulated | simple, or SHAP in every letter |
+| Readmission flag on a chart | high | very high: a clinician acts | GAM or tree |
 
-The deciding column is the third, not the second.
+The deciding column is the third. And check the trade-off exists: on the diabetes data a logistic regression beats the forest, AUC 0.866 against 0.828.
+
+## Who pays: accurate on average, unfair to a group
+
+A model can be well calibrated overall and still fail one group of patients. Before it goes live, three checks:
+
+- **By group**: calibration and who gets flagged, by area, sex, age band, country of birth. An average hides the group that pays
+- **The label**: does the model predict what you care about, or a stand-in? *Cost* stands in for *need*, and worse for anyone who uses less care for the same illness
+- **No explanation tool will show it**: importance and Shapley describe what the model does, and the model is doing exactly what it was asked
+
+::: {.callout-note}
+Not hypothetical: Obermeyer and colleagues (*Science*, 2019) found exactly this in a cost-based algorithm used by US health systems to pick patients for extra care.
+:::
 
 ## Saying it to the board
 
@@ -176,6 +254,33 @@ The deciding column is the third, not the second.
 - One sentence on the limit: *the model finds patterns, it does not know causes; the retention offer's effect we will measure with a test*
 
 Everything else is for the appendix, and for you.
+
+## [Drill 3]{.drill-kicker} Who gets the places
+
+::: {.subtitle-frame}
+In pairs · 10 minutes · a simulated district of 20 000 adults · 1 000 care-management places, to the highest predicted cost
+:::
+
+| | City | Inner areas |
+|---|---|---|
+| Share of residents | 74.8% | 25.2% |
+| Chronic conditions per resident (mean) | 0.79 | 0.80 |
+| Places in the programme | 893 | 107 |
+| Chronic conditions, patients given a place (mean) | 3.52 | 4.44 |
+
+1. The model predicts next year's cost within 1% in the city and 5% in the inner areas. Is it fair to inner-area patients?
+2. Why is an inner-area patient given a place sicker than a city one?
+3. What do you change before it goes live? The sentence for the director general.
+
+## [Drill 3 · answer]{.drill-kicker} The label was the bias
+
+- **Not fair**: a quarter of the residents, equally ill (0.80 conditions against 0.79), and 10.7% of the places — 107 of 1 000
+- **To get a place, an inner-area patient needs about one condition more**: 4.44 against 3.52. The model is right about cost: services are far, so they cost less for the same illness. It was asked the wrong question
+- **Change the label**: rank on predicted chronic conditions next year, not cost. The same 1 000 places then split 750 and 250 — three to one, like the residents
+
+::: {.callout-tip title="A sentence that defends it"}
+"We will rank patients on predicted illness, not predicted cost: on cost, inner-area patients needed one more chronic condition to get a place, because distance, not health, kept their bills low."
+:::
 
 ## A model you cannot explain is a decision you cannot defend. Choose how much accuracy that is worth to you.  {.statement}
 
@@ -201,4 +306,5 @@ Everything else is for the appendix, and for you.
 
 - **Molnar**, *Interpretable Machine Learning* — chapters 8 (PDP, ICE, permutation importance) and 9 (LIME, Shapley). Free online, and the reference for everything today
 - **Provost & Fawcett** chapter 12, *Analytical thinking* — the section on model comprehensibility
+- **Obermeyer et al.**, *Dissecting racial bias in an algorithm used to manage the health of populations*, Science 366 (2019) — Drill 3, in real life
 - Reference: the `iml` package vignette

@@ -1,8 +1,13 @@
-# Clips: `animations/scenes.py`
+# Clips: `animations/scenes.py` and `scenes_NN.py`
 
 manim Community scenes on the course navy, formulas in `MathTex`, words in Libre
-Franklin. One file for every lecture; the Makefile groups scenes per lecture
-(`SCENES_11`, `SCENES_12`, …) and `SCENES` concatenates them.
+Franklin. `scenes.py` holds the helpers, lecture 11 and the Module 1 lab; each
+other lecture has its own file, `scenes_12.py`, `scenes_14.py`, `scenes_18a.py`,
+`scenes_18b.py`, `scenes_19.py`, starting with `from scenes import *`. Module-level
+helpers in one lecture's file (a `SLOT`, a `cap()`) cannot collide with another's.
+The Makefile has one group per file (`SCENES_scenes_12 := …`) listed in
+`CLIP_FILES`; a new lecture gets a new file and a new group, and its output lands
+in `videos/scenes_NN/720p30/`.
 
 ## Render
 
@@ -75,7 +80,9 @@ What the first k-means clips got wrong, and Niccolò saw in class:
 ## Reviewing frames
 
 `scripts/contact-sheet.sh <clip.mp4> <out.png> t1 t2 …` extracts frames at the
-given seconds and tiles them two by two. Pick times right after each caption
+given seconds and tiles them two by two. The shell here is zsh, which does not
+split an unquoted `$times` into separate arguments: compute the times inside
+`bash -c '…'`, or pass them literally. Pick times right after each caption
 change and at the end. Look for: two texts overlapping, text at the frame
 edge, an object whose purpose the caption does not explain, numbers that
 disagree with the slide.

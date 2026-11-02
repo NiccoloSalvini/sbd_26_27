@@ -22,10 +22,10 @@ Lecture 14 · Principal components · Mon 16 Nov
 | Time | | Min |
 |---|---|---|
 | 10:00 | Last time · Set 12, the [In class]{.gold} questions | 15' |
-| 10:15 | From a table to distances: chi-square | 45' |
-| 11:00 | Reading the map — and what not to read | 30' |
+| 10:15 | From a table to distances: chi-square | 40' |
+| 10:55 | Reading the map — and what not to read · **Drill 1**, four hospitals | 35' |
 | 11:30 | [**Break**]{.gold} | [15']{.gold} |
-| 11:45 | Lab: from a survey file to the map | 65' |
+| 11:45 | Lab: from a survey file to the map · **Drill 2** | 65' |
 | 12:50 | Set 13 | 10' |
 
 : {tbl-colwidths="[14,76,10]"}
@@ -34,20 +34,25 @@ Lecture 14 · Principal components · Mon 16 Nov
 
 - Take a contingency table and turn it into a **map**
 - Understand what the map shows — and the one thing it does not
-- Build a brand perception map from survey data, and read it aloud
+- Read a perception map aloud: brands as customers see them, hospitals as patients describe them
 - Lab: from a raw survey file to the map, in the second half
 
 ## Why a manager cares
 
 ::: {.subtitle-frame}
-"Where does our brand sit in the customer's head?"
+"Where do we sit in their heads?" — customers', or patients'
 :::
 
-- Ask 1 200 people which attributes they associate with each of six brands: *reliable, cheap, innovative, premium, for young people, …*
-- You get a table: brands in rows, attributes in columns, counts in the cells
-- The question is not *which attribute is most common* — it is **which brands are close to which attributes, and to each other**
+| | You ask | You get |
+|---|---|---|
+| **Brand manager** | 1 200 people: which words go with each brand? *reliable, cheap, innovative, …* | brands × attributes, counts |
+| **Hospital network director** | the patient-experience survey: which words describe your stay? *short wait, kind staff, …* | hospitals × words, counts |
 
-Correspondence analysis draws that table as a picture. It is PCA for counts, and it is the standard tool of brand positioning.
+: {tbl-colwidths="[22,53,25]"}
+
+- The question is not *which word is most common* — it is **who is close to which words, and to whom**
+
+Correspondence analysis draws that table as a picture. It is PCA for counts: the standard tool of brand positioning, and a fast first read of a patient survey.
 
 ## [Section 1]{.section-kicker} From a table to distances {.section-slide background-color="#002f57"}
 
@@ -60,25 +65,24 @@ Correspondence analysis draws that table as a picture. It is PCA for counts, and
 | Brand C | 150 | 60 | 380 | 150 |
 | Brand D | 260 | 30 | 110 | 350 |
 
-Two brands are *similar* if their **row profiles** — the counts divided by the row total — are similar. Not the raw counts: B was mentioned more often than D, and that alone means nothing.
+Two brands are *similar* if their **row profiles** — the counts divided by the row total — are similar. Not the raw counts: B collected 580 mentions and D 750, and that alone means nothing.
 
 A: (.43, .05, .28, .24). D: (.35, .04, .15, .47). Similar on *reliable*, apart on *premium*.
 
 ## The chi-square distance
 
-Between two row profiles $r_i$ and $r_{i'}$:
+Between two row profiles $r_i$ and $r_{i'}$, with $c_j$ the column's overall share:
 
 $$
 d^2(i, i') \;=\; \sum_{j} \frac{(r_{ij} - r_{i'j})^2}{c_j}
 $$
 
-where $c_j$ is the column's overall share.
 
-- Ordinary Euclidean distance between profiles, **weighted by $1/c_j$**: a difference on a *rare* attribute counts more than the same difference on a common one
-- Being associated with *innovative* when few brands are is informative. Being associated with *reliable* when every brand is, is not.
+- Euclidean distance between profiles, **weighted by $1/c_j$**: a difference on a *rare* attribute counts more than on a common one
+- *Innovative* said of one brand informs, *reliable* said of every brand does not; *short wait* said of one hospital tells you more than *kind staff* said of all
 
 ::: {.callout-note}
-Total inertia — the table's whole spread — is $\chi^2 / n$ from the independence test. CA decomposes exactly the departure from independence.
+Total inertia is $\chi^2 / n$ from the independence test: CA decomposes exactly the departure from independence.
 :::
 
 ## Then PCA, on those distances
@@ -133,18 +137,46 @@ fviz_ca_biplot(ca, repel = TRUE)   # the perception map
 
 ## Reading our four brands
 
-- Axis 1 separates **Cheap** (B, alone) from everything else — the value/premium divide. It carries most of the inertia.
-- Axis 2 separates **Innovative** (C) from **Premium** (D) — the two ways of not being cheap
+- Axis 1 separates **Cheap** (B, alone) from everything else — the value/premium divide. It carries 77% of the inertia.
+- Axis 2 (19%) separates **Innovative** (C) from **Premium** (D) — the two ways of not being cheap
 - A sits between C and D and near *Reliable*: solid, differentiated on nothing in particular
 - B owns *cheap* and nothing else — which is a position, and a fragile one
 
 Those four sentences are the analysis. The map exists so a marketing director can check them in ten seconds.
 
+## [Drill 1]{.drill-kicker} Four hospitals, as their patients describe them
+
+::: {.subtitle-frame}
+In pairs · 10 minutes · `CA()` on an invented survey: 4 hospitals × 5 words
+:::
+
+| Hospital | Dim 1 (74.1%) | Dim 2 (25.7%) | Word | Dim 1 | Dim 2 |
+|---|---|---|---|---|---|
+| Centre | −0.46 | 0.10 | Short wait | 0.73 | 0.40 |
+| Coast | 0.64 | 0.30 | Kind staff | 0.22 | −0.02 |
+| North | 0.20 | −0.40 | Clear explanations | 0.20 | −0.42 |
+| South | 0.01 | 0.01 | Expert doctors | −0.40 | 0.06 |
+| | | | Modern equipment | −0.48 | 0.13 |
+
+1. Name the contrast on each axis, in the words' own language
+2. South sits at the origin. What does that tell its director?
+3. Coast's report: "waiting times are short". Does the map support it? Write the sentence it does.
+
+## [Drill 1 · answer]{.drill-kicker} What the map lets a director say
+
+- **Axis 1 (74%)**: *Expert doctors*, *Modern equipment* — Centre, the teaching hospital — against *Short wait* — Coast. Technique against access
+- **Axis 2 (26%)**: *Short wait* (Coast) against *Clear explanations* (North): two different ways patients like a hospital
+- **South at the origin**: its patients describe it like the network's average hospital — no word over-said, none missing. Not good, not bad: *average*, whatever the network's average is
+
+::: {.callout-tip title="A sentence that defends it"}
+"Of our four hospitals, Coast is the one patients most associate with short waits: 31% of its mentions, against 12% across the network. How short the waits are, this survey cannot say."
+:::
+
 ## [Section 3]{.section-kicker} Lab {.section-slide background-color="#002f57"}
 
 ## From a survey file to the map
 
-`brands.csv` on Blackboard: one row per respondent, columns `brand` and `attribute` — each respondent named up to three.
+`brands.csv` on Blackboard: one row per mention — `respondent`, `brand`, `attribute`. 1 200 respondents, each describing one brand with one to three attributes: 2 356 rows.
 
 ```{.r code-line-numbers="1-2|4|6|8-9"}
 library(tidyverse); library(FactoMineR); library(factoextra); library(here)
@@ -158,17 +190,44 @@ ca <- CA(tab, graph = FALSE); round(ca$eig[1:3, 2], 1)
 fviz_ca_biplot(ca, repel = TRUE) + labs(title = "Brand perception, 1 200 respondents")
 ```
 
-Then, in pairs: write the four sentences for *this* map. Swap with the pair next to you. Where do you disagree, and is it the map or the reading?
+Then Drill 2: the four sentences for *this* map.
+
+## [Drill 2]{.drill-kicker} Four sentences for this map
+
+::: {.subtitle-frame}
+In pairs · 10 minutes · your `CA(tab)` on `brands.csv`: 4 brands × 5 attributes, 2 356 mentions
+:::
+
+| Brand | Dim 1 (84.7%) | Dim 2 (13.4%) | Attribute | Dim 1 | Dim 2 |
+|---|---|---|---|---|---|
+| A | −0.26 | −0.04 | Cheap | 0.93 | 0.20 |
+| B | 0.82 | 0.10 | For young people | 0.45 | −0.14 |
+| C | −0.07 | −0.27 | Innovative | −0.19 | −0.29 |
+| D | −0.48 | 0.26 | Premium | −0.52 | 0.19 |
+| | | | Reliable | −0.24 | 0.10 |
+
+1. Write the four sentences for this map: one per axis, one for each of two brands
+2. Swap with the pair next to you. Where you disagree, is it the map or the reading?
+3. *For young people* was not in this morning's table. Where does it land, and what does it add to B?
+
+## [Drill 2 · answer]{.drill-kicker} The same story, one word richer
+
+- **Axis 1 (85%)**: price — *Cheap* and *For young people* against *Premium* and *Reliable*. B alone on the cheap side, D at the premium end
+- **Axis 2 (13%)**: *Innovative* (C) against *Premium* (D) — the two ways of not being cheap, as this morning
+- **A** sits near the centre: the average profile with a little more *Reliable* (32% of its mentions, 25% overall). **C** is as close, but along axis 2: the innovative one (32% against 23%)
+- **B** owns *cheap* (37% against 14%) and *young* (31% against 18%): youth and price travel together — a position, and a fragile one
+
+[Disagreements are usually a brand-to-attribute "distance" read off the map: check the angle, then the profile.]{.muted}
 
 ## A perception map does not tell you where to go. It tells you where you are, and who is standing next to you.  {.statement}
 
 ## Practice: Set 13
 
 ::: {.subtitle-frame}
-[Correspondence analysis](../homework/13-correspondence.html) · about 40 minutes · before Mon 23 Nov
+[Correspondence analysis](../homework/13-correspondence.html) · about 35 minutes · before Mon 23 Nov
 :::
 
-1. **Do it** in your own script, with the seed the set gives you.
+1. **Do it** in your own script — nothing in this set is random, no seed needed.
 2. **Check your numbers on Blackboard**: test *Set 13*. Feedback the moment you submit — as many attempts as you like.
 3. **Bring the sentences.** Questions marked [In class]{.gold} have no number to check: we discuss them on Mon 23 Nov, at the start of lecture 16.
 

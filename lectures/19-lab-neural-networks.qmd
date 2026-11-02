@@ -21,15 +21,31 @@ Lecture 18 · Neural networks · Mon 30 Nov
 
 | Time | | Min |
 |---|---|---|
-| 10:00 | Last time · Set 16, the [In class]{.gold} questions | 15' |
+| 10:00 | Last time · Set 16, the [In class]{.gold} questions · why a manager cares | 15' |
 | 10:15 | We switch to Python: setup | 15' |
-| 10:30 | Fit one properly: three splits, the validation curve | 60' |
-| 11:30 | [**Break**]{.gold} | [15']{.gold} |
-| 11:45 | Refit, touch the test set once · the four rivals | 30' |
-| 12:15 | What you will see · deep learning in one slide | 25' |
-| 12:40 | The rule · deliverable | 20' |
+| 10:30 | Fit one properly: three splits, the validation curve · **Drill 1** | 55' |
+| 11:25 | [**Break**]{.gold} | [15']{.gold} |
+| 11:40 | Refit, touch the test set once · the four rivals | 20' |
+| 12:00 | What you will see · **Drill 2** | 30' |
+| 12:30 | Deep learning, briefly | 10' |
+| 12:40 | The rule · **Drill 3** · deliverable | 20' |
 
 : {tbl-colwidths="[14,76,10]"}
+
+## Why a manager cares
+
+::: {.subtitle-frame}
+Sooner or later someone sells you a neural network
+:::
+
+| | The offer | The question this lab teaches you to ask |
+|---|---|---|
+| **Telecom** | "AI churn prediction", licensed per customer | does it beat a logistic regression on the same held-out customers? |
+| **Health authority** | "AI readmission risk", licensed per bed | does it beat the logistic score the wards already use, on the same patients? |
+
+: {tbl-colwidths="[20,36,44]"}
+
+Today you run that comparison yourself, on 7 000 customers, and see how it ends.
 
 ## Today we switch to Python
 
@@ -47,7 +63,11 @@ Setup: [the Python section of the setup page](../setup.qmd#python). `uv run jupy
 
 ## Three sets, not two
 
-{{< video media/DataSplit.mp4 width="1000" height="562" >}}
+{{< video media/DataSplit.mp4 width="880" height="495" >}}
+
+70 / 15 / 15, about 28.5% churn in each. Then the mistake, measured: the best of 30 coin-flip models scores AUC 0.547 on the test rows, and 0.500 on new customers.
+
+## The test set is touched once
 
 **Training** fits the weights. **Validation** chooses `size` and `decay`. **Test** is touched once, at the end, to report a number you can defend.
 
@@ -55,9 +75,11 @@ Setup: [the Python section of the setup page](../setup.qmd#python). `uv run jupy
 Choose hyperparameters on the test set and your reported accuracy is fiction — you have fitted the test set through the back door, with your own hands instead of gradient descent. This is the single most common mistake in applied machine learning, and it is invisible in the output.
 :::
 
+A hospital that tunes its readmission model on the very patients it then reports on makes the same mistake, and publishes it.
+
 ## Step 1 — the same rows as last week
 
-```{.python code-line-numbers="1-4|6-9|11-14|16-18"}
+```{.python code-line-numbers="1-4|6-9|11-13|14-15"}
 import pandas as pd, numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.compose import ColumnTransformer
@@ -68,27 +90,20 @@ y = (churn.pop("churn") == "yes").to_numpy()
 num = churn.select_dtypes("number").columns
 cat = churn.columns.difference(num)
 
-# 70 / 15 / 15, stratified so every split has the same churn rate
 X_tr, X_tmp, y_tr, y_tmp = train_test_split(churn, y, test_size=0.30,
                                             stratify=y, random_state=1)
 X_val, X_te, y_val, y_te = train_test_split(X_tmp, y_tmp, test_size=0.50,
                                             stratify=y_tmp, random_state=1)
-
 prep = ColumnTransformer([("num", StandardScaler(), num),
                           ("cat", OneHotEncoder(drop="first"), cat)])
 ```
 
-Networks need **both** steps: dummies because they only eat numbers, scaling because a column measured in thousands would dominate the gradient.
+Networks need **both**: dummies (numbers only) and scaling (no column dominates).
 
 ## Why the scaler goes inside the pipeline
 
-::: {.subtitle-frame}
-The mistake that inflates every result, and never announces itself
-:::
-
-- Scale the whole table first, then split, and the training set has seen the mean and standard deviation of the test set. The leak is small, silent, and always in your favour
-- A `Pipeline` fits the scaler on **training rows only**, then applies it to the others. Same for the encoder
-- This is not Python pedantry. The same trap exists in R with `scale()` before `sample()` — you have probably done it
+- Scale the whole table, then split, and training has seen the test set's mean and sd: a silent leak, always in your favour
+- A `Pipeline` fits scaler and encoder on **training rows only**. In R the trap is `scale()` before `sample()`
 
 ```{.python}
 from sklearn.pipeline import Pipeline
@@ -100,11 +115,9 @@ net = Pipeline([("prep", prep),
 net.fit(X_tr, y_tr)          # the scaler learns from X_tr, and only from X_tr
 ```
 
-`hidden_layer_sizes=(5,)` is `size = 5` in `nnet`. `alpha` is `decay` — the same $\lambda$ from ridge, third time this course.
+`hidden_layer_sizes=(5,)` is `size = 5` in `nnet`; `alpha` is `decay`, ridge's $\lambda$ again.
 
-## Step 2 — a grid, and the validation curve
-
-{{< video media/ValidationCurve.mp4 width="1000" height="562" >}}
+## Step 2 — a grid of thirty fits
 
 ```{.python code-line-numbers="1-3|5-12|14"}
 from sklearn.metrics import log_loss
@@ -122,17 +135,9 @@ for s in sizes:
 grid = pd.DataFrame(rows, columns=["size", "alpha", "val_logloss"])
 ```
 
-Thirty fits, about a minute. Plot it before the next slide: one line per `alpha`, `size` on the x-axis.
+Thirty fits, about a minute. Add the training log-loss too, `log_loss(y_tr, m.predict_proba(X_tr)[:, 1])`: Drill 1 needs it.
 
-## Read the plot before I show you mine
-
-::: {.subtitle-frame}
-Three questions to answer from your own figure
-:::
-
-- Where is the minimum? Is it at a small `size` — probably 3 to 10 — or at 50?
-- What does `alpha = 0` do as `size` grows? That rising line is slide 17 of Monday, drawn by your own laptop
-- What does `alpha = 1.0` do everywhere? Why is it flat and mediocre?
+## Plot it before you read it
 
 ```{.python}
 import matplotlib.pyplot as plt
@@ -141,9 +146,43 @@ for a, g in grid.groupby("alpha"):
 plt.xscale("log"); plt.xlabel("hidden neurons"); plt.ylabel("validation log-loss"); plt.legend()
 ```
 
-::: {.callout-note}
-A flat penalised curve is not a failure. It says the signal in this table is nearly linear, so extra capacity has nothing to find. That is the lab's conclusion arriving early.
+One line per `alpha`, `size` on the x-axis. Lower is better: log-loss is the penalty for confident wrong probabilities.
+
+## [Drill 1]{.drill-kicker} Read your validation curve
+
+::: {.subtitle-frame}
+In pairs · 10 minutes · validation log-loss, five sizes · last column on the training rows
 :::
+
+| `size` | α = 0 | α = 0.1 | α = 1 | α = 0, training |
+|---|---|---|---|---|
+| 1 | 0.489 | 0.489 | 0.490 | 0.496 |
+| 5 | 0.487 | 0.487 | 0.486 | 0.486 |
+| 10 | 0.506 | 0.497 | 0.486 | 0.459 |
+| 20 | 0.523 | 0.510 | 0.486 | 0.440 |
+| 50 | 0.610 | 0.539 | 0.486 | 0.331 |
+
+1. What does each column do as the network grows? Where is the minimum?
+2. At 50 neurons and α = 0: 0.331 on the training rows, 0.610 on validation. What is the network doing?
+3. Your `size` and `alpha`, and the sentence that defends them.
+
+## [Drill 1 · answer]{.drill-kicker} The heaviest penalty wins
+
+- **α = 0** is flat up to 5 neurons, then climbs, 0.487 → 0.610; **α = 0.1** climbs less, to 0.539; **α = 1** sits at 0.486 from 5 neurons to 50
+- On its own training rows the α = 0 network keeps improving, 0.496 → 0.331: a gap of 0.279 at 50 neurons is memorisation — Monday's overfitting clip, drawn by your laptop
+- `idxmin` picks 20 neurons, α = 1 (0.4861); 5, 10 and 50 neurons at α = 1 print 0.486 as well. A tie in the fourth decimal is no reason to pay for 20
+
+::: {.callout-tip title="A sentence that defends it"}
+"Five neurons, α = 1: it ties the best at 0.486 with the fewest weights, and the heaviest penalty winning says the signal in this table is nearly linear — extra capacity has nothing to find."
+:::
+
+[Step 3 refits what `idxmin` picked, as written, so everyone's table matches.]{.muted}
+
+## The validation curve, drawn
+
+{{< video media/ValidationCurve.mp4 width="880" height="495" >}}
+
+The lab's grid. No penalty climbs from 0.487 to 0.610 while its training loss falls to 0.331; α = 1 stays flat at 0.486 from 5 neurons to 50, and wins.
 
 ## Step 3 — refit, then touch the test set once
 
@@ -182,6 +221,12 @@ for name, m in models.items():
           f"AUC {roc_auc_score(y_te, p):.3f}  logloss {log_loss(y_te, p):.3f}")
 ```
 
+## Your table
+
+::: {.subtitle-frame}
+Fill it in from your own output, before the next section
+:::
+
 | Model | Accuracy | AUC | Log-loss |
 |---|---|---|---|
 | Logistic | | | |
@@ -190,20 +235,26 @@ for name, m in models.items():
 | Gradient boosting | | | |
 | Neural network | | | |
 
+[Predict the order before you run it. Write the prediction down: it is the honest test of what you believed this morning.]{.muted}
+
 ## [Section 2]{.section-kicker} What you will see {.section-slide background-color="#002f57"}
 
-## The network loses. Here is why.
+## The scoreboard, and why
 
-{{< video media/ModelRace.mp4 width="1000" height="562" >}}
+{{< video media/ModelRace.mp4 width="880" height="495" >}}
 
-On a table of a few thousand customers with twenty columns, the order is almost always: **boosting ≥ forest > network ≈ logistic > tree**.
+Network and logistic tie at AUC 0.790; boosting 0.764, forest 0.753, tree 0.709. The table was made by adding pushes to the log-odds, and logistic reads them back.
 
-- Tabular data has *structure a tree can use*: thresholds, interactions between a few columns. A tree finds `tenure < 6 AND contract = month-to-month` in two splits. A network has to build it out of smooth functions of scaled dummies
-- With 5 000 rows a network cannot learn much a forest does not already know. It **can** learn the noise, which is what your validation set was for
-- Its real advantage — arbitrary smooth nonlinearity — is not the shape of the signal here
+## Why the network ties
+
+On this table: **network ≈ logistic > boosting > forest > tree**, on your laptop too.
+
+- `churn.csv` was **generated by adding pushes** to the log-odds (`gen-data.R`): logistic regression is the right model by construction, and α = 1 squeezed your network into it
+- A depth-4 tree asks four questions; twelve pushes do not fit. Its accuracy, 0.694, is below the 0.714 of answering "stays" to all
+- Real tables have thresholds and interactions: that is where boosting wins, and why it usually leads (lecture 17)
 
 ::: {.callout-note}
-This is not a defect of networks. It is a mismatch between tool and data. The same network on 50 000 images would win by a mile.
+Not a defect of networks: a mismatch between tool and data. On 50 000 images the network would win by a mile.
 :::
 
 ## When the residuals tell you to reach for one
@@ -214,27 +265,65 @@ From Monday: the network with identity activation *is* OLS. So when does the non
 - Option 1: transform the response or the predictor, refit the regression, keep interpretability
 - Option 2: assume the nonlinearity is real and complicated → a network with nonlinear activations
 
-Try option 1 first. It costs a minute and, more often than not, the curve was a log.
+Try option 1 first. It costs a minute and, more often than not, the curve was a log — cost of care, length of stay, anything that cannot go below zero and has a long right tail.
 
-## [Section 3]{.section-kicker} Deep learning, in one slide {.section-slide background-color="#002f57"}
+## [Drill 2]{.drill-kicker} The same race, on patients
+
+::: {.subtitle-frame}
+In pairs · 10 minutes · lecture 17's diabetes data, in R: `glm` and `nnet` fitted on `MASS::Pima.tr` (200 women, scaled), tested on the same 332 of `Pima.te`
+:::
+
+| Model | Training accuracy | Test accuracy | AUC | Log-loss |
+|---|---|---|---|---|
+| Logistic regression | 77.5% | 80.1% | 0.866 | 0.441 |
+| Network, 3 neurons, no decay | 86.5% | 71.1% | 0.754 | 0.750 |
+| Network, 20 neurons, no decay | 100% | 74.1% | 0.724 | 8.06 |
+| Network, 20 neurons, decay = 1 | 77.5% | 79.8% | 0.864 | 0.443 |
+
+1. The 20-neuron network gets all 200 training women right. Good news? Which two numbers in its row say what it learnt?
+2. Log-loss 8.06: what is that network doing with its probabilities, and why would a GP mind?
+3. The district deploys one model. Which one, and the sentence that defends it?
+
+## [Drill 2 · answer]{.drill-kicker} The penalised network became a logistic regression
+
+- **No decay**: 100% on the training women, 74.1% on new ones, AUC 0.724: it memorised 200 women
+- **Log-loss 8.06**: certain and often wrong. 37 diabetic women get a probability below 1%, 46 healthy ones above 99%: a GP told "certainly not" is worse off than with no model
+- **Decay = 1**: 77.5% on training, as logistic, 79.8% on test, AUC 0.864: squeezed into a logistic regression
+
+::: {.callout-tip title="A sentence that defends it"}
+"Logistic regression: the penalised network ties it, 0.864 against 0.866, with 181 weights no GP can read against logistic's 8."
+:::
+
+[`set.seed(7)`, `nnet(type ~ ., size = , decay = , maxit = 2000)` on scaled columns. The best network was the most penalised, as in the lab.]{.muted}
+
+## [Section 3]{.section-kicker} Deep learning, briefly {.section-slide background-color="#002f57"}
 
 ## What "deep" means, and what it costs
 
-{{< video media/DeepScale.mp4 width="1000" height="562" >}}
+{{< video media/DeepScale.mp4 width="880" height="495" >}}
 
-MNIST: 28 × 28 pixel images of handwritten digits, 10 classes. A network 784 → 1024 → 1024 → 2048 → 10 carries **about four million weights** for sixty thousand images.
+784 → 1 024 → 1 024 → 2 048 → 10: 3 969 024 weights, 66 per image. A 224 × 224 chest X-ray needs 51 million in one dense layer; 64 convolution filters, 576.
+
+## Deep, convolutional, recurrent
+
+MNIST: 28 × 28 images of digits. A network 784 → 1024 → 1024 → 2048 → 10 has **about four million weights** for sixty thousand images.
 
 - *Deep* means more than one hidden layer. That is the whole definition
-- Four million weights on sixty thousand images **will** overfit without **dropout** — neurons switched off at random during training, an implicit ensemble — and weight decay
-- **CNNs** for images: convolution is a small filter, reused across the whole picture, so an edge detector is learned once instead of per pixel. **RNNs** for sequences: the same weights at every time step — an autoregressive model with a memory
+- That many weights **will** overfit without **dropout** (neurons switched off at random in training) and weight decay
+- **CNNs** for images: one small filter reused across the picture. **RNNs** for sequences: the same weights at every step
+- **In a hospital**: radiology, retinal screening, pathology slides, all images
 
 ::: {.callout-important title="Attention"}
-None of this applies to a customer table. They win on *spatial or sequential* data — images, text, audio, sensors. On rows and columns, use last week's tools.
+None of this helps a customer or discharge table. Deep networks win on images, text, audio, sensors; on rows and columns, use last week's tools.
 :::
 
 ## The one connection worth keeping
 
-{{< video media/AutoencoderPCA.mp4 width="1000" height="562" >}}
+{{< video media/AutoencoderPCA.mp4 width="880" height="495" >}}
+
+Sixty patients' blood pressure. A 2 → 1 → 2 linear network, from a bad start, turns onto PCA's first component (24.4°); its error, 30.3, is the variance PCA drops.
+
+## An autoencoder is a PCA that can bend
 
 An **autoencoder** is a network trained to reproduce its own input through a narrow hidden layer: $p$ inputs → $q < p$ neurons → $p$ outputs, loss = reconstruction error.
 
@@ -249,12 +338,41 @@ Lecture 14's last slide, closed. Unsupervised learning and neural networks are t
 
 | Your data are… | Start with | Consider a network when… |
 |---|---|---|
-| A table, < 100k rows | logistic → forest → boosting | never, unless residuals curve and transformations fail |
+| A table, < 100k rows: customers, discharge records | logistic → forest → boosting | never, unless residuals curve and transformations fail |
 | A table, millions of rows, hundreds of columns | boosting | a well-tuned MLP is competitive; test it |
-| Images, audio, free text, long sequences | a pretrained deep network | always — nothing else works |
+| Images, audio, free text, long sequences: scans, clinical notes | a pretrained deep network | always — nothing else works |
 | Anything where you must **explain** the decision | tree, logistic, GAM | only with lecture 20's tools, and a lawyer |
 
 The honest version of every AI vendor pitch you will ever hear fits in this table.
+
+## [Drill 3]{.drill-kicker} Four requests on a health authority's desk
+
+::: {.subtitle-frame}
+In pairs · 10 minutes · invented requests, real kinds of project
+:::
+
+| | The request | The data |
+|---|---|---|
+| A | Readmission risk within 30 days | 8 000 discharge records, 25 columns |
+| B | Retinopathy screening in diabetics | 120 000 graded retinal photos |
+| C | Possible sepsis at triage | 200 000 free-text nurse notes |
+| D | Ranking home-care applicants | 3 000 assessments; refusals can be appealed |
+
+: {tbl-colwidths="[6,44,50]"}
+
+1. For each request, where do you start? (the table on the previous slide)
+2. A vendor offers "deep learning" for A. What must they show you before you sign? One sentence.
+
+## [Drill 3 · answer]{.drill-kicker} Two for the network, two against
+
+- **A** · a table under 100k rows: logistic → forest → boosting. A network only if the residuals curve and a transformation fails
+- **B** · images: a pretrained convolutional network — the X-ray arithmetic of the clip. Nothing on rows and columns reads a retina
+- **C** · free text: a pretrained language model, for the same reason
+- **D** · every refusal must be explained to an appeal panel: a tree or a logistic score. A network only with lecture 20's tools, and a lawyer
+
+::: {.callout-tip title="A sentence that defends it"}
+"Show me its AUC against a logistic regression on the same held-out patients; if it only ties, the tie goes to the model the wards can read."
+:::
 
 ## Deliverable
 
@@ -262,7 +380,7 @@ Ungraded, but bring it Wednesday:
 
 - The five-model table, filled, on the test rows
 - Your validation figure, with the chosen `size` and `alpha` marked
-- One paragraph: *which model would you deploy for this company, and what would you tell the CFO about the one you did not choose?*
+- One paragraph: *which model would you deploy for this company, and what would you tell the CFO about the one you did not choose?* Then one sentence: would your answer change if the rows were patients and the label a readmission?
 
 ## The question is never "can a neural network do this?" It can. The question is whether anything simpler could — and it usually can.  {.statement}
 

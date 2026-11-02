@@ -22,11 +22,11 @@ Lecture 13 · Lab: clustering end to end · Fri 13 Nov
 | Time | | Min |
 |---|---|---|
 | 17:00 | Last time · questions | 10' |
-| 17:10 | The idea: a component is a direction, by hand | 50' |
+| 17:10 | The idea: a component is a direction, by hand | 35' |
+| 17:45 | Scale, again · **Drill 1** | 15' |
 | 18:00 | [**Break**]{.gold} | [10']{.gold} |
-| 18:10 | How many components, and what they mean | 30' |
-| 18:40 | Compression as a model | 10' |
-| 18:50 | Set 12 | 10' |
+| 18:10 | How many components, and what they mean · **Drill 2** | 40' |
+| 18:50 | Compression as a model · Set 12 | 10' |
 
 : {tbl-colwidths="[14,76,10]"}
 
@@ -43,9 +43,14 @@ Lecture 13 · Lab: clustering end to end · Fri 13 Nov
 Twenty questions, three answers
 :::
 
-- A customer satisfaction survey has 24 items. The board wants to know *what drives satisfaction*. Not 24 things — two or three.
-- A hospital collects 30 quality indicators per ward. They move together in ways nobody can see in a spreadsheet.
-- Before a churn model, 80 behavioural columns — many of them near-copies of each other
+| | Too many columns | The question | A few components |
+|---|---|---|---|
+| **Retailer** | 24 items in a satisfaction survey | what drives satisfaction? | two or three drivers |
+| **Regional health service** | 30 quality indicators per hospital | which hospitals do well, and at what? | outcomes, efficiency |
+
+: {tbl-colwidths="[22,30,26,22]"}
+
+- A patient-experience survey asks about courtesy, clarity and waiting a dozen ways: it measures far fewer things than it has questions
 
 In each case the data are **wide** and **redundant**. PCA finds the few directions along which they actually vary, and throws away the rest.
 
@@ -63,17 +68,17 @@ Picture the data as a cloud of $n$ points in $p$ dimensions.
 - The **second** is the line at right angles to the first with the most remaining spread
 - And so on, $p$ times — but the spread runs out fast
 
-Each point's **score** is its coordinate along that line. Each variable's **loading** is how much it contributes to the direction.
+A point's **score** is its coordinate on that line; a variable's **loading**, how much it shapes the line.
 
 ::: {.callout-note}
-Nothing is dropped, yet. PCA is a *rotation*. Compression happens when you keep the first few components and discard the others — and you decide how many.
+Nothing is dropped yet: PCA is a *rotation*. Compression comes when you keep the first few components, and you decide how many.
 :::
 
 ## The direction, found by looking for it
 
-{{< video media/Rotation.mp4 width="1000" height="562" >}}
+{{< video media/Rotation.mp4 width="880" height="495" >}}
 
-A line turns through the cloud while the variance of the projection is measured at every angle. It stops where that number is largest. The first component is not a metaphor about spread — it is the argument of a maximum, and this is that maximum being found.
+Sixty wards, scored by patients on courtesy and clarity. The line turns and the variance of the projection is traced: its peak, at 32°, is PC1, with 89% of the spread.
 
 ## The same thing, in one line
 
@@ -91,19 +96,21 @@ Everything you will read off a PCA is one of: a loading vector $\phi_k$, a score
 
 ## By hand: two variables, perfectly correlated
 
-Height and arm span, standardised, for four people: $(-1.5,-1.5), (-0.5,-0.5), (0.5,0.5), (1.5,1.5)$.
+Height and arm span of four patients, in tens of cm from the mean: $(-1.5,-1.5), (-0.5,-0.5), (0.5,0.5), (1.5,1.5)$. Each column has variance $1.25$: $2.5$ in total.
 
-- The cloud is a line at 45°. The first component is that line: $\phi_1 = (0.71, 0.71)$
-- Scores along it: $-2.1, -0.7, 0.7, 2.1$. Variance $= 2.5$
-- The second component is perpendicular: $\phi_2 = (0.71, -0.71)$. Every score is $0$. Variance $= 0$.
+- The cloud is a line at 45°. The first component is that line: $\phi_1 = (0.707, 0.707)$
+- Scores along it: $-2.12, -0.71, 0.71, 2.12$. Variance $= 2.5$: all of it
+- The second component is perpendicular: $\phi_2 = (0.707, -0.707)$. Every score is $0$. Variance $= 0$.
 
-**Two variables, one component, 100% of the variance.** You had two columns and one piece of information. That is the whole method, in the simplest case it can be seen in.
+**Two variables, one component, 100% of the variance.** Two columns, one piece of information: which is why arm span can stand in for height when a patient cannot stand.
+
+[Variances divide by $n$, as in $X^\top X / n$. `prcomp` divides by $n - 1$ and prints $3.33$ and $0$: same shares.]{.muted}
 
 ## By hand, watched
 
-{{< video media/PCAByHand.mp4 width="1000" height="562" >}}
+{{< video media/PCAByHand.mp4 width="880" height="495" >}}
 
-Four people, every score computed, and a second component whose variance is exactly zero. When two columns say the same thing, PCA says so with a number.
+The four patients, every score written out: variance $1.25 + 1.25$ goes in, $2.5 + 0$ comes out. When two columns say the same thing, PCA says so with a number.
 
 ## Scale, again
 
@@ -114,6 +121,36 @@ PCA is a variance-hunter. A variable measured in thousands *is* the first compon
 
 ::: {.callout-important title="Attention"}
 Same trap as clustering, same fix, same reason. Distance and variance are both blind to units.
+:::
+
+## [Drill 1]{.drill-kicker} One score per hospital
+
+::: {.subtitle-frame}
+In pairs · 10 minutes · 120 invented hospitals · PC1 loadings, without and with `scale. = TRUE`
+:::
+
+| Indicator | PC1 raw · 99.99% | PC1 scaled · 47.5% |
+|---|---|---|
+| Cost per case (€) | −1.00 | −0.23 |
+| Length of stay (days) | 0.00 | 0.03 |
+| 30-day mortality (%) | 0.00 | 0.56 |
+| 30-day readmissions (%) | 0.00 | 0.58 |
+| Patient experience (0–100) | 0.00 | −0.55 |
+
+: {tbl-colwidths="[44,28,28]"}
+
+1. Raw, PC1 explains 99.99% of the variance. What is it, and why?
+2. Scaled, which indicators carry PC1? What does a **high** score say about a hospital?
+3. The region publishes one PC1 score per hospital. Which version? Defend it in **one sentence**.
+
+## [Drill 1 · answer]{.drill-kicker} Euros are not more important, only bigger
+
+- **Raw**: PC1 *is* the cost per case (−1.00, every other loading 0.00). Its variance is 422 278 euro², the next is patient experience at 38: the 99.99% measures a unit, not the hospitals
+- **Scaled**: mortality (0.56), readmissions (0.58) and patient experience (−0.55) carry it. A high score is a hospital with **worse outcomes**: R chose the sign, so read it before ranking anyone
+- Cost and length of stay move to PC2 (0.67, 0.72): efficiency is a second, separate story
+
+::: {.callout-tip title="A sentence that defends it"}
+"The scaled one: unscaled, the 'performance score' is the cost per case under another name, because euros are bigger numbers than percentages; scaled, it measures outcomes, which is what we publish."
 :::
 
 ## [Section 2]{.section-kicker} How many, and what do they mean {.section-slide background-color="#002f57"}
@@ -128,21 +165,21 @@ They disagree often. When they do, prefer the smaller number you can **interpret
 
 ## Three rules, three answers
 
-{{< video media/ScreeChoice.mp4 width="1000" height="562" >}}
+{{< video media/ScreeChoice.mp4 width="880" height="495" >}}
 
-The same scree plot under the three rules you were just given. They disagree, and no amount of staring resolves it. The choice is yours to make and yours to defend — which is why the exercise asks for the sentence, not the number.
+168 patients with lung cancer (`survival::lung`, six measures, standardised): the elbow keeps one component, Kaiser two, 80% four. The choice is yours to defend.
 
 ## Naming a component
 
-Read its loadings. Large positive and large negative loadings tell you what the direction *contrasts*.
+Read its loadings: large positive and large negative ones tell you what the direction *contrasts*. Here, a private clinic's patient survey (invented, 400 patients).
 
 | Item | PC1 | PC2 |
 |---|---|---|
-| Staff courtesy | **0.48** | 0.05 |
-| Waiting time | **0.45** | −0.10 |
-| Clarity of explanations | **0.47** | 0.02 |
-| Price fairness | 0.08 | **0.71** |
-| Value for money | 0.11 | **0.68** |
+| Staff courtesy | **0.58** | −0.05 |
+| Waiting time | **0.56** | −0.04 |
+| Clarity of explanations | **0.58** | −0.06 |
+| Price fairness | 0.07 | **0.70** |
+| Value for money | 0.06 | **0.70** |
 
 PC1: *service experience*. PC2: *price perception*. Two drivers, from five items — and now a regression of satisfaction on **two** scores instead of five collinear columns.
 
@@ -164,7 +201,7 @@ fviz_pca_biplot(pca, repel = TRUE)              # both at once — the plot to s
 ```
 
 ::: {.callout-note}
-On `USArrests`, PC1 loads on all three violent-crime rates: *overall crime*. PC2 is urban population alone: *urbanisation*. Two components, 87% of the variance, and both have a name.
+On `USArrests`, PC1 is the three crime rates, *overall crime*; PC2 is *urbanisation*. Two components, 87% of the variance, both named.
 :::
 
 ## The biplot, read properly
@@ -176,6 +213,35 @@ On `USArrests`, PC1 loads on all three violent-crime rates: *overall crime*. PC2
 - A point far out along an arrow scores high on that variable
 
 It is the single most information-dense plot in this course. Spend the lab learning to read one.
+
+## [Drill 2]{.drill-kicker} How fit is the patient?
+
+::: {.subtitle-frame}
+In pairs · 10 minutes · the clip's 168 patients, `survival::lung` · loadings from `prcomp(scale. = TRUE)`
+:::
+
+| | Age | ECOG, doctor | Karnofsky, doctor | Karnofsky, patient | Calories at meals | Weight lost |
+|---|---|---|---|---|---|---|
+| **PC1** · $\lambda = 2.56$ | −0.33 | −0.55 | 0.55 | 0.47 | 0.18 | −0.19 |
+| **PC2** · $\lambda = 1.08$ | −0.36 | 0.23 | −0.29 | −0.05 | 0.81 | −0.26 |
+
+: {tbl-colwidths="[22,10,13,14,14,14,13]"}
+
+[ECOG: 0 no symptoms … 4 bedbound. Karnofsky: 100 no complaints, lower is worse.]{.muted}
+
+1. Which measures carry PC1, with which sign? What does a **high** PC1 score say about a patient?
+2. Kaiser keeps PC2. What is it, read from its loadings?
+3. One component or two? The **one sentence** for the oncology unit's manager.
+
+## [Drill 2 · answer]{.drill-kicker} One component, and it has a name
+
+- **PC1** (43% of the variance): Karnofsky by the doctor (0.55) and by the patient (0.47), ECOG against them (−0.55). A high score is a **fitter patient**: *functional status*
+- **PC2** (18%): calories at meals (0.81) and little else. One measure is not a driver; Kaiser keeps it only because 1.08 clears 1 by 0.08
+- **Keep one**: the elbow's answer, and the only component with a name
+
+::: {.callout-tip title="A sentence that defends it"}
+"One: it is where the scree flattens, and it is the only component we can name, how fit the patient is, read from the doctor's scores and the patient's own; the second is the calories column, so if it matters we use the column."
+:::
 
 ## [Section 3]{.section-kicker} Compression as a model {.section-slide background-color="#002f57"}
 
@@ -199,6 +265,7 @@ Hold this thought for week 5. A neural network that learns to compress its input
 ## Before the lab
 
 - `prcomp` on `USArrests`, with and without `scale. = TRUE`. Compare the first loading vector. Which state moved most?
+- Rerun Drill 2: `prcomp` on the six columns of `survival::lung` after `na.omit()`. Do you get 42.6% for PC1? Are your signs the slide's?
 - On `customers.csv` from Friday: PCA on the six behavioural columns. How many components for 80%? Name PC1 and PC2 from the loadings.
 - Then: `kmeans` on the first two scores instead of all six columns. Same segments?
 

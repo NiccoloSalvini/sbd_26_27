@@ -394,7 +394,7 @@ slide need `!important`. Do not "simplify" any of those away.
 **Git on this repo: add files by path.** `git add -A` scans `_site/` and
 `setup_files/` on iCloud and hangs for minutes. `git add index.qmd` is instant.
 
-**Clips: `animations/scenes.py`.** manim scenes on the course navy, formulas in
+**Clips: `animations/scenes.py` and `animations/scenes_NN.py`.** manim scenes on the course navy, formulas in
 `MathTex`, words in Libre Franklin via `manimpango.register_font`. `make clips-preview`
 (`-ql`) to check frames, `make clips` (`-qm`, then an ffmpeg `+faststart` remux into
 `lectures/media/`) for the deck; embed with `{{< video media/Name.mp4 width="880" height="495" >}}`:
@@ -421,8 +421,12 @@ to nothing ("start:three", "whichisw"). `make clips-preview` then
 `ffprobe` the result is how you check a duration — read the number, do not guess
 from the code.
 
-The Makefile groups scenes per lecture (`SCENES_11`, `SCENES_18`, `SCENES_19`)
-and `SCENES` concatenates them; add a lecture's group when its clips exist. The AND-gate scenes do their
+`scenes.py` holds the helpers (`Stage`, `caption`, `label`, palette), lecture 11
+and the Module 1 lab; lectures 12, 14, 18 and 19 have a file each
+(`scenes_12.py`, `scenes_14.py`, `scenes_18a.py`, `scenes_18b.py`, `scenes_19.py`)
+that starts `from scenes import *`, so two lectures' helpers never collide. The
+Makefile has one group per file (`SCENES_scenes_12 := …`, listed in `CLIP_FILES`);
+a new lecture's clips get a new file and a new group. The AND-gate scenes do their
 arithmetic in integer hundredths so the LaTeX never shows `0.30000000000000004`.
 Two traps: `manim.cfg` is read by configparser, which keeps an inline `# comment` as
 part of the value (a `#` in `media_dir` makes latex fail "without a log file"); and

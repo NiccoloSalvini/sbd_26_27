@@ -21,14 +21,14 @@ Lecture 12 · Hierarchical clustering · Mon 9 Nov
 
 | Time | | Min |
 |---|---|---|
-| 09:00 | Last time · Sets 10–11, the [In class]{.gold} questions | 20' |
-| 09:20 | Step 1 · load and look | 25' |
-| 09:45 | Step 2 · prepare: transform, then scale | 20' |
-| 10:05 | Step 3 · explore with a tree on a sample | 25' |
+| 09:00 | Last time · Sets 10–11, the [In class]{.gold} questions | 15' |
+| 09:15 | Step 1 · load and look · **Drill 1** | 30' |
+| 09:45 | Step 2 · prepare: transform, then scale · **Drill 2**, on patients | 25' |
+| 10:10 | Step 3 · explore with a tree on a sample | 20' |
 | 10:30 | [**Break**]{.gold} | [15']{.gold} |
-| 10:45 | Step 4 · decide $k$, deploy with k-means | 35' |
-| 11:20 | Step 5 · profile, name, hand over | 30' |
-| 11:50 | The deliverable | 10' |
+| 10:45 | Step 4 · decide $k$, deploy with k-means · **Drill 3** | 35' |
+| 11:20 | Step 5 · profile and name · **Drill 4**, the deliverable | 30' |
+| 11:50 | Hand in · what Monday opens with | 10' |
 
 : {tbl-colwidths="[14,76,10]"}
 
@@ -69,18 +69,34 @@ cust |> select(-id) |> pivot_longer(everything()) |>
   ggplot(aes(value)) + geom_histogram(bins = 40) + facet_wrap(~name, scales = "free")
 ```
 
-Before any model: what does `monetary` look like? Almost certainly skewed — a few customers spend a hundred times the median. k-means will build a cluster around them alone.
+Before any model: what does `monetary` look like? Spending is almost always skewed — a few customers spend many times the median, and k-means will build a cluster around them alone.
 
-## What to write down before step 2
+## [Drill 1]{.drill-kicker} What `summary()` is telling you
 
-Answer on paper, one line each:
+::: {.subtitle-frame}
+In pairs · 10 minutes · `summary(cust)` and `sapply(cust[-1], sd)`, five of the six columns
+:::
 
-- Which columns are **behaviour** and which are **identity**? (`id` leaves now)
-- Which variable would dominate an unscaled distance? Why?
-- Are there rows that are not customers — test accounts, staff, `monetary = 0` with `frequency = 12`?
+| Column | Min | Median | Mean | Max | SD |
+|---|---|---|---|---|---|
+| `recency` | 0 | 35 | 67.2 | 391 | 80.5 |
+| `frequency` | 1 | 9 | 8.68 | 27 | 5.28 |
+| `monetary` | 41 | 568 | 797 | 9 214 | 812 |
+| `tenure` | 1 | 42 | 40.8 | 125 | 25.4 |
+| `channel_online` | 0 | 0.35 | 0.41 | 1 | 0.32 |
 
-::: {.callout-important title="Attention"}
-Ten minutes here save an afternoon of explaining a segment that is "the three people who bought a car".
+1. Which column would own an unscaled distance? Which number in the table says so?
+2. Is `monetary` skewed? Name the two numbers that say it.
+3. Any rows that are not customers — test accounts, `monetary = 0` with `frequency = 12`? Then decide what `monetary` needs before k-means, in one sentence.
+
+## [Drill 1 · answer]{.drill-kicker} Log it, then scale everything
+
+- **`monetary` owns the distance**: SD 812, against 80.5 for `recency` and 0.32 for `channel_online` — 99% of the total variance. Unscaled, k-means cuts spending bands and ignores the rest
+- **Skewed**: mean 797 against a median of 568; the top customer spends 9 214, 16 times the median. The top 10% of customers hold 34% of all spending
+- **Not customers**: none here — no `NA`, nobody under €41 or one purchase. Checked, not assumed
+
+::: {.callout-tip title="A sentence that defends it"}
+"`monetary` goes in logged, and every column goes in scaled: raw, it is 99% of the distance, and its tail would get a cluster of its own — the three people who bought a car."
 :::
 
 ## [Section 2]{.section-kicker} Prepare {.section-slide background-color="#002f57"}
@@ -99,8 +115,36 @@ attr(X, "scaled:center")                      # keep these: you need them to pro
 colMeans(X) |> round(3)                       # all zero. Good.
 ```
 
-- `log1p` because `log(0)` is not a number and some customers spent nothing
+- `log1p`, not `log`: these two columns have no zeros, but most real tables do, and `log(0)` is `-Inf`
 - `scale()` because distance in euros² + distance in days² is not a distance
+
+## [Drill 2]{.drill-kicker} Step 2 on a patient table
+
+::: {.subtitle-frame}
+In pairs · 10 minutes · an invented registry extract: 5 000 adult patients, one year
+:::
+
+| Column | Min | Median | Mean | Max | SD |
+|---|---|---|---|---|---|
+| `gp_code` | 1001 | 1022 | 1021.6 | 1042 | 12.1 |
+| `age` | 19 | 53 | 54.1 | 96 | 17.2 |
+| `gp_visits` | 0 | 2 | 2.73 | 19 | 2.82 |
+| `ed_visits` | 0 | 0 | 0.48 | 17 | 1.12 |
+| `cost` (€) | 0 | 430 | 1 100 | 27 150 | 2 352 |
+
+1. One column must leave before any distance, and R will not warn you. Which, and why?
+2. Which columns get `log1p`, and why not `log` on this table?
+3. Age: in the distance, or only in the profile afterwards? Defend it in one sentence.
+
+## [Drill 2 · answer]{.drill-kicker} Prepare for the question you will ask
+
+- **`gp_code` leaves**: a label stored as a number. Scaled, it would weigh as much as `age`, and GP 1001's patients would be "far" from GP 1042's. It is `id` again, in disguise
+- **`log1p` on `cost` and `ed_visits`**: the top cost is 63 times the median, 17 ED visits against a median of 0. And zeros: 74% never went to the emergency department, 17% cost nothing, so `log` would return `-Inf`. `gp_visits` is borderline, either way defensible
+- **Unscaled**, `cost` is 99.99% of the variance: the "segments" would be cost bands
+
+::: {.callout-tip title="A sentence that defends it"}
+"Age goes in the profile, not the distance: we want groups that use care differently, and age then says who they are — so a group of young, frequent ED users can show up at all."
+:::
 
 ## [Section 3]{.section-kicker} Explore {.section-slide background-color="#002f57"}
 
@@ -143,6 +187,33 @@ table(km$cluster, km2$cluster)               # same groups, different seed?
 
 If the table is not close to a permutation matrix, the structure is not stable at this $k$. Try $k - 1$.
 
+## [Drill 3]{.drill-kicker} Four or five?
+
+::: {.subtitle-frame}
+In pairs · 10 minutes · `kmeans(X, k, nstart = 50)` on all 6 000 rows, seed 26, and again with seed 27
+:::
+
+| $k$ | 2 | 3 | 4 | 5 | 6 | 7 |
+|---|---|---|---|---|---|---|
+| $W$ | 23 697 | 15 822 | 10 729 | 9 270 | 8 257 | 7 751 |
+| Silhouette | 0.36 | 0.42 | 0.48 | 0.47 | 0.37 | 0.34 |
+| Smallest segment | 40% | 19% | 18% | 6% | 6% | 6% |
+| Rows moved, seed 26 vs 27 | 0 | 0 | 0 | 0 | 0 | 712 |
+
+1. What do the elbow and the silhouette say?
+2. $k = 5$ is almost as good and just as stable. What does the *smallest segment* row add?
+3. Which $k$ do you deploy? Write the sentence for the marketing director.
+
+## [Drill 3 · answer]{.drill-kicker} Four, and why not five
+
+- **Elbow**: $W$ falls by 12 297, 7 875, 5 093, then only 1 458 — it stops bending after $k = 4$
+- **Silhouette**: best at 4 (0.48), with 5 close behind (0.47). Stability does not decide here: nothing moves between seeds up to $k = 6$; at 7, 712 rows do
+- **The fifth group** is 350 customers split off segment 1 on returns alone — 3 items a year against 1. A returns policy, not a segment
+
+::: {.callout-tip title="A sentence that defends it"}
+"Four: the gain in $W$ collapses after four, the silhouette peaks there, and a fifth group would be a 6% sliver of one segment, split on returns alone."
+:::
+
 ## [Section 5]{.section-kicker} Profile and hand over {.section-slide background-color="#002f57"}
 
 ## Step 5 — back to the units people understand
@@ -162,26 +233,44 @@ fviz_cluster(km, data = X, geom = "point", ellipse.type = "norm")
 
 Medians, not means — you logged `monetary` for a reason, and the mean is back under the tail's control.
 
-## The deliverable
+## [Drill 4]{.drill-kicker} Name them, then spend the budget
 
-One table, four rows, in the language of the person who will use it:
+::: {.subtitle-frame}
+In pairs · 10 minutes · your `profile` at seed 26: five of the six medians, and each segment's share of all spending
+:::
+
+| Segment | Recency (days) | Purchases | Spend (€) | Tenure (months) | Online | Customers | Of all spend |
+|---|---|---|---|---|---|---|---|
+| 1 | 25 | 14 | 269 | 30 | 0.92 | 22% | 8% |
+| 2 | 30 | 11 | 736 | 60 | 0.10 | 41% | 41% |
+| 3 | 222.5 | 3 | 1 648 | 48 | 0.36 | 19% | 46% |
+| 4 | 39 | 3 | 187 | 4 | 0.54 | 18% | 5% |
+
+1. A **name** for each segment, from the numbers: every adjective must point at a column
+2. The win-back budget goes to one segment. Which, and which number makes the case?
+3. Segment 4 spends least. Do you drop it from the plan? One sentence.
+
+## [Drill 4 · answer]{.drill-kicker} The deliverable
 
 | Segment | Name | Who they are | What to do |
 |---|---|---|---|
-| 1 | *Lapsed high-value* | high monetary, recency > 180 d | win-back, personal, now |
-| 2 | *Online regulars* | frequent, small, 90% online | app push, bundle offers |
-| 3 | *New and undecided* | tenure < 6 mo, moderate | onboarding journey; watch churn |
-| 4 | *Store loyalists* | frequent, in-store, long tenure | protect, do not discount |
+| 1 | *Online regulars* | 14 buys a year, 92% online, €269 | app push, bundles |
+| 2 | *Store loyalists* | 11 buys, 10% online, 5 years | protect, no discounts |
+| 3 | *Lapsed high-value* | €1 648, silent for 222 days | win-back, personal, now |
+| 4 | *New and undecided* | 4 months in, 3 buys, €187 | onboarding; watch churn |
 
-::: {.callout-note}
-Names from the numbers, not from imagination. Every adjective in the table must point at a column in `profile`.
-:::
+: {tbl-colwidths="[12,26,36,26]"}
+
+- **Win-back goes to 3**: 19% of the customers, **46% of last year's spending**
+- **4 stays in the plan**: it spends least because it is four months old; lecture 17's churn model says who stays
 
 ## A segmentation is finished when someone else can act on it without you in the room.  {.statement}
 
+[A marketing director on Monday, or a care manager deciding who gets a case manager first.]{.muted}
+
 ## Hand in — optional, ungraded
 
-Push to the `homework/` set for this week, or just keep it:
+Bring it to Monday's lecture, or just keep it:
 
 - your `profile` table
 - your $k$, and the two sentences that justify it

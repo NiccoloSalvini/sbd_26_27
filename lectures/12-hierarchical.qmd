@@ -22,9 +22,10 @@ Lecture 11 · k-means · Tue 3 Nov
 | Time | | Min |
 |---|---|---|
 | 17:00 | Last time · questions | 10' |
-| 17:10 | Growing the tree: linkage, chaining, by hand | 50' |
-| 18:00 | [**Break**]{.gold} | [10']{.gold} |
-| 18:10 | Reading a dendrogram · choosing and using | 40' |
+| 17:10 | Growing the tree: linkage, chaining, by hand | 40' |
+| 17:50 | [**Break**]{.gold} | [10']{.gold} |
+| 18:00 | Reading a dendrogram · **Drill 1** | 25' |
+| 18:25 | Choosing and using: case-mix groups · **Drill 2** | 25' |
 | 18:50 | Set 11 | 10' |
 
 : {tbl-colwidths="[14,76,10]"}
@@ -42,9 +43,14 @@ Lecture 11 · k-means · Tue 3 Nov
 Sometimes the number of groups is the question, not the input
 :::
 
-- A hospital director asks: *how many kinds of patient do we actually treat?* — k-means demands the answer before it starts
-- A payer groups hospitals into peer sets for benchmarking: *which are comparable?* — and needs to see the structure at several levels, not one
-- Brand managers want a tree of products, not a flat list of four segments
+| | The question | What the tree gives |
+|---|---|---|
+| **Brand manager** | which of our products compete with which? | a tree of the range: lines, families, the whole catalogue |
+| **Regional health authority** | which hospitals are comparable, for benchmarking? | peer groups at every level: two kinds, four, twelve |
+
+: {tbl-colwidths="[24,38,38]"}
+
+- A hospital director asks *how many kinds of patient do we actually treat?* — k-means demands the answer before it starts
 
 Hierarchical clustering gives you **all the partitions at once**, from $n$ groups down to one, and lets you choose after looking.
 
@@ -67,9 +73,9 @@ Step 2 hides the whole subject. "Closest" between two *points* is obvious. "Clos
 
 ## Watch the tree get built
 
-{{< video media/Dendrogram.mp4 width="1000" height="562" >}}
+{{< video media/Dendrogram.mp4 width="880" height="495" >}}
 
-The five patients of the next slide, merged one pair at a time. Each merge is drawn at the distance that produced it — and the same tree, cut twice, answers two different questions.
+The five patients of the by-hand slide: merge the smallest distance, update the table, repeat. Heights 1, 1, 4, 9; cut at 5 gives two groups, at 2 three.
 
 ## Linkage: the distance between two groups
 
@@ -84,9 +90,9 @@ Same data, four linkages, four different trees. **Ward** and **complete** are th
 
 ## Chaining, so you recognise it
 
-{{< video media/LinkageFour.mp4 width="1000" height="562" >}}
+{{< video media/LinkageFour.mp4 width="880" height="495" >}}
 
-Two clear groups and seven noisy points between them. Single linkage walks across the bridge one nearest-pair at a time and returns **one** cluster. Nothing in the output says this happened.
+16 small hospitals, 16 large, 9 in between. Single linkage chains across them: **40 + 1** at $k = 2$, small and large apart only at $k = 8$. Complete, average, Ward: apart at $k = 2$.
 
 ## By hand: five patients, one variable
 
@@ -116,9 +122,35 @@ The most common misreading is the third bullet. Students — and consultants —
 
 ## The misreading, and the proof
 
-{{< video media/DendrogramRead.mp4 width="1000" height="562" >}}
+{{< video media/DendrogramRead.mp4 width="880" height="495" >}}
 
-Two leaves drawn side by side, joining only at the top of the tree. Then the same tree with a subtree flipped: the neighbours change, the tree does not. Any dendrogram can be redrawn this way, which is why horizontal position can carry no information.
+C and D sit side by side, yet C is nearer B (12.2) than D (18.0) and they join only at 44.9. Two flips move the neighbours, not a height. Cut in the long gap.
+
+## [Drill 1]{.drill-kicker} Where would you cut?
+
+::: {.subtitle-frame}
+In pairs · 10 minutes · 41 hospitals, invented: beds, % emergency, stay, % over 75 · Ward, scaled
+:::
+
+| Groups | Cut holds between | Stretch | Group sizes |
+|---|---|---|---|
+| 2 | 9.6 and 12.1 | 2.5 | 34 · 7 |
+| 3 | 7.0 and 9.6 | 2.6 | 22 · 12 · 7 |
+| 4 | 4.1 and 7.0 | 2.9 | 16 · 12 · 7 · 6 |
+| 5 | 1.6 and 4.1 | 2.5 | 16 · 12 · 6 · 6 · 1 |
+
+1. Which cut holds over the longest stretch of height? Is it a clear winner?
+2. At five, the new group is the region's only children's hospital, which at four sat with six private clinics. To benchmark cost per admission, four or five? Defend it in one **sentence**.
+
+## [Drill 1 · answer]{.drill-kicker} The heights narrow it, the use decides
+
+- **Longest stretch**: four groups, 2.9 — but 2.5, 2.6 and 2.5 are close behind. No single long gap: the tree points to three to five groups, it does not choose
+- **The four groups**: 6 teaching (896 beds), 16 general district (61% emergency), 12 community (9.5-day stays, 54% over 75), and 7 with few emergencies (12%): six private clinics *and* the children's hospital
+- **Five** splits off the one hospital with no peer in the region. A group of one is not a peer group: benchmark it against children's hospitals elsewhere
+
+::: {.callout-tip title="A sentence that defends it"}
+"Four peer groups, and the children's hospital benchmarked on its own: four holds over the longest stretch, and next to six private clinics its cost per admission would measure its patients, not its management."
+:::
 
 ## [Section 2]{.section-kicker} Choosing and using {.section-slide background-color="#002f57"}
 
@@ -161,13 +193,40 @@ The application where this method earns its keep
 :::
 
 - Rows: admissions. Columns: length of stay, number of procedures, comorbidity count, ICU hours, cost
-- Scale, Ward, dendrogram. The tree typically shows a clear top split — *simple* vs *complex* stays — and then a fan of subgroups
-- Cut at the level clinicians recognise: they will tell you whether "four" or "seven" matches the wards they actually run
+- Scale, Ward, dendrogram: usually a clear top split, *simple* vs *complex* stays, then a fan of subgroups
+- Cut at the level clinicians recognise: they know whether "four" or "seven" matches the wards they run
 - The groups become **the units of cost accounting and benchmarking**. This is, in outline, how DRG systems were born.
 
 ::: {.callout-important title="Attention"}
-Cost dominates everything if you do not scale it. And a cluster with three patients is not a case-mix group; it is three outliers. Check group sizes before you name them.
+Unscaled, cost dominates everything. And a cluster of three patients is not a case-mix group: check sizes before you name them.
 :::
+
+## [Drill 2]{.drill-kicker} Name the case-mix groups
+
+::: {.subtitle-frame}
+In pairs · 10 minutes · 600 invented admissions · Ward, scaled, cut at 5 · means per group
+:::
+
+| Group | Stay (d) | Procedures | Comorbid. | ICU (h) | Cost (€) | Admissions |
+|---|---|---|---|---|---|---|
+| 1 | 2.9 | 0.9 | 0.8 | 2 | 2 900 | 366 |
+| 2 | 7.3 | 0.5 | 4.3 | 2 | 4 300 | 110 |
+| 3 | 8.0 | 3.8 | 1.5 | 22 | 14 000 | 95 |
+| 4 | 83.0 | 0.3 | 2.0 | 0 | 26 900 | 3 |
+| 5 | 21.5 | 5.0 | 4.1 | 148 | 49 500 | 26 |
+
+1. A **name** for each group that a ward manager would recognise
+2. Group 4: three patients, 83 days, almost nothing done. A case-mix group? What do you do?
+3. Which groups carry the cost? **One number** from the table
+
+## [Drill 2 · answer]{.drill-kicker} Four groups and a finding
+
+- **1 · short stays** (2.9 days, €2 900): day surgery and quick admissions, 61% of the work
+- **2 · older medical patients** (4.3 comorbidities, almost no procedures): a ward that needs geriatricians, not theatres
+- **3 · major surgery** (3.8 procedures, 22 ICU hours) and **5 · critical care** (148 ICU hours, €49 500): **20% of admissions, 62% of the spending**
+- **4 · not a group**: three patients kept 83 days with almost nothing done — most likely waiting for a care-home bed. Check the records and set them aside before naming; it is a discharge problem, not a tariff
+
+[Per the table: $95 \times 14\,000 + 26 \times 49\,500 = 2\,617\,000$ out of $4\,232\,100$ euro, from 121 of 600 admissions.]{.muted}
 
 ## The tree is not the answer. The cut is.  {.statement}
 
@@ -176,6 +235,7 @@ Cost dominates everything if you do not scale it. And a cluster with three patie
 ## Before the lab
 
 - Run today's block on `USArrests` with `ward.D2`, `complete` and `single`. Three trees. Which one chains?
+- Read the Ward heights as in Drill 1, `rev(hc$height)[1:6]`: where is the longest stretch with no merge?
 - Cut Ward at $k=4$ and compare `cutree()` with Tuesday's `kmeans(k = 4)` — `table(km$cluster, groups)`. How many states move?
 - Friday's lab does this on a real customer table, start to finish, and ends with segment names.
 

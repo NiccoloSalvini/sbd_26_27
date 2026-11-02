@@ -22,11 +22,11 @@ Lecture 16 · Decision trees · Mon 23 Nov
 | Time | | Min |
 |---|---|---|
 | 10:00 | Last time · Set 14, the [In class]{.gold} questions | 15' |
-| 10:15 | Many trees: bagging and random forests | 50' |
-| 11:05 | Boosting: learn from the mistakes, slowly | 25' |
-| 11:30 | [**Break**]{.gold} | [15']{.gold} |
-| 11:45 | Lab: churn, end to end | 65' |
-| 12:50 | Set 15 | 10' |
+| 10:15 | Many trees: bagging and random forests · **Drill 1** | 50' |
+| 11:05 | Boosting: learn from the mistakes, slowly · **Drill 2** | 35' |
+| 11:40 | [**Break**]{.gold} | [15']{.gold} |
+| 11:55 | Lab: churn, end to end · then the same pipeline in a hospital | 60' |
+| 12:55 | Set 15 | 5' |
 
 : {tbl-colwidths="[14,76,10]"}
 
@@ -35,19 +35,23 @@ Lecture 16 · Decision trees · Mon 23 Nov
 - Understand why averaging many bad trees gives one good model — and the one trick that makes it work
 - Tell **bagging**, **random forests** and **boosting** apart in a sentence each
 - Fit both, tune the two or three settings that matter, and read variable importance
-- Lab: a churn model end to end, with a test error you would sign
+- Lab: a churn model end to end, with a test error you would sign — and the same choice made for a hospital
 
 ## Why a manager cares
 
 ::: {.subtitle-frame}
-On a table of customers, this is the model that wins
+On a table of customers, or of patients, this is the model that usually wins
 :::
 
-- Churn, default, readmission, fraud, response to an offer: in a decade of competitions and deployments, on tabular data, **gradient-boosted trees** win or tie almost every time
-- Random forests are a close second, and need almost no tuning
-- The price is the tree's one virtue: you can no longer read the model
+| | Predict | So that |
+|---|---|---|
+| **Telecom** | who cancels next month | the retention calls reach the customers about to leave |
+| **Hospital** | who is readmitted within 30 days, who misses the appointment | the nurse's call, the reminder, the double booking reach the right patients |
 
-Today you learn to build the thing that wins. Week 7 is about living with what you cannot read.
+: {tbl-colwidths="[16,36,48]"}
+
+- On such tables **gradient-boosted trees** win or tie almost every time; random forests come close with almost no tuning
+- The price is the tree's one virtue: you can no longer read the model. Lecture 20 is about living with that
 
 ## [Section 1]{.section-kicker} Many trees {.section-slide background-color="#002f57"}
 
@@ -90,6 +94,34 @@ Bagging's trees look alike because they all grab the same strong variable at the
 $m = p$ *is* bagging. `ranger` and `randomForest` default to $\sqrt{p}$. It is the one setting worth touching; try $p/3$ and $\sqrt p$ and keep the better OOB error.
 :::
 
+## [Drill 1]{.drill-kicker} Monday's tree was one draw
+
+::: {.subtitle-frame}
+In pairs · 10 minutes · Monday's data: trained on `Pima.tr` (200 women), tested on `Pima.te` (332)
+:::
+
+| Model | First split | Test error |
+|---|---|---|
+| 10 bootstrap trees | `glu` 8 times, `npreg` once, `age` once | 23.2–38.0% |
+| Monday's tree, 4 leaves | `glu < 123.5` | 25.6% |
+| Bagging, 500 trees, $m = 7$ | — | 25.6% |
+| Random forest, 500 trees, $m = 2$ | — | 23.8% |
+
+: {tbl-colwidths="[34,44,22]"}
+
+1. Ten samples of the same women: how many first questions? What does that say about *the* tree?
+2. Tree 7 (root `age < 28.5`) scored 23.2%, better than the forest. Deploy it? One sentence.
+
+## [Drill 1 · answer]{.drill-kicker} Average the lottery
+
+- **Three variables at the root** in ten samples, `glu`'s cut moving from 111.5 to 144.5, test errors from 23.2% to 38.0%: a single tree is one draw from a wide lottery, and Monday's tree was one of them
+- **Averaging 500 draws** beats almost every draw: the forest is better than 9 of the 10 trees, and with five other seeds it stays between 23.5% and 25.0%
+- **Forest against bagging** is close here: with 7 variables, five seeds give 23.5–25.0% against 24.1–24.7%. The big gain is averaging at all
+
+::: {.callout-tip title="A sentence that defends it"}
+"No: I know tree 7 was the lucky one only because I looked at the test women; picked in advance, a single tree lands anywhere from 23% to 38%, the forest lands near 24% whatever the seed."
+:::
+
 ## [Section 2]{.section-kicker} Boosting {.section-slide background-color="#002f57"}
 
 ## Boosting: learn from the mistakes, slowly
@@ -101,10 +133,10 @@ Forests grow trees **in parallel**, each ignorant of the others. Boosting grows 
 3. Update: $\hat f \leftarrow \hat f + \lambda \hat f_b$, and $r \leftarrow r - \lambda \hat f_b$
 4. Repeat $B$ times
 
-Three knobs: **$B$** trees, **$\lambda$** the learning rate (0.01–0.1: small steps), and **$d$** the depth of each tree (1–4: stumps and near-stumps).
+Three knobs: **$B$** trees, **$\lambda$** the learning rate (0.01–0.1), **$d$** the depth of each tree (1–4).
 
 ::: {.callout-note}
-"Gradient" boosting: step 2 fits the tree to the *gradient of the loss* — for squared error, exactly the residual; for classification, the gradient of the log-loss. `xgboost` is this, with every engineering shortcut ever found.
+"Gradient" boosting fits each tree to the *gradient of the loss*: for squared error, the residual itself. `xgboost` is this, with every engineering shortcut ever found.
 :::
 
 ## Forest vs boosting, in one table
@@ -127,7 +159,7 @@ set.seed(1); tr <- sample(nrow(d), 7000)
 
 rf <- ranger(default ~ ., data = d[tr, ], num.trees = 500, importance = "impurity", probability = TRUE)
 
-rf$prediction.error                                   # OOB error, no test set needed
+rf$prediction.error                                   # OOB Brier score: an error without a test set
 sort(rf$variable.importance, decreasing = TRUE)       # which variables did the work
 
 pred <- predict(rf, d[-tr, ])$predictions[, "Yes"]   # probability of default, held-out rows
@@ -135,24 +167,49 @@ pred <- predict(rf, d[-tr, ])$predictions[, "Yes"]   # probability of default, h
 
 ## In R — boosting
 
-```{.r code-line-numbers="1|3-4|6-9|11"}
+```{.r code-line-numbers="1|3-5|7-8|10"}
 library(xgboost)
 
-X  <- model.matrix(default ~ . - 1, d)               # numeric matrix, no intercept
-y  <- as.numeric(d$default == "Yes")
+X   <- model.matrix(default ~ . - 1, d)              # numeric matrix, no intercept
+y   <- as.numeric(d$default == "Yes")
+dtr <- xgb.DMatrix(X[tr, ], label = y[tr])
 
-xgb <- xgboost(data = X[tr, ], label = y[tr],
-               nrounds = 300, eta = 0.05, max_depth = 3,
-               objective = "binary:logistic", verbose = 0)
+par <- list(objective = "binary:logistic", eta = 0.05, max_depth = 3)
+xgb <- xgb.train(params = par, data = dtr, nrounds = 300)
 
 p_xgb <- predict(xgb, X[-tr, ])
 ```
 
-Then the comparison that matters: forest vs boosting vs Monday's pruned tree vs a plain logistic regression, **on the same held-out rows**, with the same metric.
-
 ::: {.callout-important title="Attention"}
-`nrounds = 300` at `eta = 0.05` is a starting point, not an answer. Use `xgb.cv()` to pick `nrounds` by cross-validation; watch the test log-loss stop falling and start rising. That turning point is your model.
+`nrounds = 300` is a starting point: `xgb.cv(params = par, data = dtr, nrounds = 1000, nfold = 5)` finds the round where the test log-loss stops falling. Compare every model on the same held-out rows.
 :::
+
+## [Drill 2]{.drill-kicker} Which model invites the patients?
+
+::: {.subtitle-frame}
+In pairs · 10 minutes · trained on `Pima.tr`, scored on the same 332 women of `Pima.te` (109 diabetic) · cut at 0.5
+:::
+
+| Model | Accuracy | Invited | Diabetic caught | AUC |
+|---|---|---|---|---|
+| Logistic regression | 80.1% | 89 | 66 | 0.866 |
+| Monday's four-leaf tree | 74.4% | 82 | 53 | 0.728 |
+| Random forest, 500 trees | 78.0% | 94 | 65 | 0.830 |
+| Boosting, 60 rounds (`xgb.cv`) | 76.2% | 106 | 68 | 0.829 |
+
+1. Which model ranks the women best? Which is the most accurate?
+2. Every GP must be able to say why their patient was invited to the test. Which model do you deploy? Defend it in one sentence.
+
+## [Drill 2 · answer]{.drill-kicker} The baseline wins this one
+
+- **Logistic regression** is best on both: 80.1% accuracy, AUC 0.866. With 200 women and 7 measurements there is little left for trees to find that a straight line on the log-odds misses
+- **Forest and boosting** clearly beat Monday's tree (AUC 0.83 against 0.73), not the baseline. Boosting catches the most diabetic women, 68, by inviting the most, 106
+
+::: {.callout-tip title="A sentence that defends it"}
+"The logistic regression: it ranks the women best, and every GP can be told which measurements raised the patient's risk and by how much; the forest would cost that explanation and buy nothing."
+:::
+
+["Boosting wins on tabular data" is a claim about thousands of rows. On 200, the baseline nobody may skip is the model to beat — today's lab checks it on 7 000.]{.muted}
 
 ## [Section 3]{.section-kicker} Lab {.section-slide background-color="#002f57"}
 
@@ -164,11 +221,27 @@ Then the comparison that matters: forest vs boosting vs Monday's pruned tree vs 
 2. Logistic regression: the baseline nobody may skip
 3. Pruned tree — print it, read it
 4. Random forest, default $m$; then $m = p/3$
-5. `xgb.cv` to choose `nrounds`; then `xgboost`
+5. `xgb.cv` to choose `nrounds`; then `xgb.train`
 6. One table: model × {accuracy, AUC, log-loss} on the 30%
 7. `variable.importance` from the forest vs the top splits of the tree: do they agree?
 
 Deliverable: the table in step 6, and one paragraph on **which model you would deploy, and why the answer is not simply "the most accurate one"**.
+
+## The same pipeline, in a hospital
+
+::: {.subtitle-frame}
+The deliverable's second paragraph: a 30-day readmission model, built step by step like this one
+:::
+
+| | Telecom · churn | Hospital · readmitted within 30 days |
+|---|---|---|
+| A missed case costs | a customer, and the revenue | a patient back in a bed, often sicker |
+| A false alarm costs | a discount nobody needed | a nurse's phone call |
+| Who must understand the score | the retention team | the ward's doctors and nurses, and the patient |
+
+: {tbl-colwidths="[30,30,40]"}
+
+Same seven steps, same table of models. Would you deploy the same model, at the same 0.5 cut? Write the second paragraph: what changes, and why.
 
 ## Every tree in a forest is wrong. The forest is right because they are wrong in different ways.  {.statement}
 

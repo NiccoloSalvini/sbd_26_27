@@ -21,12 +21,12 @@ Lecture 15 · Correspondence analysis · Tue 17 Nov
 
 | Time | | Min |
 |---|---|---|
-| 17:00 | Last time · Set 13, the [In class]{.gold} questions | 15' |
-| 17:15 | Growing a tree: one split, by hand | 45' |
-| 18:00 | [**Break**]{.gold} | [10']{.gold} |
-| 18:10 | Too far, and back: pruning | 30' |
-| 18:40 | Reading the tree you printed | 10' |
-| 18:50 | Set 14 | 10' |
+| 17:00 | Last time · Set 13, the [In class]{.gold} questions | 10' |
+| 17:10 | Growing a tree: one split, by hand · **Drill 1** | 45' |
+| 17:55 | [**Break**]{.gold} | [10']{.gold} |
+| 18:05 | Too far, and back: pruning · **Drill 2** | 30' |
+| 18:35 | Reading the tree you printed · **Drill 3** | 20' |
+| 18:55 | Set 14 | 5' |
 
 : {tbl-colwidths="[14,76,10]"}
 
@@ -34,18 +34,24 @@ Lecture 15 · Correspondence analysis · Tue 17 Nov
 
 - Grow a tree by hand: one split, one impurity calculation, one decision
 - Understand why trees overfit on purpose, and how pruning fixes it
-- Read a fitted tree the way a manager can — because that is the point of them
+- Read a fitted tree the way a manager, or a clinician, can — because that is the point of them
 - Set up Friday: why one tree is weak and a hundred are strong
 
 ## Why a manager cares
 
 ::: {.subtitle-frame}
-The only model you can print on one page and hand to the credit committee
+The only model you can print on one page and hand to the people who must apply it
 :::
 
-- *If income < 30k and no prior account → decline. Else if age < 25 and balance > 800 → review.*
+| | One branch, read aloud | Who reads it, and argues |
+|---|---|---|
+| **Bank** | income < 30k and no prior account → *decline* | the credit committee, the regulator |
+| **Hospital** | heart failure, two admissions this year, lives alone → *nurse call within 48 h of discharge* | the ward's doctors and nurses, the quality office |
+
+: {tbl-colwidths="[16,52,32]"}
+
 - Every branch is a **rule**. Every leaf is a **decision**. No coefficients, no link functions.
-- Regulators, clinicians and sales managers can *read* a tree, disagree with a branch, and tell you which one
+- Triage protocols and clinical pathways were trees long before machine learning. Now the data grow them, and a clinician can still disagree with a branch, and say which one
 
 We are back to supervised learning. The $y$ is back. What changes is that the model is an **algorithm**, not an equation.
 
@@ -183,6 +189,36 @@ Weighted child impurity: $\tfrac{5}{10} \times 0.32 + \tfrac{5}{10} \times 0.32 
 
 **Gain: $0.50 - 0.32 = 0.18$.** Try `balance < 500` and get a gain of 0.02? Then tenure wins, the node splits on it, and the algorithm moves down to each child and starts again.
 
+## [Drill 1]{.drill-kicker} The first question of a screening tree
+
+::: {.subtitle-frame}
+In pairs · 10 minutes · `MASS::Pima.tr`: 200 women, 68 diabetic, Gini 0.449
+:::
+
+| First split | Women, each side | Diabetic, each side | Gain |
+|---|---|---|---|
+| `glu < 123.5` (blood glucose) | 109 · 91 | 14% · 58% | 0.098 |
+| `age < 28.5` | 104 · 96 | 15% · 54% | 0.075 |
+| `npreg < 6.5` (pregnancies) | 159 · 41 | 26% · 66% | 0.052 |
+| `bmi < 27.35` | 48 · 152 | 6% · 43% | 0.049 |
+
+: {tbl-colwidths="[34,22,24,20]"}
+
+1. Which split does `rpart` put at the root, and why?
+2. The outreach van has a scale and a questionnaire but no lab: no `glu`. Which split starts its tree?
+3. Is the van worth running? Tell the prevention manager in one sentence.
+
+## [Drill 1 · answer]{.drill-kicker} Without a lab, start from age
+
+- **Clinic**: `glu < 123.5`, the largest gain (0.098). Below it 14% are diabetic, above it 58%: the purest two groups any single question makes
+- **Van**: `age < 28.5`, gain 0.075; `rpart` run without `glu` picks the same. 15% against 54%: almost the separation the blood test gives, so the van does not replace the clinic, it decides who goes there
+
+::: {.callout-tip title="A sentence that defends it"}
+"Yes: without a blood test the van still splits the women into 15% and 54% diabetic, against 14% and 58% with one, so it screens on age and sends the women over 28 to the clinic for the glucose test."
+:::
+
+[Gain = 0.449 minus the Gini of the two sides, weighted. Without the lab the root loses 0.098 − 0.075 = 0.023 of its gain, about a quarter.]{.muted}
+
 ## [Section 2]{.section-kicker} Too far, and back {.section-slide background-color="#002f57"}
 
 ## A fully grown tree is a lookup table
@@ -229,14 +265,73 @@ rpart.plot(pruned)                              # the one-page model
 
 Then `predict(pruned, d[-tr, ], type = "class")` against `d$default[-tr]` — the confusion matrix — and you have a test error to report.
 
+## [Drill 2]{.drill-kicker} How much tree do the GPs get?
+
+::: {.subtitle-frame}
+In pairs · 10 minutes · `printcp(fit)` for Drill 1's women, after `set.seed(16)`, turned on its side
+:::
+
+| `nsplit` | 0 | 1 | 2 | 3 | 4 | 7 |
+|---|---|---|---|---|---|---|
+| `CP` | 0.221 | 0.162 | 0.074 | 0.059 | 0.015 | 0.010 |
+| `rel error` | 1.00 | 0.78 | 0.62 | 0.54 | 0.49 | 0.44 |
+| `xerror` | 1.00 | 0.96 | 0.75 | 0.72 | 0.65 | 0.71 |
+| `xstd` | 0.099 | 0.097 | 0.091 | 0.089 | 0.086 | 0.089 |
+
+1. Which tree has the lowest `xerror`? How many leaves? (leaves = `nsplit` + 1)
+2. The 1-SE rule: the smallest tree whose `xerror` is under the minimum plus its `xstd`. Which one?
+3. The district's GPs will apply the tree on paper, at the desk. Which one do you print for them, and why?
+
+## [Drill 2 · answer]{.drill-kicker} Four leaves, on paper
+
+- **Minimum**: `xerror` 0.65 at 4 splits, **five leaves**. The default tree, 7 splits, fits these 200 women better (`rel error` 0.44) and new women worse (`xerror` 0.71)
+- **1-SE**: 0.65 + 0.086 ≈ 0.74; the smallest tree under it has 3 splits, `xerror` 0.72: **four leaves**
+
+::: {.callout-tip title="A sentence that defends it"}
+"The four-leaf tree: its cross-validated error is within one standard error of the best, so the data cannot tell the two apart, and a GP applies four leaves without a computer."
+:::
+
+[`xerror` is relative to the root's error, 68/200 = 0.34: 0.65 × 0.34 = 22% of women misclassified in cross-validation, 0.72 × 0.34 = 24.5%.]{.muted}
+
+## [Section 3]{.section-kicker} Reading the tree {.section-slide background-color="#002f57"}
+
 ## Reading the tree you printed
 
-- **Top node**: the single most useful question in the data. On `Default`, it is `balance < 1800`. One variable, and most of the signal.
+- **Top node**: the single most useful question in the data. On `Default`, it is `balance < 1789`. One variable, and most of the signal.
 - Each node shows the predicted class, the class probability, and the share of data reaching it
 - A leaf with 2% of the data and a 51% probability is a leaf that should not exist — the pruning failed, or the `cp` was too small
 
 ::: {.callout-note}
-Notice what is *not* in the tree: `income`. It was available, and it never split. That is a finding, and it is free.
+Notice what is *not* in the tree: `student`. It was available, and no question about it ever beat one on `balance` or `income`. That is a finding, and it is free — about this tree, not yet about the world.
+:::
+
+## [Drill 3]{.drill-kicker} Read it to the clinic
+
+::: {.subtitle-frame}
+In pairs · 10 minutes · Drill 2's four-leaf tree, as `print()` gives it · `ped` is a family-history score
+:::
+
+| Leaf | Path | Women | Diabetic | Predicts |
+|---|---|---|---|---|
+| A | `glu < 123.5` | 109 | 15 · 14% | no |
+| B | `glu ≥ 123.5` · `ped < 0.3095` | 35 | 12 · 34% | no |
+| C | `glu ≥ 123.5` · `ped ≥ 0.3095` · `bmi < 28.65` | 11 | 3 · 27% | no |
+| D | `glu ≥ 123.5` · `ped ≥ 0.3095` · `bmi ≥ 28.65` | 45 | 38 · 84% | yes |
+
+: {tbl-colwidths="[8,52,12,16,12]"}
+
+1. Read leaf D aloud: one sentence a GP understands, with its numbers
+2. Leaf B predicts "no", yet 12 of its 35 women are diabetic. The district invites every "yes" to a confirmatory test. Do you invite B too?
+3. Age was the runner-up root in Drill 1 and is not in this tree. What do you tell the clinic about age?
+
+## [Drill 3 · answer]{.drill-kicker} The tree, the cut and the missing variable
+
+- **D**: "Glucose 124 or more, a family-history score of 0.31 or more and a BMI of 28.65 or more: 38 of these 45 women were diabetic."
+- **B**: invite them. The tree says "no" only because 34% is under 50%, and 0.5 is the software's default, not a clinical decision. On the 332 women of `MASS::Pima.te`, inviting B as well finds 67 diabetic women instead of 53: 28 more invitations, half of them to diabetic women
+- **Age** matters: in the full tree it splits the low-glucose women into 5% and 31% diabetic. Pruning removed it because both sides predict "no" — it changed no prediction
+
+::: {.callout-tip title="A sentence that defends it"}
+"Age is not needed by *this* tree, which is not the same as age not mattering: among women with glucose under 124, those over 28 are six times as often diabetic."
 :::
 
 ## Trees: the honest scorecard
@@ -256,7 +351,8 @@ The last two rows are one problem, and Friday's lecture is one answer: **many tr
 ## Before the lab
 
 - Run today's block. Prune at the 1-SE `cp` instead of the minimum. How many leaves do you lose? Does test error move?
-- Fit a tree on `customers.csv` with `segment` (from week 1) as the target. Which variable is at the top? Is that the variable *you* would have named the segments by?
+- Do you get Drill 2's table? `set.seed(16)`, then `rpart(type ~ ., data = MASS::Pima.tr, method = "class")` and `printcp()`
+- Fit a tree on `customers.csv` with the k-means segment you built in the lab on Fri 13 Nov as the target. Which variable is at the top? Is that the variable *you* would have named the segments by?
 - Bootstrap: `d[sample(nrow(d), replace = TRUE), ]` three times, three trees. Compare the top splits.
 
 ## Practice: Set 14

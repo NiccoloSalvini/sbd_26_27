@@ -14,7 +14,7 @@ Lecture 20 · Interpretability · Wed 9 Dec
 :::
 
 - More accuracy usually means less explanation — and someone pays for the difference
-- Global tools describe the model; local tools explain one customer. Neither proves cause
+- Global tools describe the model; local tools explain one patient. Neither proves cause, and neither shows which group the model shortchanges
 - **A model you cannot explain is a decision you cannot defend**
 
 ## Today
@@ -22,13 +22,13 @@ Lecture 20 · Interpretability · Wed 9 Dec
 | Time | | Min |
 |---|---|---|
 | 10:00 | Last time · Set 17, the [In class]{.gold} questions | 15' |
-| 10:15 | Dashboards | 30' |
-| 10:45 | Uncertainty | 25' |
-| 11:10 | Charts that lie | 20' |
-| 11:30 | [**Break**]{.gold} | [15']{.gold} |
-| 11:45 | The story | 25' |
-| 12:10 | Human and AI | 20' |
-| 12:30 | Closing · Set 18 · the exam | 30' |
+| 10:15 | Dashboards | 25' |
+| 10:40 | Uncertainty · **Drill 1** | 30' |
+| 11:10 | Charts that lie · **Drill 2** | 25' |
+| 11:35 | [**Break**]{.gold} | [15']{.gold} |
+| 11:50 | The story · **Drill 3** | 30' |
+| 12:20 | Human and AI | 15' |
+| 12:35 | Closing · Set 18 · the exam | 25' |
 
 : {tbl-colwidths="[14,76,10]"}
 
@@ -47,8 +47,14 @@ Lecture 20 · Interpretability · Wed 9 Dec
 The analysis that is not understood was not done
 :::
 
-- Every model in this course ends in a room where someone decides
-- That person has fifteen minutes, no R, and a different question from yours
+| | The room where it is decided | What they need from you |
+|---|---|---|
+| **Company** | the CFO, fifteen minutes before the budget | which customers, how many euro, how sure |
+| **Hospital, health authority** | the board monthly, the ward manager every morning | which patients, how many beds, how sure |
+
+: {tbl-colwidths="[24,40,36]"}
+
+- Every model in this course ends in that room, with someone who has no R and a different question from yours
 - The difference between an analysis that changes a decision and one that is filed is almost never the model. It is the last slide.
 
 Twelve lectures of methods. This one is about the last slide.
@@ -69,7 +75,7 @@ The typical failure is a dashboard with twenty panels and no decision — an ana
 
 ## The panel that works
 
-- **Title is the finding**, not the variable: *Churn risk is concentrated in month-to-month fibre customers*, not *Churn by contract type*
+- **Title is the finding**, not the variable: *Churn risk is concentrated in month-to-month fibre customers*, not *Churn by contract type*; *Beds block on Friday, when discharges stop*, not *Occupancy by weekday*
 - One comparison per chart. Two, if they are the point.
 - The number that matters, large; the context — last period, target, range — small and adjacent
 - Colour means one thing across the whole dashboard. Navy is *us*, grey is *everyone else*, one accent for *look here*.
@@ -79,7 +85,7 @@ The typical failure is a dashboard with twenty panels and no decision — an ana
 
 The model produces a probability per customer. The dashboard shows:
 
-- **Not** the probabilities. A ranked **list of the top 200 to contact**, with the two SHAP reasons per row
+- **Not** the probabilities. A ranked **list of the top 200 to contact** — for a care manager, the 50 patients to call this week — with the two SHAP reasons per row
 - The **lift**: *contacting these 200 reaches 4× the churners of a random 200*
 - **Model health**: accuracy on last month's outcomes, so the reader knows when to stop trusting it
 - **A date**: when it was retrained. A model is a perishable good.
@@ -88,15 +94,15 @@ The model produces a probability per customer. The dashboard shows:
 
 ## Show it, always — but show it as a decision aid
 
-A point forecast of *€1.42M next quarter* is a lie of precision. An interval of *€1.1M–€1.8M* is honest and, presented badly, paralysing.
+*€1.42M next quarter* is a lie of precision. *€1.1M–€1.8M* is honest and, presented badly, paralysing.
 
 - **Fan charts** for forecasts: darker where likely, lighter where possible. The eye reads the width as *how much to hedge*.
-- **Bands** on estimates, not error bars on bars — bars imply a floor; an interval has none
+- **Bands** on estimates, not error bars on bars
 - **Probability of the thing that matters**: not *the interval is 1.1–1.8*, but *there is a 20% chance we miss the €1.2M covenant*
 - **Scenarios** when the uncertainty is about the world, not the estimate: *if the competitor cuts prices…*
 
 ::: {.callout-important title="Attention"}
-An interval from a model is uncertainty *given the model is right*. It says nothing about the model being wrong. Say that, once, in words.
+An interval is uncertainty *given the model is right*. Say that, once, in words.
 :::
 
 ## How much uncertainty to show
@@ -109,6 +115,35 @@ An interval from a model is uncertainty *given the model is right*. It says noth
 | Public, patients | the risk in natural frequencies: *3 in 100*, never *3%* |
 
 The last row is not style. Natural frequencies are understood correctly by most people; percentages and relative risks are not, including by doctors.
+
+## [Drill 1]{.drill-kicker} Will we have enough beds?
+
+::: {.subtitle-frame}
+In pairs · 10 minutes · an invented hospital: ten winters' peak occupied beds, a linear trend, this winter's forecast
+:::
+
+| This winter's peak, medical beds | |
+|---|---|
+| Point forecast | 396 |
+| 80% prediction interval | 376 – 415 |
+| 95% prediction interval | 364 – 428 |
+| Probability the peak exceeds our 410 beds | 0.17 |
+
+1. The director general asks: *"Will we have enough beds this winter?"* Which row answers her, and in what words?
+2. A 20-bed surge ward needs staff from 1 January. Open it, or not? One sentence
+3. Name one thing that could push the peak higher and that none of these numbers include
+
+## [Drill 1 · answer]{.drill-kicker} The probability of the thing she fears
+
+- **The last row, as a frequency**: *in about one winter in six like the last ten we would run out of beds; in five we would not.* The point forecast alone says "yes"; the 95% interval alone says "we don't know"
+- **Prepare it, do not open it**: staff on call from January, and a trigger written down in advance — open when occupancy passes 400 beds
+- **A winter unlike the last ten**: a new flu strain, a COVID wave, a cold snap. The interval is uncertainty *given the trend holds* — say that once, in words
+
+::: {.callout-tip title="A sentence that defends it"}
+"We prepare the surge ward but open it only past 400 occupied beds: five winters in six we will not need it, and the sixth we will see coming."
+:::
+
+[`predict(lm(peak ~ winter), interval = "prediction")` on ten invented winters.]{.muted}
 
 ## [Section 3]{.section-kicker} Charts that lie {.section-slide background-color="#002f57"}
 
@@ -133,6 +168,37 @@ Each one is a legitimate technique in some context. The lie is in the mismatch b
 - Label the *n*
 - If a chart needs a paragraph to be read correctly, redraw it
 
+## [Drill 2]{.drill-kicker} The headline a health authority was sent
+
+::: {.subtitle-frame}
+In pairs · 10 minutes · `datasets::Seatbelts`: drivers killed per month, GB · belts compulsory from 31 Jan 1983
+:::
+
+The press release: **"Seat belt law: driver deaths down 61%"**
+
+| Comparison | Before | After | Change |
+|---|---|---|---|
+| Press release: Dec 1982 → Jul 1983 | 152 | 60 | −60.5% |
+| Feb–Dec, 1982 → 1983 | 1 357 | 1 078 | −20.6% |
+| Feb–Dec, 1981 → 1982, no new law | 1 235 | 1 357 | +9.9% |
+| Dec → Jul, average 1969–81, no law | | | −21.2% |
+
+: {tbl-colwidths="[52,14,14,20]"}
+
+1. Which of the six lies is the press release?
+2. Rewrite the headline so the health authority can print it
+3. Is the honest fall all the law's doing? What does row 3 warn you of?
+
+## [Drill 2 · answer]{.drill-kicker} Same months, and a control
+
+- **Cherry-picked window**: the worst month of 1982 against the best of 1983. Deaths fall from December to July every year, by a fifth on average, with no law at all
+- **The honest headline**: *driver deaths fell by a fifth in the eleven months after the law: 1 078, against 1 357 in the same months of 1982*
+- **Not all of it**: 1982 was a bad year, 9.9% above 1981, so part of the fall is a return to normal — against 1981 it is −12.7%. The law's signature is elsewhere: front-seat passengers, covered by the law, −31.3%; rear-seat passengers, not covered, −3.3%; kilometres driven +1.3%
+
+::: {.callout-tip title="A sentence that defends it"}
+"We print a fifth, not 61%: same months on both sides, and the rear seats the law did not cover barely moved."
+:::
+
 ## [Section 4]{.section-kicker} The story {.section-slide background-color="#002f57"}
 
 ## Structure that survives a fifteen-minute meeting
@@ -153,6 +219,33 @@ Fifteen minutes. Eight slides. If the decision-maker leaves after slide 1 they s
 > The model finds patterns, not causes: we will measure the offer's effect with a holdout of 200.
 
 That is the whole of Module 2, in four sentences a CFO can act on. Everything before today was so that the four sentences are *true*.
+
+## [Drill 3]{.drill-kicker} Rewrite the deck for the board
+
+::: {.subtitle-frame}
+In pairs · 10 minutes · the analyst's slides on Wednesday's Drill 3, in the analyst's order
+:::
+
+| The analyst's title | What the chart shows |
+|---|---|
+| 1 · Data sources and methods | 20 000 residents, two years of records |
+| 2 · Model accuracy | next year's cost predicted within 1% (city) and 5% (inner areas) |
+| 3 · Programme places by area | ranked on cost: city 893, inner areas 107 · on illness: 750, 250 |
+| 4 · Conditions of the patients selected | ranked on cost: 3.52 city, 4.44 inner areas |
+
+1. Which slide goes first?
+2. Rewrite titles 3 and 4 as findings, numbers included
+3. Write the four-line summary: decision, evidence, uncertainty, ask
+
+## [Drill 3 · answer]{.drill-kicker} The decision first
+
+- **None of the four goes first**: slide 1 is the decision, and the analyst never wrote it. Slide 1 of the analyst's deck goes to the appendix; slide 2 shrinks to one line
+- **3** · *Ranked on cost, inner areas get 107 of 1 000 places for a quarter of the residents* · **4** · *To get a place, an inner-area patient needs one chronic condition more*
+
+> Rank patients for the programme on predicted illness, not predicted cost, from the next intake.
+> On cost, inner-area residents — a quarter of the district, as ill as the city — got 107 of 1 000 places.
+> On illness they get 250; records are thinner where care is far, so we will check the split every six months.
+> We ask the board to approve the change and a twelve-month evaluation against a control group.
 
 ## [Section 5]{.section-kicker} Human and AI {.section-slide background-color="#002f57"}
 

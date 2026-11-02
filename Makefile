@@ -23,25 +23,23 @@ clean:
 	rm -rf _site .quarto
 
 ## render every manim scene at deck quality, remux moov-first, copy where the site serves them
-# lecture 11 ------------------------------------------------------------------
+# scenes.py holds the helpers, lecture 11 and the Module 1 lab; lectures 12, 14, 18
+# and 19 have a file each, which imports scenes.py. One group per file.
 SCENES_11 := Lloyd KmeansByHand ScaleBreaks ShapeBreaks ElbowLie
-# lecture 12 ------------------------------------------------------------------
-SCENES_12 := Dendrogram LinkageFour DendrogramRead
-# lecture 18 ------------------------------------------------------------------
-SCENES_18 := Boundary PerceptronByHand Perceptron GradientDescent Sigmoid HiddenLayer Overfitting
-# lecture 19 (the lab) ---------------------------------------------------------
-SCENES_19 := DataSplit ValidationCurve ModelRace DeepScale AutoencoderPCA
-SCENES_14 := Rotation PCAByHand ScreeChoice
-# the lab: Module 1 in R ------------------------------------------------------
 SCENES_LAB := TwoMeans LeastSquares LogitCurve ShrinkPath Decompose
-SCENES := $(SCENES_11) $(SCENES_12) $(SCENES_14) $(SCENES_18) $(SCENES_19) $(SCENES_LAB)
+SCENES_scenes := $(SCENES_11) $(SCENES_LAB)
+SCENES_scenes_12 := Dendrogram LinkageFour DendrogramRead
+SCENES_scenes_14 := Rotation PCAByHand ScreeChoice
+SCENES_scenes_18a := Boundary PerceptronByHand Perceptron GradientDescent
+SCENES_scenes_18b := Sigmoid HiddenLayer Overfitting
+SCENES_scenes_19 := DataSplit ValidationCurve ModelRace DeepScale AutoencoderPCA
+CLIP_FILES := scenes scenes_12 scenes_14 scenes_18a scenes_18b scenes_19
+MEDIA := $(HOME)/.cache/sbd-manim-media/videos
 clips:
-	cd animations && .venv/bin/manim -qm --disable_caching scenes.py $(SCENES)
 	mkdir -p lectures/media
-	for s in $(SCENES); do \
-	  ffmpeg -v error -y -i $(HOME)/.cache/sbd-manim-media/videos/scenes/720p30/$$s.mp4 -c copy -movflags +faststart lectures/media/$$s.mp4; \
-	done
+	$(foreach f,$(CLIP_FILES),(cd animations && .venv/bin/manim -qm --disable_caching $(f).py $(SCENES_$(f))) && \
+	  for s in $(SCENES_$(f)); do ffmpeg -v error -y -i $(MEDIA)/$(f)/720p30/$$s.mp4 -c copy -movflags +faststart lectures/media/$$s.mp4; done;)
 
 ## quick, low-quality render of every scene: for checking frames, not for the deck
 clips-preview:
-	cd animations && .venv/bin/manim -ql --disable_caching scenes.py $(SCENES)
+	$(foreach f,$(CLIP_FILES),(cd animations && .venv/bin/manim -ql --disable_caching $(f).py $(SCENES_$(f)));)
