@@ -157,8 +157,9 @@ scored type and creates only `Presentation` text blocks; reads come back as
 opaque `QuestionBlock` handles. So tests are authored in the Ultra UI or
 imported with Upload Questions, and the API does the rest: title, release date
 (`bb_release_by_date`), points after the upload (`bb_set_question_points`), and
-the gradebook side. Time limit, attempts and results-release settings are not
-exposed on any route.
+the gradebook side. Time limit, attempts and results release are not on the
+public API; Ultra's private API takes attempts and results release, which
+`bb_test_settings` writes (2 Nov 2026), and the time limit is read only.
 
 Writes are off by default; grade writes have a second switch of their own.
 
@@ -203,16 +204,19 @@ manifest's questions straight into the test, in order, at its points, through
 the Ultra interface's own API (a test is an assessment on the same route as a
 bank). `bb_assessment_questions` reads the test back to check it against the
 pool; the mock of 23 Oct 2026 went in this way and was verified question by
-question. **"In order" is not quite true**: the MCP posts every MC with
-`positionAfter: "start"` (each lands first) and a TF at the end, so a manifest
-of MCs comes out reversed. Until the MCP is fixed, fill from a manifest in
-reverse with the TF last (`private/set-10-fill.json`, 2 Nov 2026) and read the
-order back. Shuffle the answer options in the pool file too: Ultra keeps them
+question. Until 2 Nov 2026 the MCP posted every MC with `positionAfter:
+"start"`, so a manifest of MCs went in reversed; fixed by the MCP's PR 1
+(branch `impostazioni-test`, `bb_test_settings` with it; `private/set-10-fill.json` is the reversed workaround used
+for Set 10). Read the order back either way. Shuffle the answer options in the pool file too: Ultra keeps them
 as written, and a pool written correct-first gives the answer away. The
 practice-set tests (Set 10 onwards) are 1 point a question, MC and TF only:
 the Ultra route takes no numeric type, so a number to check is an MC whose
-distractors are the neighbouring results (the next k, a bad start). Attempts,
-feedback and when answers show are UI-only. The Upload Questions file is the fallback (then
+distractors are the neighbouring results (the next k, a bad start). Their
+settings go through `bb_test_settings(course, content_id, attempts=0,
+show_after_submission=[…], auto_post_grades=True)`: unlimited attempts,
+score and correct answers at submission, grades posted. Set 10 was set so on
+2 Nov 2026, and released with its folder `hw` by `bb_release_by_date` from
+Tue 3 Nov 12:00 Rome (11:00 UTC). The Upload Questions file is the fallback (then
 `bb_set_question_points` for the points). Every
 number in a key comes from `private/mock-exam-1-key.R`, run; a question whose
 answer moves with the seed says so in its key. The mock before each
