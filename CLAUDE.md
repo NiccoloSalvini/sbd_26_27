@@ -345,6 +345,11 @@ The lab deck `lectures/lab-module-1-in-r.qmd` ends with an appendix, one slide
 per mock question with the answer, generated from the pool and the Blackboard
 order; regenerate it rather than editing those slides by hand.
 
+**The rulebook for a Module 2 deck, its drills and its clips is the project
+skill `.claude/skills/sbd-lectures/`** (shape, drills, healthcare examples, clip
+rules and failure catalogue, the checks before a lecture, publishing). A rule
+learnt in a session goes there and in the matching line below.
+
 **Module 2 is twelve decks, `lectures/10-*.qmd` to `21-*.qmd`, one per row of
 the schedule**, all in this format; Module 1 (Prof. Arbia) is PDFs in `slides/`.
 Start a new deck from `10-opening.qmd`. Every deck follows one shape, and a
