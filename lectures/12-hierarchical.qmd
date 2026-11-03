@@ -73,9 +73,20 @@ Step 2 hides the whole subject. "Closest" between two *points* is obvious. "Clos
 
 ## Watch the tree get built
 
-{{< video media/Dendrogram.mp4 width="880" height="495" >}}
+:::: {.columns}
+::: {.column width="64%"}
+{{< video media/Dendrogram.mp4 width="740" height="416" >}}
+:::
+::: {.column width="36%"}
+**The data**: five patients, length of stay in days
 
-The five patients of the by-hand slide: merge the smallest distance, update the table, repeat. Heights 1, 1, 4, 9; cut at 5 gives two groups, at 2 three.
+$$2,\ 3,\ 6,\ 10,\ 11$$
+
+**The rule**: complete linkage. Two groups are as far apart as their *farthest* pair.
+:::
+::::
+
+Merge the smallest distance, update the table, repeat. Heights 1, 1, 4, 9; cut at 5 gives two groups, at 2 three.
 
 ## Linkage: the distance between two groups
 
@@ -90,9 +101,21 @@ Same data, four linkages, four different trees. **Ward** and **complete** are th
 
 ## Chaining, so you recognise it
 
-{{< video media/LinkageFour.mp4 width="880" height="495" >}}
+:::: {.columns}
+::: {.column width="64%"}
+{{< video media/LinkageFour.mp4 width="740" height="416" >}}
+:::
+::: {.column width="36%"}
+**The data**: 41 hospitals, size (beds) and case mix, scaled
 
-16 small hospitals, 16 large, 9 in between. Single linkage chains across them: **40 + 1** at $k = 2$, small and large apart only at $k = 8$. Complete, average, Ward: apart at $k = 2$.
+- 16 small, 16 large
+- 9 mid-sized, evenly spaced between them
+
+**The rule**: single linkage. Two groups are as close as their *nearest* pair.
+:::
+::::
+
+Single linkage chains across the mid-sized ones: **40 + 1** at $k = 2$, small and large apart only at $k = 8$. Complete, average, Ward: apart at $k = 2$.
 
 ## By hand: five patients, one variable
 
