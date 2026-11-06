@@ -284,7 +284,7 @@ The lab on Fri 13 Nov is clustering end to end, on a real customer table. Come h
 ## Practice: Set 10
 
 ::: {.subtitle-frame}
-[k-means and customer segmentation](../homework/10-kmeans.html) · about 40 minutes · before Mon 9 Nov
+[k-means and customer segmentation](../homework/10-kmeans.html) · about 40 minutes · before Mon 16 Nov
 :::
 
 1. **Do it** in your own script, with the seed the set gives you.

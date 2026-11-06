@@ -216,7 +216,14 @@ settings go through `bb_test_settings(course, content_id, attempts=0,
 show_after_submission=[…], auto_post_grades=True)`: unlimited attempts,
 score and correct answers at submission, grades posted. Set 10 was set so on
 2 Nov 2026, and released with its folder `hw` by `bb_release_by_date` from
-Tue 3 Nov 12:00 Rome (11:00 UTC). The Upload Questions file is the fallback (then
+Tue 3 Nov 12:00 Rome (11:00 UTC). Set 11 (6 Nov 2026) is on `swiss`, built into
+R, not `customers.csv`: nobody had opened that file yet (its lab is 13 Nov) and
+an exam can use only built-in data. Its test opens with a Presentation block
+(`bb_add_question`) holding the two lines to start from, so it stands without the
+site, and every question carries the pool's `why` as automatic feedback:
+`bb_test_fill(…, feedback=True)`, MCP PR 2. Sets 10 and 11 are due Mon 16 Nov
+23:59 Rome (`bb_update_gradebook_column`, `due`, set after `bb_test_settings`).
+The Upload Questions file is the fallback (then
 `bb_set_question_points` for the points). Every
 number in a key comes from `private/mock-exam-1-key.R`, run; a question whose
 answer moves with the seed says so in its key. The mock before each

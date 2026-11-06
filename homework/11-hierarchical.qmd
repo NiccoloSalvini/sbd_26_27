@@ -3,37 +3,62 @@ title: "Set 11 — hierarchical clustering"
 subtitle: "After lecture 12 · 9 November · about 35 minutes"
 ---
 
-Data: [`customers.csv`](../materials/customers.csv). Take a random sample of 300
-rows — a full dendrogram of 6 000 is unreadable, and that is itself part of the
-lesson:
+Data: `swiss`, built into R, so there is nothing to download. 47 French-speaking
+provinces of Switzerland around 1888: read them as 47 health districts. Six
+columns, all percentages or indices (`?swiss` has the details):
+
+| Column | What |
+|---|---|
+| `Fertility` | a standardised fertility index: higher, more births |
+| `Agriculture` | % of men working in farming |
+| `Examination`, `Education` | two measures of schooling among army draftees |
+| `Catholic` | % Catholic, as opposed to Protestant |
+| `Infant.Mortality` | % of live births who die within a year |
 
 ```r
-set.seed(11)
-s <- customers[sample(nrow(customers), 300), ]
+Z <- scale(swiss)   # very different spreads: scale first
+d <- dist(Z)
 ```
 
-The Blackboard test checks your numbers against this sample.
+The Blackboard test checks your numbers against these two lines and the code
+below.
 
 ## 1 · Four linkages, four trees
 
-Build the distance matrix on scaled columns, then cluster with `complete`,
-`average`, `single` and `ward.D2`. Plot the four dendrograms.
+Cluster `d` with `complete`, `average`, `single` and `ward.D2`, and plot the four
+dendrograms, for instance `plot(hclust(d, method = "single"))`. With 47
+provinces the names on the leaves are readable.
 
-One of them produces a long thin tree with points joining one at a time. Name
-it, and explain the mechanism that causes it.
+One of them produces a long thin tree, with provinces joining one at a time.
+Name it, and explain the mechanism that causes it. Cut it at `k = 4` with
+`cutree`: which provinces does it leave on their own, and what makes them odd?
 
 ## 2 · Cut, and compare
 
-Cut the Ward tree at `k = 4` with `cutree`. Cross-tabulate against k-means on
-the same 300 scaled rows: `set.seed(11)`, then `kmeans(scale(s[, 2:7]), 4,
-nstart = 25)`.
+Cut the Ward tree at `k = 3` and profile the groups, back in the original units:
 
-How many customers do the two methods place together? Where they disagree, is it
-a few points on a boundary or an entire segment split differently?
+```r
+hw <- hclust(d, method = "ward.D2")
+groups <- cutree(hw, k = 3)
+aggregate(swiss, list(group = groups), mean)   # one row per group
+```
+
+Name each group in a few words a health authority would understand. One column
+barely changes from one group to the next: which, and what does that mean for
+anyone hoping to use these groups to target infant mortality?
+
+Then cross-tabulate against k-means on the same scaled data: `set.seed(11)`,
+then `km <- kmeans(Z, 3, nstart = 25)`, then `table(groups, km$cluster)`. The
+labels are arbitrary, so match each Ward group with the k-means group it
+overlaps most. How many provinces do the two methods place together? Where they
+disagree, is it a few provinces on a boundary or an entire group split
+differently? Look the disagreeing provinces up in `swiss`: what do they have in
+common?
 
 ## 3 · The height axis means something
 
-On the Ward dendrogram, find the two largest jumps in merge height.
+On the Ward dendrogram, find the two largest jumps in merge height:
+`rev(hw$height)` lists the merges from the top of the tree down.
 
 What would cutting at each of them give you, and which cut would you defend?
 Why is a large jump evidence, and what is the argument it is *not* proof?
@@ -44,9 +69,9 @@ Why is a large jump evidence, and what is the argument it is *not* proof?
 
 Hierarchical clustering gives you a nested structure that k-means cannot.
 
-Describe one business question where the *nesting* is the answer — where
-knowing that segment A splits into A1 and A2 changes a decision — and one where
-the flat partition is all anybody needs.
+Describe one question, for a health authority or a business, where the
+*nesting* is the answer — where knowing that group A splits into A1 and A2
+changes a decision — and one where the flat partition is all anybody needs.
 
 ## Check yourself on Blackboard
 

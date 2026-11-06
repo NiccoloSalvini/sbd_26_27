@@ -265,7 +265,7 @@ In pairs · 10 minutes · 600 invented admissions · Ward, scaled, cut at 5 · m
 ## Practice: Set 11
 
 ::: {.subtitle-frame}
-[Hierarchical clustering](../homework/11-hierarchical.html) · about 40 minutes · before Fri 13 Nov
+[Hierarchical clustering](../homework/11-hierarchical.html) · about 40 minutes · before Mon 16 Nov
 :::
 
 1. **Do it** in your own script, with the seed the set gives you.
